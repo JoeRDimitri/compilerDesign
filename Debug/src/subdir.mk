@@ -4,13 +4,16 @@
 
 # Add inputs and outputs from these tool invocations to the build variables 
 CPP_SRCS += \
-../src/helloWorld.cpp 
+../src/lexor.cpp \
+../src/testor.cpp 
 
 CPP_DEPS += \
-./src/helloWorld.d 
+./src/lexor.d \
+./src/testor.d 
 
 OBJS += \
-./src/helloWorld.o 
+./src/lexor.o \
+./src/testor.o 
 
 
 # Each subdirectory must supply rules for building sources it contributes
@@ -25,7 +28,7 @@ src/%.o: ../src/%.cpp src/subdir.mk
 clean: clean-src
 
 clean-src:
-	-$(RM) ./src/helloWorld.d ./src/helloWorld.o
+	-$(RM) ./src/lexor.d ./src/lexor.o ./src/testor.d ./src/testor.o
 
 .PHONY: clean-src
 

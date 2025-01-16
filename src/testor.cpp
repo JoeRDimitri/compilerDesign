@@ -1,19 +1,14 @@
 #include "lexor.h"
+#include <filesystem> // C++17 and later
 #include <iostream>
-#include <unordered_map>
-#include <string>
-#include <iterator>
+
 
 int main (){
 
 	lexor* lex = new lexor();
-	std::unordered_map <std::string, std::string> um = lex->tokenMap;
-	auto map_iterator = um.begin();
-	while(map_iterator != um.end()){
-		std::cout<<"Dictionary key = "<<map_iterator->first<<". Dictonary value = "<<map_iterator->second<<"."<< std::endl;
-		map_iterator++;
-	}
-
+	std::cout << "Current working directory: " << std::filesystem::current_path() << std::endl;
+	lex->connectFile("./assignment1.COMP442-6421.paquet.2025.4/lexpositivegrading.src");
+	lex->disconnectFile();
 	delete lex;
 	return 0;
 }

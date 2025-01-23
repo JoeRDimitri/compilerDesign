@@ -78,7 +78,7 @@ public:
 	token();
 	token(std::string type, std::string lexeme, int line, int column);
 	//Destructor
-	~token();
+	~token(){};
 
 	//Getters
 	std::string getTypeName(){return this->typeName;};
@@ -109,8 +109,6 @@ private:
 	static const char letterArray[52];
 	//Array to hold Alphanum = letters + numbers
 	static const char alphanumArray[63];
-	//Array that holds the ascii code vallues of possible whitespaces
-	static const char whiteSpaceArray[];
 	//inputFileStream to read the file.
 	static std::ifstream inputFileStream;
 	//A boolean to check if this is the first time reading the txt file.
@@ -139,6 +137,7 @@ public:
 	lexor(){};
 	//Destructor
 	~lexor(){};
+	//Overall flow control. Returns the next token in input file.
 	token* getNextToken();
 
 

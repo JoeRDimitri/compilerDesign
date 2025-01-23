@@ -7,8 +7,12 @@ int main (){
 
 	lexor* lex = new lexor();
 	std::cout << "Current working directory: " << std::filesystem::current_path() << std::endl;
-	lex->connectFile("./assignment1.COMP442-6421.paquet.2025.4/lexpositivegrading.src");
-	lex->disconnectFile();
+	try{
+		lex->getNextToken();
+	}
+	catch (const std::exception& e) {
+	        std::cerr << "Caught exception: " << e.what() << std::endl;
+	    }
 	delete lex;
 	return 0;
 }

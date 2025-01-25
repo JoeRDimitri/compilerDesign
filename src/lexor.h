@@ -78,10 +78,6 @@ public:
 	std::vector <std::string> splitString(const std::string& str, char delimiter);
 };
 
-
-
-
-
 //A token is defined as a data structure that has a lexeme, a type, and a location (line + column)
 
 class token{
@@ -98,7 +94,7 @@ private:
 
 public:
 	//Constructor
-	token();
+	token(){};
 	token(std::string type, std::string lexeme, int line, int column);
 	//Destructor
 	~token(){};
@@ -122,8 +118,8 @@ std::ostream& operator<<(std::ostream& os, token& t);
 
 //Lexor class
 class lexor{
-private:
 
+private:
 	//Token map will be initialized with the buildTokenMap function.
 	//Will contain all of the mappings between the lexeme and the type. Except for intnum, floatnum, id, blockcmt since they need a more complex analysis.
 	static const std::unordered_map<std::string,std::string> tokenMap;
@@ -149,7 +145,6 @@ private:
 	static errorHandler handler;
 
 
-
 	//Function to establish connection to the file to read.
 	static bool connectFile(std::string);
 	//Function to cut the connection to the file to read.
@@ -171,9 +166,15 @@ private:
 	void setPossibleType();
 	//function that updates the string and advance the pointer
 	void addAndMove();
+	//Function to handle error
+	token* errorProtocol(std::string type);
+	//Function returns a valid token
+	token* validToken(std::string type);
 
 	token* id();
 	token* num();
+	token* fraction();
+	token* flt();
 	token* res();
 	token* cmt();
 	token* invalidChar();

@@ -145,6 +145,7 @@ bool lexor::isReservedWord(std::string s){
 
 bool lexor::isReservedWord(){
 	std::string charAsString {currentCharacter};
+	std::cout<<tokenMap.count(charAsString)<<std::endl;
 	if(tokenMap.count(charAsString)>0||currentCharacter == '=') return true;
 	else return false;
 }
@@ -180,23 +181,59 @@ void lexor::addAndMove(){
 	column++;
 }
 
-token* lexor::id(){
-	//lexeme is still empty at this point
-	//Invalid Id case
-	if(currentCharacter == '_'){
-		while(!isWhiteSpace())addAndMove();
-		std::string tempLexeme = currentLexeme;
-		currentLexeme = "";
+token* lexor::errorProtocol(std::string type){
+
+	while(!isWhiteSpace()&&!isReservedWord()&&currentCharacter != '=')addAndMove();
+	std::string tempLexeme = currentLexeme;
+	currentLexeme = "";
+
+	if(type.compare("id")==0){
 		handler.handleError("Lexical error", "Invalid Identifier",tempLexeme, line, column);
 		return new token("invalidid",tempLexeme,line,column);
 	}
+	else if(type.compare("intnum")==0){
+		handler.handleError("Lexical error", "Invalid Number",tempLexeme, line, column);
+		return new token("invalidnum",tempLexeme,line,column);
+	}
+	else if(type.compare("frac")==0){
+		handler.handleError("Lexical error", "Invalid Number",tempLexeme, line, column);
+		return new token("invalidnum",tempLexeme,line,column);
+	}
+}
+
+token* lexor::validToken(std::string type){
+
+	std::string tempLexeme = currentLexeme;
+	currentLexeme = "";
+
+	if(type.compare("id")==0){
+		if(isReservedWord(tempLexeme)) return new token(tokenMap.at(tempLexeme),tempLexeme,line,column);
+		else return new token("id",tempLexeme,line,column);
+	}
+	else if (type.compare("intnum")==0){
+		return new token("intnum",tempLexeme,line,column);
+	}
+	else if (type.compare("frac")==0){
+		return new token("floatnum",tempLexeme,line,column);
+	}
+	else if(type.compare("res")==0){
+		std::string value = tokenMap.at(tempLexeme);
+		return new token(value,tempLexeme,line,column);
+	}
+}
+
+token* lexor::id(){
+
+	//lexeme is still empty at this point
+	//Invalid Id case
+	if(currentCharacter == '_'){return errorProtocol("id");}
+
 	//We add our first character
 	addAndMove();
 
 	//While the current character is an alpha numeric value keep adding this to the current lexeme.
-	while(isInArray(alphanumArray,63)){
-		addAndMove();
-	}
+	while(isInArray(alphanumArray,63)){addAndMove();}
+
 	/*There are numerous resons why we might be here.
 	 * 1. We might've reached a whitespace. In that case we can simply return from this function since we have found a proper lexeme
 	 * 2. We might've reached a special character, in that case we can simply return from thins functino since we have found a proper lexeme
@@ -204,36 +241,133 @@ token* lexor::id(){
 
 	if(isWhiteSpace()){}
 	else if(isReservedWord()){}
-	else{
-		while(!isWhiteSpace())addAndMove();
-	}
-
-	std::string tempLexeme = currentLexeme;
-	currentLexeme = "";
-	if(isReservedWord(tempLexeme)) return new token(tokenMap.at(tempLexeme),tempLexeme,line,column);
-	else return new token("id",tempLexeme,line,column);
-
-
+	else{return errorProtocol("id");}
+	return validToken("id");
 }
 
 token* lexor::num(){
+
 	//lexeme is still empty at this point
 	//Check if it is 0
 	if(currentCharacter == '0'){
 		//We add our first character
 		addAndMove();
+
 		/*We need to make sure that the next character is either:
 		 *1. A white space. in which case we are done successfully
 		 *2. a '.' in which case we go to the float function.
 		 *3. anything else is an invalid num
 		 */
+		if(currentCharacter =='.')return fraction();
+
+		else if(isWhiteSpace()||isReservedWord()){return validToken("intnum");}
+
+		else{return errorProtocol("intnum");}
+	}
+	//Check if its nonzero
+	else if(isInArray(nonZeroArray,9)){
+		addAndMove();
+
+		while(isInArray(intArray,10)){addAndMove();}
+
+		/*
+		 * At this point there are cases we need to consider
+		 * 1. White space
+		 * 2. anything else is an error
+		 */
+		if(currentCharacter =='.')return fraction();
+
+		if(isWhiteSpace()||isReservedWord()){return validToken("intnum");}
+
+		else{return errorProtocol("intnum");}
+
+
 	}
 
-
+	std::cout<<"CODE SHOULD NOT REACH HERE :: TOKEN* LEXOR::NUM()\n returning an empty token.";
+	return new token();
 
 }
 
-token* lexor::res(){}
+token* lexor::fraction(){
+	//Double check that the currentCharacter == '.'
+	if(currentCharacter == '.'){addAndMove();}
+	else{
+		std::cout<<"INCORRECT CHARACTER, EXPECTED '.' in FRACTION() \n RETURN EMPTY TOKEN";
+		return new token();
+	}
+
+	//Continuing after confirming'.'
+	if(isInArray(intArray,10)){
+		//a digit was confirmed so we move on
+		//We keep adding digits
+		//When we've reached the end of the lexeme we need to check the final digit.
+		while(isInArray(intArray,10)){addAndMove();}
+		//Need to verify the last character of the lexeme is not a 0
+		if(currentLexeme.back() == '0'){return errorProtocol("frac");}
+
+		else if(currentCharacter == 'e')flt();
+		//If we reach a white space or a reserve word we've reached the end of the lexeme
+		else if(isWhiteSpace()||isReservedWord()){return validToken("frac");}
+		else{return errorProtocol("frac");}
+	}
+	//Anything that is not a number is an error.
+	return errorProtocol("frac");
+}
+
+token* lexor::flt(){
+	//Double check currentCharacter == 'e'
+	if(currentCharacter == 'e'){addAndMove();}
+	else{
+		std::cout<<"INCORRECT CHARACTER, EXPECTED 'e' in FLT()\n RETURN EMPTY TOKEN";
+		return new token();
+	}
+	//Continuing after confirming'e'
+	/*
+	 *There are a few cases that we need to consider
+	 *1. we have a 0 after the e
+	 *2. we have a nonzero number after the e
+	 *3. we have a +/- after e
+	 */
+	//If we habe a digit just use num () to verify
+	if(isInArray(intArray,10)){
+		token* t = num();
+		t->setTypeName("floatnum");
+		return t ;
+	}
+
+	//If we have a + or a - we add it to the lexeme and then use num() to verify
+	else if(currentCharacter == '+' || currentCharacter == '-'){
+		addAndMove();
+		if(isInArray(intArray,10)){
+			token* t = num();
+			t->setTypeName("floatnum");
+			return t ;
+		}
+	}
+
+	//If we have anything else we have an error.
+	return errorProtocol("frac");
+}
+
+token* lexor::res(){
+	std::string charAsString1 {currentCharacter};
+	//confirming the decision
+	if(tokenMap.count(charAsString1)>0||currentCharacter == '='){addAndMove();}
+	else{
+		std::cout<<"INCORRECT CHARACTER, EXPECTED a map item in RES()\n RETURN EMPTY TOKEN";
+		return new token();
+	}
+	std::string charAsString2 = charAsString1 + currentCharacter;
+
+	if(tokenMap.count(charAsString2)>0){
+		addAndMove();
+	}
+
+	else{}
+
+	return validToken("res");
+}
 
 token* lexor::cmt(){}
 
@@ -307,7 +441,7 @@ void errorHandler::handleError(const std::string& errorType,const std::string & 
     std::ofstream file(fileName, std::ios::app);
 
     // Write content to the file
-    file << errorType << ":"<<invalidType<<"\""<<lexeme<<"\""<<": line "<<line<<": column "<<column<<std::endl;
+    file << errorType << ": "<<invalidType<<"\": "<<lexeme<<"\""<<": line "<<line<<": column "<<column<<std::endl;
 
     // Close the file
     file.close();

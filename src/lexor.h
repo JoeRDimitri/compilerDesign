@@ -4,6 +4,7 @@
 #include <string>
 #include <unordered_map>
 #include <fstream>
+#include <vector>
 #include <stdexcept> // For standard exceptions
 
 //ENUM that lists all of the possible types that a token can be.
@@ -60,6 +61,28 @@ enum type{
 	BLOCKCMT
 };
 
+//The error handler handles the errors
+class errorHandler{
+private:
+
+public:
+	static std::string fileName;
+
+	errorHandler(){};
+	errorHandler(std::string filename){fileName = filename;};
+
+	void setFileName(std::string s);
+
+	void handleError(const std::string & errorType,const std::string & invalidType,const std::string & lexeme, const int & line, const int & column);
+
+	std::vector <std::string> splitString(const std::string& str, char delimiter);
+};
+
+
+
+
+
+//A token is defined as a data structure that has a lexeme, a type, and a location (line + column)
 
 class token{
 private:
@@ -91,8 +114,11 @@ public:
 	void setLexeme(const std::string s){this->lexeme = s;};
 	void setLine(const int i){this->line = i;};
 	void setColumn(const int i){this->column = i;};
+
+
 };
 
+std::ostream& operator<<(std::ostream& os, token& t);
 
 //Lexor class
 class lexor{
@@ -106,7 +132,7 @@ private:
 	//non Zero Array will hold the string of each int from 1 to 9 (excluding 0)
 	static const char nonZeroArray [9];
 	//Array to hold all possible letters
-	static const char letterArray[52];
+	static const char letterArray[53];
 	//Array to hold Alphanum = letters + numbers
 	static const char alphanumArray[63];
 	//inputFileStream to read the file.
@@ -117,6 +143,10 @@ private:
 	static int line;
 	static int column;
 	static char currentCharacter;
+	static std::string currentLexeme;
+	static std::string possibleType;
+	static token currentToken;
+	static errorHandler handler;
 
 
 
@@ -126,11 +156,28 @@ private:
 	static bool disconnectFile();
 	//Function to check if the lexeme is a reserved word by looking into tokenMap.
 	//Returns true if reserved word is found and false if none are found.
-	bool isReservedWord(std::string lexeme,std::string &);
+	bool isReservedWord(std::string lexeme);
 	//Function that moves the input stream forward if it reads white space. white space values are 9-10-11-12-13-32
 	void getRidOfWhiteSpace();
+	//checks if current character is whitespace
+	bool isWhiteSpace();
 	//Function that runs the first time that we read from a text file. This should only be called a single time in the entire program.
 	bool virginProtocol();
+	//Given a an array, this function will check that array to compare it to the currentCharacter
+	bool isInArray(const char * c, int n);
+	//check dictionnary
+	bool isReservedWord();
+	//Sets the possible type to determine what the type of the lexeme is.
+	void setPossibleType();
+	//function that updates the string and advance the pointer
+	void addAndMove();
+
+	token* id();
+	token* num();
+	token* res();
+	token* cmt();
+	token* invalidChar();
+
 
 public:
 	//Constructor
@@ -142,9 +189,7 @@ public:
 
 
 
+
 };
-
-//A token is defined as a data structure that has a lexeme, a type, and a location (line + column)
-
 
 #endif

@@ -245,7 +245,7 @@ token* lexor::id(){
 	return validToken("id");
 }
 
-token* lexor::num(){
+token* lexor::num(int decision){
 
 	//lexeme is still empty at this point
 	//Check if it is 0
@@ -258,9 +258,10 @@ token* lexor::num(){
 		 *2. a '.' in which case we go to the float function.
 		 *3. anything else is an invalid num
 		 */
-		if(currentCharacter =='.')return fraction();
-
-		else if(isWhiteSpace()||isReservedWord()){return validToken("intnum");}
+		if(decision == 0){
+			if(currentCharacter =='.')return fraction();
+		}
+		if(isWhiteSpace()||isReservedWord()){return validToken("intnum");}
 
 		else{return errorProtocol("intnum");}
 	}
@@ -275,8 +276,9 @@ token* lexor::num(){
 		 * 1. White space
 		 * 2. anything else is an error
 		 */
+		if(decision == 0){
 		if(currentCharacter =='.')return fraction();
-
+		}
 		if(isWhiteSpace()||isReservedWord()){return validToken("intnum");}
 
 		else{return errorProtocol("intnum");}
@@ -306,7 +308,7 @@ token* lexor::fraction(){
 		//Need to verify the last character of the lexeme is not a 0
 		if(currentLexeme.back() == '0'){return errorProtocol("frac");}
 
-		else if(currentCharacter == 'e')flt();
+		else if(currentCharacter == 'e')return flt();
 		//If we reach a white space or a reserve word we've reached the end of the lexeme
 		else if(isWhiteSpace()||isReservedWord()){return validToken("frac");}
 		else{return errorProtocol("frac");}
@@ -331,7 +333,7 @@ token* lexor::flt(){
 	 */
 	//If we habe a digit just use num () to verify
 	if(isInArray(intArray,10)){
-		token* t = num();
+		token* t = num(1);
 		t->setTypeName("floatnum");
 		return t ;
 	}
@@ -340,7 +342,7 @@ token* lexor::flt(){
 	else if(currentCharacter == '+' || currentCharacter == '-'){
 		addAndMove();
 		if(isInArray(intArray,10)){
-			token* t = num();
+			token* t = num(1);
 			t->setTypeName("floatnum");
 			return t ;
 		}
@@ -358,8 +360,16 @@ token* lexor::res(){
 		std::cout<<"INCORRECT CHARACTER, EXPECTED a map item in RES()\n RETURN EMPTY TOKEN";
 		return new token();
 	}
+	//Check if it is possibly a comment
+	if(charAsString1.compare("/")){
+		addAndMove();
+		//Could be a comment but need to confirm
+		std::string charAsString2 = charAsString1 + currentCharacter;
+		if(charAsString2.compare("//")||charAsString2.compare("/*")){cmt();}
+	}
+	//Continue natural flow
 	std::string charAsString2 = charAsString1 + currentCharacter;
-
+	//
 	if(tokenMap.count(charAsString2)>0){
 		addAndMove();
 	}
@@ -369,7 +379,9 @@ token* lexor::res(){
 	return validToken("res");
 }
 
-token* lexor::cmt(){}
+token* lexor::cmt(){
+
+}
 
 token* lexor::invalidChar(){}
 
@@ -400,7 +412,7 @@ token* lexor:: getNextToken(){
 
 	//Check what the currentCharacter and go into the corresponding function
 	if(possibleType == "id")return id();
-	else if(possibleType == "num")return num();
+	else if(possibleType == "num")return num(0);
 	else if(possibleType == "res")return res();
 	else if(possibleType =="cmt")return cmt();
 	else return invalidChar();

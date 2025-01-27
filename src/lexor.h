@@ -172,7 +172,7 @@ private:
 	token* validToken(std::string type);
 
 	token* id();
-	token* num();
+	token* num(int decision);
 	token* fraction();
 	token* flt();
 	token* res();

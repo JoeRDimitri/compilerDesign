@@ -7,7 +7,7 @@ int main (){
 
 	lexor* lex = new lexor();
 	std::cout << "Current working directory: " << std::filesystem::current_path() << std::endl;
-	for (int k = 0;k<75;k++){
+	for (int k = 0;k<2;k++){
 	try{
 		token * t = lex->getNextToken();
 		std::cout<<(*t)<<std::endl;

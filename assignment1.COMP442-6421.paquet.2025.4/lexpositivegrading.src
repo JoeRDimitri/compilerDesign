@@ -1,6 +1,3 @@
-120.34e10	
-12345.6789e-123	
-
 ==	+	or	(	;	int 		while	local
 <>	-	and	)	,	float		if	constructor
 <	*	not	{	.	void		then	attribute
@@ -22,7 +19,8 @@
 	
 1.23	
 12.34	
-
+120.34e10	
+12345.6789e-123	
 
 abc 	
 abc1

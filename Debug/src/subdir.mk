@@ -4,16 +4,16 @@
 
 # Add inputs and outputs from these tool invocations to the build variables 
 CPP_SRCS += \
-../src/lexor.cpp \
-../src/testor.cpp 
+../src/Driver.cpp \
+../src/lexor.cpp 
 
 CPP_DEPS += \
-./src/lexor.d \
-./src/testor.d 
+./src/Driver.d \
+./src/lexor.d 
 
 OBJS += \
-./src/lexor.o \
-./src/testor.o 
+./src/Driver.o \
+./src/lexor.o 
 
 
 # Each subdirectory must supply rules for building sources it contributes
@@ -28,7 +28,7 @@ src/%.o: ../src/%.cpp src/subdir.mk
 clean: clean-src
 
 clean-src:
-	-$(RM) ./src/lexor.d ./src/lexor.o ./src/testor.d ./src/testor.o
+	-$(RM) ./src/Driver.d ./src/Driver.o ./src/lexor.d ./src/lexor.o
 
 .PHONY: clean-src
 

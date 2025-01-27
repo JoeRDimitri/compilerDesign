@@ -65,7 +65,9 @@ int lexor::column = 0;
 char lexor::currentCharacter;
 std::string lexor::currentLexeme;
 std::string lexor::possibleType;
-std::string errorHandler::fileName;
+std::string errorHandler::errorFileName;
+std::string errorHandler::tokenFileName;
+
 errorHandler lexor:: handler;
 
 
@@ -169,6 +171,8 @@ bool lexor::virginProtocol(){
 	{
 		handler.setFileName(fileLocation);
 
+
+
 		//We've properly connected to the file now we need to get rid of the white space and then hand control back over getNextToken().
 		return true;
 	}
@@ -176,7 +180,9 @@ bool lexor::virginProtocol(){
 }
 
 void lexor::addAndMove(){
-	currentLexeme+=currentCharacter;
+	if(currentCharacter=='\r'){currentLexeme += "\\n";line++;}
+	else if(currentCharacter == '\n');
+	else currentLexeme+=currentCharacter;
 	currentCharacter = inputFileStream.get();
 	column++;
 }
@@ -207,20 +213,54 @@ token* lexor::validToken(std::string type){
 	currentLexeme = "";
 
 	if(type.compare("id")==0){
-		if(isReservedWord(tempLexeme)) return new token(tokenMap.at(tempLexeme),tempLexeme,line,column);
-		else return new token("id",tempLexeme,line,column);
+		if(isReservedWord(tempLexeme)) {
+			token* t = new token(tokenMap.at(tempLexeme),tempLexeme,line,column);
+			handler.writeToken(t);
+			return t;
+		}
+		else{
+			token* t = new token("id",tempLexeme,line,column);
+			handler.writeToken(t);
+			return t;
+		}
 	}
 	else if (type.compare("intnum")==0){
-		return new token("intnum",tempLexeme,line,column);
+		token* t = new token("intnum",tempLexeme,line,column);
+		handler.writeToken(t);
+		return t;
 	}
 	else if (type.compare("frac")==0){
-		return new token("floatnum",tempLexeme,line,column);
+		token* t = new token("floatnum",tempLexeme,line,column);
+		handler.writeToken(t);
+		return t;
 	}
 	else if(type.compare("res")==0){
 		std::string value = tokenMap.at(tempLexeme);
-		return new token(value,tempLexeme,line,column);
+		token* t =  new token(value,tempLexeme,line,column);
+		handler.writeToken(t);
+		return t;
+	}
+	else if(type.compare("linecomment")==0){
+		getLine(tempLexeme);
+		token* t = new token("linecomment",tempLexeme,line, column);
+		handler.writeToken(t);
+		return t;
+	}
+
+	else if(type.compare("blockcomment")==0){
+		token* t = new token("blockcmt",tempLexeme,line,column);
+		handler.writeToken(t);
+		return t;
 	}
 }
+
+void lexor::getLine(std::string &tempLexeme){
+	while(currentCharacter != '\r' && currentCharacter!='\n'&&!inputFileStream.eof()){
+		addAndMove();
+	}
+	line++;
+}
+
 
 token* lexor::id(){
 
@@ -361,11 +401,13 @@ token* lexor::res(){
 		return new token();
 	}
 	//Check if it is possibly a comment
-	if(charAsString1.compare("/")){
-		addAndMove();
+	if(charAsString1.compare("/")==0){
 		//Could be a comment but need to confirm
 		std::string charAsString2 = charAsString1 + currentCharacter;
-		if(charAsString2.compare("//")||charAsString2.compare("/*")){cmt();}
+		if(charAsString2.compare("//")==0||charAsString2.compare("/*")==0){
+			addAndMove();
+			return cmt();
+		}
 	}
 	//Continue natural flow
 	std::string charAsString2 = charAsString1 + currentCharacter;
@@ -380,7 +422,52 @@ token* lexor::res(){
 }
 
 token* lexor::cmt(){
+	if(currentLexeme.compare("//")==0){
+		return validToken("linecomment");
+	}
+	else if(currentLexeme.compare("/*")==0){
+		std::stack<int> commentStackCounter;
+		commentStackCounter.push(0);
 
+		while(true){
+			if(commentStackCounter.empty())return validToken("blockcomment");
+
+			if(inputFileStream.eof())
+				return errorProtocol("eof");
+
+			while(currentCharacter != '*'&&currentCharacter != '/'&&!inputFileStream.eof()){
+				addAndMove();
+			}
+			if(inputFileStream.eof())
+				continue;
+			else if(currentCharacter == '*'){
+				addAndMove();
+				if(currentCharacter == '/'){
+					addAndMove();
+					commentStackCounter.pop();
+					continue;
+				}
+				continue;
+			}
+			else if(currentCharacter == '/'){
+				addAndMove();
+				if(currentCharacter == '*'){
+					addAndMove();
+					commentStackCounter.push(0);
+					continue;
+					}
+			}
+
+			else{
+				addAndMove();
+				continue;
+			}
+		}
+	}
+
+	else{
+		std::cout<<"ERROR THE CODE SHOULD NOT REACH HERE, END OF CMT() FUNCTION"<<std::endl;
+	}
 }
 
 token* lexor::invalidChar(){}
@@ -424,6 +511,11 @@ token::token(std::string type, std::string lexeme, int line, int column){
 	this->line = line;
 	this->column = column;
 }
+void errorHandler::writeToken(token* t){
+    std::ofstream file(tokenFileName, std::ios::app);
+    file<<(*t);
+    file.close();
+}
 
 std::vector<std::string> errorHandler:: splitString(const std::string& str, char delimiter) {
     std::vector<std::string> result;
@@ -443,14 +535,22 @@ std::vector<std::string> errorHandler:: splitString(const std::string& str, char
 void errorHandler::setFileName(std::string s){
 	std::vector<std::string> result = splitString(s,'/');
 	std::string filenamewithperiod = result.back();
-	std::string filename = filenamewithperiod.substr(0,filenamewithperiod.find("."));
-	fileName = filename+".outlexerrors";
+	std::string tokenfilename = filenamewithperiod.substr(0,filenamewithperiod.find("."));
+	std::string errorfilename = filenamewithperiod.substr(0,filenamewithperiod.find("."));
+	errorFileName = errorfilename+".outlexerrors";
+	tokenFileName = tokenfilename+".outlextokens";
+    std::ofstream file(errorFileName, std::ios::app);
+    file.close();
+    std::ofstream file2(tokenFileName, std::ios::app);
+    file2.close();
+
+
 }
 
 void errorHandler::handleError(const std::string& errorType,const std::string & invalidType, const std::string& lexeme, const int & line, const int & column) {
 
     // Open the file in append mode to write (creates the file if it doesn't exist)
-    std::ofstream file(fileName, std::ios::app);
+    std::ofstream file(errorFileName, std::ios::app);
 
     // Write content to the file
     file << errorType << ": "<<invalidType<<"\": "<<lexeme<<"\""<<": line "<<line<<": column "<<column<<std::endl;

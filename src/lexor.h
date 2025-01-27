@@ -5,77 +5,29 @@
 #include <unordered_map>
 #include <fstream>
 #include <vector>
-#include <stdexcept> // For standard exceptions
-
-//ENUM that lists all of the possible types that a token can be.
-enum type{
-	ID,
-	INTNUM,
-	FLOATNUM,
-	EQ,
-	PLUS,
-	OR,
-	OPENPAR,
-	SEMI,
-	INT,
-	WHILE,
-	LOCAL,
-	NOTEQ,
-	MINUS,
-	AND,
-	CLOSEPAR,
-	COMMA,
-	FLOAT,
-	IF,
-	CONSTRUCTOR,
-	LT,
-	MULT,
-	NOT,
-	OPENCUBR,
-	DOT,
-	VOID,
-	THEN,
-	ATTRIBUTE,
-	GT,
-	DIV,
-	CLOSECUBR,
-	COLON,
-	CLASS,
-	ELSE,
-	FUNCTION,
-	LEQ,
-	ASSIGN,
-	OPENSQBR,
-	ARROW,
-	SELF,
-	READ,
-	PUBLIC,
-	GEQ,
-	CLOSESQBR,
-	ISA,
-	WRITE,
-	PRIVATE,
-	IMPLEMENTATION,
-	RETURN,
-	INLINECMT,
-	BLOCKCMT
-};
-
+#include <stdexcept>
+#include <stack>
+//forward declaration
+class token;
 //The error handler handles the errors
 class errorHandler{
 private:
 
 public:
-	static std::string fileName;
+	static std::string errorFileName;
+	static std::string tokenFileName;
+
 
 	errorHandler(){};
-	errorHandler(std::string filename){fileName = filename;};
+	errorHandler(std::string filename1,std::string filename2){errorFileName = filename1;tokenFileName = filename2;};
 
 	void setFileName(std::string s);
 
 	void handleError(const std::string & errorType,const std::string & invalidType,const std::string & lexeme, const int & line, const int & column);
 
 	std::vector <std::string> splitString(const std::string& str, char delimiter);
+
+	void writeToken(token* t);
 };
 
 //A token is defined as a data structure that has a lexeme, a type, and a location (line + column)
@@ -170,6 +122,8 @@ private:
 	token* errorProtocol(std::string type);
 	//Function returns a valid token
 	token* validToken(std::string type);
+	//for the linecomment
+	void getLine(std::string & tempLexeme);
 
 	token* id();
 	token* num(int decision);

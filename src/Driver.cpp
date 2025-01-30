@@ -8,7 +8,7 @@ int main (){
 	lexor* lex = new lexor();
 	std::cout << "Current working directory: " << std::filesystem::current_path() << std::endl;
 	try{
-		for (int k = 0;k<75;k++){
+		while(true){
 		try{
 			token * t = lex->getNextToken();
 			std::cout<<(*t)<<std::endl;
@@ -22,7 +22,7 @@ int main (){
 
 	}
 	catch (const EndOfFileException& e) {
-	        std::cout << "EOF reached, terminating program normally.\n";
+	        std::cerr << "EOF reached, terminating program normally.\n";
 	    }
 	catch(const std::exception & e){
         std::cerr << "Caught a generic exception: " << e.what() << '\n';

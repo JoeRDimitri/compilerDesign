@@ -67,10 +67,7 @@ std::string lexor::currentLexeme;
 std::string lexor::possibleType;
 std::string errorHandler::errorFileName;
 std::string errorHandler::tokenFileName;
-
 errorHandler lexor:: handler;
-
-
 
 bool lexor::connectFile(std::string fileName){
 
@@ -125,9 +122,11 @@ void lexor::getRidOfWhiteSpace(){
 		currentCharacter = inputFileStream.get();
 	}
 }
+
 bool lexor::checkEndOfStream(){
 	return inputFileStream.eof();
 }
+
 bool lexor::isWhiteSpace(){
 	if((currentCharacter >= 9 && currentCharacter <=13)||currentCharacter==32)
 		return true;
@@ -149,7 +148,6 @@ bool lexor::isReservedWord(std::string s){
 
 bool lexor::isReservedWord(){
 	std::string charAsString {currentCharacter};
-	std::cout<<tokenMap.count(charAsString)<<std::endl;
 	if(tokenMap.count(charAsString)>0||currentCharacter == '=') return true;
 	else return false;
 }
@@ -160,6 +158,7 @@ void lexor::setPossibleType(){
 	else if(isInArray(intArray,10))possibleType = "num";
 	else if(tokenMap.count(charAsString)>0||currentCharacter == '=') possibleType ="res";
 	else if(currentCharacter == '/')possibleType="cmt";
+	else {possibleType="inv";}
 
 }
 
@@ -197,7 +196,6 @@ int lexor::addAndMove(std::string & templexeme){
 	return tempLineCounter;
 }
 
-
 token* lexor::errorProtocol(std::string type){
 
 	while(!isWhiteSpace()&&!isReservedWord()&&currentCharacter != '=')addAndMove();
@@ -209,12 +207,20 @@ token* lexor::errorProtocol(std::string type){
 		return new token("invalidid",tempLexeme,line,column);
 	}
 	else if(type.compare("intnum")==0){
+		if(currentCharacter == '.'){
+			addAndMove(tempLexeme);
+			while(!isWhiteSpace()&&!isReservedWord()&&currentCharacter != '=')addAndMove(tempLexeme);
+		}
 		handler.handleError("Lexical error", "Invalid Number",tempLexeme, line, column);
 		return new token("invalidnum",tempLexeme,line,column);
 	}
 	else if(type.compare("frac")==0){
 		handler.handleError("Lexical error", "Invalid Number",tempLexeme, line, column);
 		return new token("invalidnum",tempLexeme,line,column);
+	}
+	else if(type.compare("invChar")==0){
+		handler.handleError("Lexical error", "Invalid Character",tempLexeme, line, column);
+		return new token("invalidchar",tempLexeme,line,column);
 	}
 }
 
@@ -272,7 +278,6 @@ void lexor::getLine(std::string &tempLexeme){
 		addAndMove(tempLexeme);
 	}
 }
-
 
 token* lexor::id(){
 
@@ -485,7 +490,9 @@ token* lexor::cmt(){
 	}
 }
 
-token* lexor::invalidChar(){}
+token* lexor::invalidChar(){
+	return errorProtocol("invChar");
+}
 
 token* lexor:: getNextToken(){
 	//Check if we've run this file before. IF we have not then we begin the virgin protocol
@@ -521,7 +528,7 @@ token* lexor:: getNextToken(){
 	else if(possibleType == "num")return num(0);
 	else if(possibleType == "res")return res();
 	else if(possibleType =="cmt")return cmt();
-	else return invalidChar();
+	else if(possibleType =="inv")return invalidChar();
 }
 
 token::token(std::string type, std::string lexeme, int line, int column){
@@ -530,6 +537,7 @@ token::token(std::string type, std::string lexeme, int line, int column){
 	this->line = line;
 	this->column = column;
 }
+
 void errorHandler::writeToken(token* t){
     std::ofstream file(tokenFileName, std::ios::app);
     file<<(*t)<<std::endl;

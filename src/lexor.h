@@ -116,12 +116,16 @@ private:
 	bool isReservedWord();
 	//Sets the possible type to determine what the type of the lexeme is.
 	void setPossibleType();
+	//function that checks for the end of the input stream
+	bool checkEndOfStream();
 	//function that updates the string and advance the pointer
 	void addAndMove();
+	//function that update the string that is provided. Overloaded function
+	int addAndMove(std::string & tempLexeme);
 	//Function to handle error
 	token* errorProtocol(std::string type);
 	//Function returns a valid token
-	token* validToken(std::string type);
+	token* validToken(std::string type,int lineCounter = 0);
 	//for the linecomment
 	void getLine(std::string & tempLexeme);
 
@@ -146,5 +150,13 @@ public:
 
 
 };
+
+class EndOfFileException : public std::exception {
+public:
+    const char* what() const noexcept override {
+        return "End of file reached";
+    }
+};
+
 
 #endif

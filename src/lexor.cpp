@@ -125,7 +125,9 @@ void lexor::getRidOfWhiteSpace(){
 		currentCharacter = inputFileStream.get();
 	}
 }
-
+bool lexor::checkEndOfStream(){
+	return inputFileStream.eof();
+}
 bool lexor::isWhiteSpace(){
 	if((currentCharacter >= 9 && currentCharacter <=13)||currentCharacter==32)
 		return true;
@@ -180,12 +182,21 @@ bool lexor::virginProtocol(){
 }
 
 void lexor::addAndMove(){
-	if(currentCharacter=='\r'){currentLexeme += "\\n";line++;}
-	else if(currentCharacter == '\n');
-	else currentLexeme+=currentCharacter;
+	currentLexeme+=currentCharacter;
 	currentCharacter = inputFileStream.get();
 	column++;
 }
+
+int lexor::addAndMove(std::string & templexeme){
+	int tempLineCounter = 0;
+	if(currentCharacter=='\r'){templexeme += "\\n";column = 0;}
+	else if(currentCharacter == '\n'){tempLineCounter++;}
+	else templexeme+=currentCharacter;
+	currentCharacter = inputFileStream.get();
+	column++;
+	return tempLineCounter;
+}
+
 
 token* lexor::errorProtocol(std::string type){
 
@@ -207,7 +218,7 @@ token* lexor::errorProtocol(std::string type){
 	}
 }
 
-token* lexor::validToken(std::string type){
+token* lexor::validToken(std::string type, int lineCounter){
 
 	std::string tempLexeme = currentLexeme;
 	currentLexeme = "";
@@ -244,21 +255,22 @@ token* lexor::validToken(std::string type){
 		getLine(tempLexeme);
 		token* t = new token("linecomment",tempLexeme,line, column);
 		handler.writeToken(t);
+		column = 0;
 		return t;
 	}
 
 	else if(type.compare("blockcomment")==0){
 		token* t = new token("blockcmt",tempLexeme,line,column);
 		handler.writeToken(t);
+		line+=lineCounter;
 		return t;
 	}
 }
 
 void lexor::getLine(std::string &tempLexeme){
 	while(currentCharacter != '\r' && currentCharacter!='\n'&&!inputFileStream.eof()){
-		addAndMove();
+		addAndMove(tempLexeme);
 	}
-	line++;
 }
 
 
@@ -426,40 +438,43 @@ token* lexor::cmt(){
 		return validToken("linecomment");
 	}
 	else if(currentLexeme.compare("/*")==0){
+		int lineCounter = 0;
 		std::stack<int> commentStackCounter;
 		commentStackCounter.push(0);
 
 		while(true){
-			if(commentStackCounter.empty())return validToken("blockcomment");
+			if(commentStackCounter.empty()){
+				return validToken("blockcomment",lineCounter);
+			}
 
 			if(inputFileStream.eof())
 				return errorProtocol("eof");
 
 			while(currentCharacter != '*'&&currentCharacter != '/'&&!inputFileStream.eof()){
-				addAndMove();
+				lineCounter += addAndMove(currentLexeme);
 			}
 			if(inputFileStream.eof())
 				continue;
 			else if(currentCharacter == '*'){
-				addAndMove();
+				addAndMove(currentLexeme);
 				if(currentCharacter == '/'){
-					addAndMove();
+					addAndMove(currentLexeme);
 					commentStackCounter.pop();
 					continue;
 				}
 				continue;
 			}
 			else if(currentCharacter == '/'){
-				addAndMove();
+				addAndMove(currentLexeme);
 				if(currentCharacter == '*'){
-					addAndMove();
+					addAndMove(currentLexeme);
 					commentStackCounter.push(0);
 					continue;
 					}
 			}
 
 			else{
-				addAndMove();
+				addAndMove(currentLexeme);
 				continue;
 			}
 		}
@@ -485,7 +500,7 @@ token* lexor:: getNextToken(){
 			//We are good to begin the process.
 			//Get rid of white spaces
 			//set line and column to 0
-			line = 0;
+			line = 1;
 			column = 0;
 			currentCharacter = inputFileStream.get();
 			currentLexeme = "";
@@ -493,6 +508,10 @@ token* lexor:: getNextToken(){
 	}
 	//Get rid of all white space.
 	getRidOfWhiteSpace();
+
+	if(checkEndOfStream()){
+		throw EndOfFileException();
+	}
 
 	//We've set the possible type for the first character of our brand new lexeme.
 	setPossibleType();
@@ -513,7 +532,7 @@ token::token(std::string type, std::string lexeme, int line, int column){
 }
 void errorHandler::writeToken(token* t){
     std::ofstream file(tokenFileName, std::ios::app);
-    file<<(*t);
+    file<<(*t)<<std::endl;
     file.close();
 }
 

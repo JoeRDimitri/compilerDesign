@@ -203,24 +203,28 @@ token* lexor::errorProtocol(std::string type){
 	currentLexeme = "";
 
 	if(type.compare("id")==0){
-		handler.handleError("Lexical error", "Invalid Identifier",tempLexeme, line, column);
-		return new token("invalidid",tempLexeme,line,column);
+		token * t = new token("invalidid",tempLexeme,line,column);
+		handler.handleError("Lexical error", "Invalid Identifier",tempLexeme, line, column, t);
+		return t;
 	}
 	else if(type.compare("intnum")==0){
 		if(currentCharacter == '.'){
 			addAndMove(tempLexeme);
 			while(!isWhiteSpace()&&!isReservedWord()&&currentCharacter != '=')addAndMove(tempLexeme);
 		}
-		handler.handleError("Lexical error", "Invalid Number",tempLexeme, line, column);
-		return new token("invalidnum",tempLexeme,line,column);
+		token * t = new token("invalidnum",tempLexeme,line,column);
+		handler.handleError("Lexical error", "Invalid Number",tempLexeme, line, column,t);
+		return t;
 	}
 	else if(type.compare("frac")==0){
-		handler.handleError("Lexical error", "Invalid Number",tempLexeme, line, column);
-		return new token("invalidnum",tempLexeme,line,column);
+		token * t = new token("invalidnum",tempLexeme,line,column);
+		handler.handleError("Lexical error", "Invalid Number",tempLexeme, line, column,t);
+		return t;
 	}
 	else if(type.compare("invChar")==0){
-		handler.handleError("Lexical error", "Invalid Character",tempLexeme, line, column);
-		return new token("invalidchar",tempLexeme,line,column);
+		token * t = new token("invalidchar",tempLexeme,line,column);
+		handler.handleError("Lexical error", "Invalid Character",tempLexeme, line, column,t);
+		return t;
 	}
 }
 
@@ -574,16 +578,20 @@ void errorHandler::setFileName(std::string s){
 
 }
 
-void errorHandler::handleError(const std::string& errorType,const std::string & invalidType, const std::string& lexeme, const int & line, const int & column) {
+void errorHandler::handleError(const std::string& errorType,const std::string & invalidType, const std::string& lexeme, const int & line, const int & column, token * t) {
 
     // Open the file in append mode to write (creates the file if it doesn't exist)
-    std::ofstream file(errorFileName, std::ios::app);
+    std::ofstream file1(errorFileName, std::ios::app);
+    std::ofstream file2(tokenFileName, std::ios::app);
 
-    // Write content to the file
-    file << errorType << ": "<<invalidType<<"\": "<<lexeme<<"\""<<": line "<<line<<": column "<<column<<std::endl;
+    // Write error content to the file
+    file1 << errorType << ": "<<invalidType<<"\": "<<lexeme<<"\""<<": line "<<line<<": column "<<column<<std::endl;
+    //write error token to the token file
+    file2<<(*t)<<std::endl;
 
     // Close the file
-    file.close();
+    file1.close();
+    file2.close();
 }
 
 

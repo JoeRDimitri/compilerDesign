@@ -23,7 +23,7 @@ public:
 
 	void setFileName(std::string s);
 
-	void handleError(const std::string & errorType,const std::string & invalidType,const std::string & lexeme, const int & line, const int & column);
+	void handleError(const std::string & errorType,const std::string & invalidType,const std::string & lexeme, const int & line, const int & column, token * t);
 
 	std::vector <std::string> splitString(const std::string& str, char delimiter);
 

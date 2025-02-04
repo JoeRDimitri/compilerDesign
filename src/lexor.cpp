@@ -300,7 +300,7 @@ token* lexor::id(){
 	 * 2. We might've reached a special character, in that case we can simply return from thins functino since we have found a proper lexeme
 	 * 3. else*/
 
-	if(isWhiteSpace()){}
+	if(isWhiteSpace()||checkEndOfStream()){}
 	else if(isReservedWord()){}
 	else{return errorProtocol("id");}
 	return validToken("id");
@@ -322,7 +322,7 @@ token* lexor::num(int decision){
 		if(decision == 0){
 			if(currentCharacter =='.')return fraction();
 		}
-		if(isWhiteSpace()||isReservedWord()){return validToken("intnum");}
+		if(isWhiteSpace()||isReservedWord()||checkEndOfStream()){return validToken("intnum");}
 
 		else{return errorProtocol("intnum");}
 	}
@@ -340,7 +340,7 @@ token* lexor::num(int decision){
 		if(decision == 0){
 		if(currentCharacter =='.')return fraction();
 		}
-		if(isWhiteSpace()||isReservedWord()){return validToken("intnum");}
+		if(isWhiteSpace()||isReservedWord()||checkEndOfStream()){return validToken("intnum");}
 
 		else{return errorProtocol("intnum");}
 
@@ -371,7 +371,7 @@ token* lexor::fraction(){
 
 		else if(currentCharacter == 'e')return flt();
 		//If we reach a white space or a reserve word we've reached the end of the lexeme
-		else if(isWhiteSpace()||isReservedWord()){return validToken("frac");}
+		else if(isWhiteSpace()||isReservedWord()||checkEndOfStream()){return validToken("frac");}
 		else{return errorProtocol("frac");}
 	}
 	//Anything that is not a number is an error.

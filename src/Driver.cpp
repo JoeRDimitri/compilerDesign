@@ -4,7 +4,7 @@
 
 
 int main (){
-
+/*	CODE TO TEST THE LEXOR
 	lexor* lex = new lexor();
 	std::cout << "Current working directory: " << std::filesystem::current_path() << std::endl;
 	try{
@@ -30,4 +30,5 @@ int main (){
 
 	delete lex;
 	return 0;
+*/
 }

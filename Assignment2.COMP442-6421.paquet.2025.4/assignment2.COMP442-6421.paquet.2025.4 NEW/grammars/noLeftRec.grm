@@ -30,7 +30,7 @@
 
 <expr> ::= <arithExpr> <expr2>
 
-<expr2> ::= EPSILON
+<expr2> ::= EPSILON 
 <expr2> ::= <relOp> <arithExpr>
 
 <fParams> ::= 'id' ':' <type> <rept-fParams3> <rept-fParams4> 
@@ -52,10 +52,10 @@
 <rept-factor2> ::= <rept-varible2> <rept-factor4>
 
 <rept-factor3> ::= '.' <rept-factor>
-<rept-factor3> ::= EPSILON
+<rept-factor3> ::= EPSILON 
 
 <rept-factor4> ::= '.' <rept-factor>
-<rept-factor4> ::= EPSILON
+<rept-factor4> ::= EPSILON 
 
 <funcBody> ::= '{' <rept-funcBody1> '}' 
 
@@ -91,7 +91,7 @@
 <multOp> ::= 'and' 
 
 <opt-classDecl2> ::= 'isa' 'id' <rept-opt-classDecl22> 
-<opt-classDecl2> ::= EPSILON 
+<opt-classDecl2> ::= EPSILON  
 
 <prog> ::= <rept-prog0> 
 

@@ -1,10 +1,10 @@
 #include "parser.h"
-
+std::unordered_map<std::string, std::vector<std::string>*> parser::firstSet;
 std::ifstream parser::inputFileStream;
-char parser::currentCharacter;
-bool parser::virgin = true;
-std::unordered_map<std::string, std::vector<std::string>> parser::firstSet;
+std::string parser::currentWord;
+std::string parser::currentSymbol;
 std::string parser::line;
+bool parser::virgin = true;
 int parser::lineIndex;
 
 
@@ -81,16 +81,19 @@ void parser::generateFirstSet(){
 		}
 	}
 
+	bool change = false;
 	line ="";
+	currentSymbol ="";
 	lineIndex = 0;
 
 	//we should get line until the end of the file.
-	while (std::getline(inputFileStream, line))
-	{
+	while (std::getline(inputFileStream, line) || change ){
 	    std::cout << line << std::endl;
-	    updateCurrentCharacter();
+	    lineIndex = 0;
+	    change =false;
+	    currentSymbol = "";
 	    //We get the first set and store it in a temp variable.
-	    findNT();
+	    std::vector<std::string> * firstSetPtr = findNT();
 
 	    //We have the NT. Now we move passed the assignment operator.
 		if(checkForAssignment()){
@@ -98,9 +101,34 @@ void parser::generateFirstSet(){
 			//We've gotten rid of the white space
 			//We check if the first symbol after the assignment symbol is a terminal.
 			if(checkT()){
+				//A terminal symbol is found.
+				//We simply add the terminal symbol to the first set if its not already there.
+				//check if the terminal symbol exists in vector
+				getSymbol("t");
+
+				if(!inVector(firstSetPtr)){
+					firstSetPtr->emplace_back(currentSymbol);
+					currentSymbol = "";
+					std::cout<<"Adding: "<<currentSymbol<<"to the first Set of : "<<currentWord<<std::endl;
+					continue;
+				}
+
+				else continue;
+
 
 			}
 			else if(checkNT()){
+				//If we are here it is becaue we've passed the assignment operator.
+				//We've gotten rid of the white space
+				//We check if the first symbol after the assignment symbol is a non terminal, then we get symbol.
+				getSymbol("nt");
+
+			}
+			else if(checkE()){
+				//If we are here it is becaue we've passed the assignment operator.
+				//We've gotten rid of the white space
+				//We check if the first symbol after the assignment symbol is a an epsilon symbol
+				getSymbol("e");
 
 			}
 			else{
@@ -125,18 +153,45 @@ void parser::generateFirstSet(){
 	// In the line we need to find the first occurence of <
 }
 
+bool parser::checkE(){
+	if(line.at(lineIndex)=='E'){
+		lineIndex++;
+		return true;
+	}
+	return false;
+
+}
+
+void parser::getSymbol(std::string s){
+	if(s == "t"){while(line.at(lineIndex)!= '\''){currentSymbol += line.at(lineIndex);}}
+	else if(s=="nt"){while(line.at(lineIndex)!= '>'){currentSymbol += line.at(lineIndex);}}
+	else if(s == "e"){while(line.at(lineIndex)!=' '){currentSymbol += line.at(lineIndex);}}
+}
+bool parser::inVector(std::vector<std::string> * firstSet){
+	for (std::string value : (*firstSet)) {
+		if(value == currentSymbol)
+			return true;
+	}
+	return false;
+}
 
 bool parser::checkT(){
-	if(line.at(lineIndex)=='\''){return true;}
+	if(line.at(lineIndex)=='\''){
+		lineIndex++;
+		return true;
+	}
 	return false;
 }
 
 bool parser::checkNT(){
-	if(line.at(lineIndex)=='<'){return true;}
+	if(line.at(lineIndex)=='<'){
+		lineIndex ++;
+		return true;
+	}
 	return false;
 }
 
-std::vector* parser::findNT(){
+std::vector<std::string> * parser::findNT(){
 	while(line.at(lineIndex) != '<'){
 		lineIndex++;
 	}
@@ -153,13 +208,11 @@ std::vector* parser::findNT(){
 
 
 	//need to check if this nonterminal already exists.
-	if(firstSet.count(currentWord) == 0){
-		//it does not exist, then we need to create that entry in the dictionary
-		firstSet.emplace(currentWord, new std::vector());
-	}
+    if (firstSet.count(currentWord) == 0) {
+        firstSet[currentWord] = new std::vector<std::string>();  // Allocate memory
+    }
 
-	return firstSet.at(currentWord);
-
+    return firstSet.at(currentWord);  // Dereference the pointer
 }
 
 bool parser::checkForAssignment(){
@@ -170,15 +223,11 @@ bool parser::checkForAssignment(){
 			tempIndex++;
 			if(line.at(tempIndex)=='='){
 				lineIndex = tempIndex;
+				lineIndex++;
 				getRidOfWhiteSpace();
 				return true;
 			}
 		}
 	}
 	return false;
-}
-
-
-void parser::updateCurrentCharacter(){
-	currentCharacter = line.at(lineIndex);
 }

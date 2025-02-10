@@ -12,11 +12,11 @@ private:
 	//unordered map for the first set
 	//Key will be the name of the nonterminal symbol
 	//The value will be a vector containing the actual set.
-	static std::unordered_map<std::string, std::vector<std::string>> firstSet;
-	static std::unordered_map<std::string, std::vector<std::string>> followSet;
+	static std::unordered_map<std::string, std::vector<std::string>*> firstSet;
+	static std::unordered_map<std::string, std::vector<std::string>*> followSet;
 	static std::ifstream inputFileStream;
 	static bool virgin;
-	static char currentCharacter;
+	static std::string currentSymbol;
 	static std::string currentWord;
 	static std::string line;
 	static int lineIndex;
@@ -35,13 +35,16 @@ private:
 
 	void generateFirstSet();
 	//Finds the first non terminal symbol which will the symbol we are generating a first set for
-	std::vector* findNT();
+	std::vector<std::string> * findNT();
 	//Updates the currentCharacter
-	void updateCurrentCharacter();
 	bool checkForAssignment();
 	//Checks if it is a terminal.
 	bool checkT();
 	bool checkNT();
+	bool checkE();
+	//Function that checks if the current symbol is in the vector that is provided as an argument
+	bool inVector(std::vector<std::string> * v);
+	void getSymbol(std::string t);
 
 };
 

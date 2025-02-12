@@ -1,9 +1,27 @@
 #include "lexor.h"
+#include "parser.h"
 #include <filesystem>
 #include <iostream>
 
 
 int main (){
+
+	parser p;
+	p.generateFirstSet();
+
+	// Iterate over the map
+	    for (const auto& pair : p.firstSet) {
+	        std::cout << "Key: " << pair.first << " -> Values: ";
+
+	        // Check if the pointer is valid before dereferencing
+	        if (pair.second) {
+	            for (const auto& value : *(pair.second)) {
+	                std::cout << value << " ";
+	            }
+	        }
+	        std::cout << std::endl;
+	    }
+
 /*	CODE TO TEST THE LEXOR
 	lexor* lex = new lexor();
 	std::cout << "Current working directory: " << std::filesystem::current_path() << std::endl;
@@ -29,6 +47,7 @@ int main (){
 	}
 
 	delete lex;
+	*/
 	return 0;
-*/
+
 }

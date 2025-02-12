@@ -12,8 +12,6 @@ private:
 	//unordered map for the first set
 	//Key will be the name of the nonterminal symbol
 	//The value will be a vector containing the actual set.
-	static std::unordered_map<std::string, std::vector<std::string>*> firstSet;
-	static std::unordered_map<std::string, std::vector<std::string>*> followSet;
 	static std::ifstream inputFileStream;
 	static bool virgin;
 	static std::string currentSymbol;
@@ -33,7 +31,6 @@ private:
 	//Function that moves the input stream forward if it reads white space. white space values are 9-10-11-12-13-32
 	void getRidOfWhiteSpace();
 
-	void generateFirstSet();
 	//Finds the first non terminal symbol which will the symbol we are generating a first set for
 	std::vector<std::string> * findNT();
 	//Updates the currentCharacter
@@ -43,8 +40,23 @@ private:
 	bool checkNT();
 	bool checkE();
 	//Function that checks if the current symbol is in the vector that is provided as an argument
-	bool inVector(std::vector<std::string> * v);
+	bool inVector(std::vector<std::string> * v, const std::string s = currentSymbol);
 	void getSymbol(std::string t);
+	void addAndMove(bool & change, std::vector<std::string>* v, std::string s = currentSymbol);
+	void compareSymbolVector(bool & change, std::vector<std::string>* v);
+
+public:
+	static std::unordered_map<std::string, std::vector<std::string>*> firstSet;
+	static std::unordered_map<std::string, std::vector<std::string>*> followSet;
+
+	void generateFirstSet();
+
+	~parser(){
+		for (auto& pair : firstSet) {
+		        delete pair.second;  // Deallocate the vector pointer
+		    }
+
+	}
 
 };
 

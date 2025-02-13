@@ -5,6 +5,7 @@ std::string parser::currentWord;
 std::string parser::currentSymbol;
 std::string parser::line;
 bool parser::virgin = true;
+bool parser::change = true;
 int parser::lineIndex;
 
 
@@ -68,7 +69,6 @@ void parser::getRidOfWhiteSpace(){
 
 
 void parser::generateFirstSet(){
-	bool change = true;
 
 	//Check if we've run this file before. IF we have not then we begin the virgin protocol
 	//Virgin protocol is used to get the establish file connection.
@@ -91,79 +91,86 @@ void parser::generateFirstSet(){
 		line ="";
 		currentSymbol ="";
 		lineIndex = 0;
-
+	   // Reset the file stream to read again
+		inputFileStream.clear();  // Clear EOF flag
+		inputFileStream.seekg(0); // Move back to the beginning
 		//we should get line until the end of the file.
 		while (std::getline(inputFileStream, line)){
 			std::cout << line << std::endl;
 			lineIndex = 0;
 			currentSymbol = "";
+			currentWord = "";
+
 
 			getRidOfWhiteSpace();
+
+			if(lineIndex == line.size())
+				continue;
+
 			//We get the first set and store it in a temp variable.
 			std::vector<std::string> * firstSetPtr = findNT();
 
 			//We have the NT. Now we move passed the assignment operator.
 			if(checkForAssignment()){
-				//If we are here it is becaue we've passed the assignment operator.
-				//We've gotten rid of the white space
-				//We need a loop here for all of the symbols in the line: essentially while the line index != to length of the line
+			//If we are here it is becaue we've passed the assignment operator.
+			//We've gotten rid of the white space
+			//We need a loop here for all of the symbols in the line: essentially while the line index != to length of the line
 
-				while(lineIndex!=line.size()){
-					currentSymbol = "";
+				currentSymbol = "";
 
-					//We check if the first symbol after the assignment symbol is a terminal.
-					if(checkT()){
-						//A terminal symbol is found.
-						//We simply add the terminal symbol to the first set if its not already there.
-						//check if the terminal symbol exists in vector
-						getSymbol("t");
-						//If the terminal symbol is not in the first set.
-						if(!inVector(firstSetPtr)){
-							//We add it and move onto the next symbol
-							addAndMove( change, firstSetPtr);
-							currentSymbol ="";
-							continue;
-
-						}
-						//if the terminal symbol is in the first set vector, then we need to reset the currentSymbol and move onto the next symbol.
-						else {
-							currentSymbol = "";
-							continue;
-						}
-
+				//We check if the first symbol after the assignment symbol is a terminal.
+				if(checkT()){
+					//A terminal symbol is found.
+					//We simply add the terminal symbol to the first set if its not already there.
+					//check if the terminal symbol exists in vector
+					getSymbol("t");
+					//If the terminal symbol is not in the first set.
+					if(!inVector(firstSetPtr)){
+						//We add it and move onto the next symbol
+						addAndMove( change, firstSetPtr);
+						currentSymbol ="";
+						continue;
 
 					}
-					else if(checkNT()){
-						//If we are here it is becaue we've passed the assignment operator.
-						//We've gotten rid of the white space
-						//We check if the first symbol after the assignment symbol is a non terminal, then we get symbol.
-						getSymbol("nt");
-						compareSymbolVector(change,firstSetPtr);
-
+					//if the terminal symbol is in the first set vector, then we need to reset the currentSymbol and move onto the next symbol.
+					else {
+						currentSymbol = "";
+						continue;
 					}
-					else if(checkE()){
-						//If we are here it is becaue we've passed the assignment operator.
-						//We've gotten rid of the white space
-						//We check if the first symbol after the assignment symbol is a an epsilon symbol
-						getSymbol("e");
-						if(!inVector(firstSetPtr)){
-							//We add it and move onto the next symbol
-							addAndMove( change, firstSetPtr);
-							currentSymbol ="";
-							continue;
 
-						}
-						//if the terminal symbol is in the first set vector, then we need to reset the currentSymbol and move onto the next symbol.
-						else {
-							currentSymbol = "";
-							continue;
-						}
 
-					}
-					else{
-						std::cout<<"Error in the grammar, neither NT or T found at: "<<currentWord<<std::endl<<"line is: "<<line<<std::endl<<"lineIndex is "<<lineIndex<<std::endl;
-					}
 				}
+				else if(checkNT()){
+					//If we are here it is becaue we've passed the assignment operator.
+					//We've gotten rid of the white space
+					//We check if the first symbol after the assignment symbol is a non terminal, then we get symbol.
+					getSymbol("nt");
+					compareSymbolVector(change,firstSetPtr);
+
+				}
+				else if(checkE()){
+					//If we are here it is becaue we've passed the assignment operator.
+					//We've gotten rid of the white space
+					//We check if the first symbol after the assignment symbol is a an epsilon symbol
+					getSymbol("e");
+					if(!inVector(firstSetPtr)){
+						//We add it and move onto the next symbol
+						addAndMove( change, firstSetPtr);
+						currentSymbol ="";
+						continue;
+
+					}
+					//if the terminal symbol is in the first set vector, then we need to reset the currentSymbol and move onto the next symbol.
+					else {
+						currentSymbol = "";
+						continue;
+					}
+
+				}
+				else{
+					std::cout<<"Error in the grammar, neither NT or T found at: "<<currentWord<<std::endl<<"line is: "<<line<<std::endl<<"lineIndex is "<<lineIndex<<std::endl;
+				}
+
 			}
 
 			else{
@@ -176,12 +183,14 @@ void parser::generateFirstSet(){
 
 		}
 	}
-	//Now we have line variable. We will need to parse line
-	// In the line we need to find the first occurence of <
+
+	disconnectFile();
+
 }
 
 void parser:: compareSymbolVector(bool & change,std::vector<std::string>* v){
 	//Check if this vector exists.
+	bool eps;
 	if(firstSet.count(currentSymbol)==0){
 		change = true;
 		return;
@@ -192,26 +201,115 @@ void parser:: compareSymbolVector(bool & change,std::vector<std::string>* v){
 
 		//For each element in the firstSetPtrOfSymbol vector, we need check if its in our v ptr vector.
 		for(std::string value : (*firstSetPtrOfSymbol)){
-			if(inVector(v,value)){
+			if(inVector(v,value) && value != "EPSILON"){
 				continue;
 			}
-			else{
+			else if (!inVector(v,value) && value != "EPSILON"){
 				addAndMove(change,v,value);
 				continue;
+			}
+			if (value == "EPSILON"){
+				eps = true;
+			}
+		}
+		while(eps){
+			if(lineIndex == line.size()){
+				eps = false;
+				if(!inVector(v,"EPSILON")){
+					addAndMove(change,v,"EPSILON");
+					change = true;
+				}
+			}
+			else{
+				checkTheNextSymbol(eps,v);
+			}
+
+		}
+		if(eps &&lineIndex == line.size()){
+			if(!inVector(v,"EPSILON")){
+				change = true;
+				addAndMove(change,v,"EPSILON");
+			}
+			return;
+		}
+
+	}
+}
+
+void parser::checkTheNextSymbol(bool & eps, std::vector<std::string>*v){
+	getRidOfWhiteSpace();
+	currentSymbol = "";
+	if(checkT()){
+		eps = false;
+
+		//A terminal symbol is found.
+		//We simply add the terminal symbol to the first set if its not already there.
+		//check if the terminal symbol exists in vector
+		getSymbol("t");
+		//If the terminal symbol is not in the first set.
+		if(!inVector(v)){
+			//We add it and move onto the next symbol
+			addAndMove( change, v);
+			currentSymbol ="";
+			return;
+
+		}
+		//if the terminal symbol is in the first set vector, then we need to reset the currentSymbol and move onto the next symbol.
+		else {
+			currentSymbol = "";
+		}
+
+	}
+	else if(checkNT()){
+		//If we are here it is becaue we've passed the assignment operator.
+		//We've gotten rid of the white space
+		//We check if the first symbol after the assignment symbol is a non terminal, then we get symbol.
+		getSymbol("nt");
+		compareSymbolVectorRec(eps,v);
+
+	}
+
+
+
+}
+
+void parser:: compareSymbolVectorRec(bool & eps,std::vector<std::string>* v){
+	//Check if this vector exists.
+	if(firstSet.count(currentSymbol)==0){
+		change = true;
+		eps = false;
+		return;
+	}
+	else{
+		//We need to get the vector of the current symbol.
+		std::vector<std::string> * firstSetPtrOfSymbol = firstSet.at(currentSymbol);
+
+		//For each element in the firstSetPtrOfSymbol vector, we need check if its in our v ptr vector.
+		for(std::string value : (*firstSetPtrOfSymbol)){
+			if(inVector(v,value) && value != "EPSILON"){
+				continue;
+			}
+			else if (!inVector(v,value) && value != "EPSILON"){
+				addAndMove(change,v,value);
+				continue;
+			}
+
+			if (value == "EPSILON"){
+				eps = true;
 			}
 		}
 	}
 }
 
+
 void parser:: addAndMove(bool& change, std::vector<std::string> * v, std::string s){
 	v->emplace_back(s);
 	change = true;
-	std::cout<<"Adding: "<<currentSymbol<<"to the first Set of : "<<currentWord<<std::endl;
+	std::cout<<"Adding: "<<s<<" to the first Set of : "<<currentWord<<std::endl;
 }
 
 bool parser::checkE(){
 	if(line.at(lineIndex)=='E'){
-		lineIndex++;
 		return true;
 	}
 	return false;

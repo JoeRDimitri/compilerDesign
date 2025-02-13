@@ -18,6 +18,7 @@ private:
 	static std::string currentWord;
 	static std::string line;
 	static int lineIndex;
+	static bool change;
 
 	//Function to establish connection to the file to read.
 	static bool connectFile(std::string);
@@ -44,6 +45,8 @@ private:
 	void getSymbol(std::string t);
 	void addAndMove(bool & change, std::vector<std::string>* v, std::string s = currentSymbol);
 	void compareSymbolVector(bool & change, std::vector<std::string>* v);
+	void checkTheNextSymbol(bool& eps, std::vector<std::string>*v);
+	void compareSymbolVectorRec(bool & eps, std::vector<std::string> *v);
 
 public:
 	static std::unordered_map<std::string, std::vector<std::string>*> firstSet;

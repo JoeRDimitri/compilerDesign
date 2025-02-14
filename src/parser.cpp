@@ -308,7 +308,7 @@ void parser:: compareSymbolVectorRec(bool & eps,std::vector<std::string>* v){
 void parser:: addAndMove(bool& change, std::vector<std::string> * v, std::string s){
 	v->emplace_back(s);
 	change = true;
-	std::cout<<"Adding: "<<s<<" to the first Set of : "<<currentWord<<std::endl;
+//	std::cout<<"Adding: "<<s<<" to the first Set of : "<<currentWord<<std::endl;
 }
 
 bool parser::checkE(){
@@ -491,9 +491,6 @@ void parser::generateFollowSet(){
 				//Now currentWord == the symbol that we need to analyze
 				std::vector<std::string> * followSetVectorOfWord = findNT(1);
 
-				if(nt == "prog"){
-					std::cout<<nt;
-				}
 				int tempLineIndex = lineIndex;
 
 				//Now we get the symbol after it.
@@ -551,6 +548,7 @@ void parser::generateFollowSet(){
 								//A terminal symbol is found.
 								//We simply add the terminal symbol to the first set if its not already there.
 								//check if the terminal symbol exists in vector
+								currentSymbol ="";
 								getSymbol("t",tempLineIndex);
 								//If the terminal symbol is not in the first set.
 								if(!inVector(followSetVectorOfWord)){
@@ -594,6 +592,7 @@ void parser::generateFollowSet(){
 
 		}
 	}
+	disconnectFile();
 }
 
 bool parser :: hasEpsilon(std::vector <std::string> * b){
@@ -645,7 +644,6 @@ std::vector<std::string> * parser:: findFollowSet(std::string s){
 
 void parser:: compareAndAdd(std::vector<std::string> * followSetOfWord, std::vector<std::string> * followSetOfOriginalNT){
 	if(followSetOfOriginalNT->size()==0){
-		std::cout<<currentWord<<std::endl;
 		change =true;
 		return;
 	}

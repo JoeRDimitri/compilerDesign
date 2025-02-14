@@ -30,34 +30,47 @@ private:
 	bool virginProtocol();
 
 	//Function that moves the input stream forward if it reads white space. white space values are 9-10-11-12-13-32
-	void getRidOfWhiteSpace();
+	void getRidOfWhiteSpace(int & templineIndex = lineIndex);
 
 	//Finds the first non terminal symbol which will the symbol we are generating a first set for
-	std::vector<std::string> * findNT();
+	std::vector<std::string> * findNT(int k);
 	//Updates the currentCharacter
 	bool checkForAssignment();
 	//Checks if it is a terminal.
-	bool checkT();
-	bool checkNT();
+	bool checkT(int & tempLineIndex = lineIndex);
+	bool checkNT(int & tempLineIndex = lineIndex);
 	bool checkE();
 	//Function that checks if the current symbol is in the vector that is provided as an argument
 	bool inVector(std::vector<std::string> * v, const std::string s = currentSymbol);
-	void getSymbol(std::string t);
+	void getSymbol(std::string t,int & tempLineIndex = lineIndex);
 	void addAndMove(bool & change, std::vector<std::string>* v, std::string s = currentSymbol);
 	void compareSymbolVector(bool & change, std::vector<std::string>* v);
 	void checkTheNextSymbol(bool& eps, std::vector<std::string>*v);
 	void compareSymbolVectorRec(bool & eps, std::vector<std::string> *v);
 
+	void getToAssignmentOp();
+	void getFollowSetSymbol();
+	void movePointer(int & templineIndex);
+	std::vector<std::string> * findFollowSet(std::string);
+	void compareAndAdd(std::vector<std::string>* v1, std::vector<std::string>* v2);
+	bool hasEpsilon(std::vector<std::string> * v);
 public:
 	static std::unordered_map<std::string, std::vector<std::string>*> firstSet;
 	static std::unordered_map<std::string, std::vector<std::string>*> followSet;
 
 	void generateFirstSet();
+	void generateFollowSet();
 
+
+	parser(){};
 	~parser(){
 		for (auto& pair : firstSet) {
 		        delete pair.second;  // Deallocate the vector pointer
 		    }
+		for (auto& pair : followSet) {
+		        delete pair.second;  // Deallocate the vector pointer
+		    }
+
 
 	}
 

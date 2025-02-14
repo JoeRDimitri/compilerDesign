@@ -115,9 +115,6 @@
 <rept-funcBody1> ::= <localVarDeclOrStat> <rept-funcBody1> 
 <rept-funcBody1> ::= EPSILON 
 
-<rept-idnest1> ::= <indice> <rept-idnest1> 
-<rept-idnest1> ::= EPSILON 
-
 <rept-implDef3> ::= <funcDef> <rept-implDef3> 
 <rept-implDef3> ::= EPSILON 
 

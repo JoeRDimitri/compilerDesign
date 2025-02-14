@@ -8,6 +8,19 @@ int main (){
 
 	parser p;
 	p.generateFirstSet();
+    for (const auto& pair : p.firstSet) {
+        std::cout << "Key: " << pair.first << " -> Values: ";
+
+        // Check if the pointer is valid before dereferencing
+        if (pair.second) {
+            for (const auto& value : *(pair.second)) {
+                std::cout << value << " ";
+            }
+        }
+        std::cout << std::endl;
+    }
+
+
 	std::cout<<"------------------------------------------------------------------------------------"<<std::endl;
 	p.generateFollowSet();
 

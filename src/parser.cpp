@@ -100,7 +100,7 @@ void parser::generateFirstSet(){
 		inputFileStream.seekg(0); // Move back to the beginning
 		//we should get line until the end of the file.
 		while (std::getline(inputFileStream, line)){
-			std::cout << line << std::endl;
+//			std::cout << line << std::endl;
 			lineIndex = 0;
 			currentSymbol = "";
 			currentWord = "";
@@ -450,7 +450,7 @@ void parser::generateFollowSet(){
 		//we should get line until the end of the file.
 		while (std::getline(inputFileStream, line)){
 
-			std::cout << line << std::endl;
+//			std::cout << line << std::endl;
 			lineIndex = 0;
 			currentSymbol = "";
 			currentWord = "";

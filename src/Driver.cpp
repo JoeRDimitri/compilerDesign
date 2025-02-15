@@ -7,8 +7,8 @@
 int main (){
 
 	parser p;
-	p.generateFirstSet();
-    for (const auto& pair : p.firstSet) {
+	p.faf.generateFirstSet();
+    for (const auto& pair : p.faf.firstSet) {
         std::cout << "Key: " << pair.first << " -> Values: ";
 
         // Check if the pointer is valid before dereferencing
@@ -22,10 +22,10 @@ int main (){
 
 
 	std::cout<<"------------------------------------------------------------------------------------"<<std::endl;
-	p.generateFollowSet();
+	p.faf.generateFollowSet();
 
 	// Iterate over the map
-	    for (const auto& pair : p.followSet) {
+	    for (const auto& pair : p.faf.followSet) {
 	        std::cout << "Key: " << pair.first << " -> Values: ";
 
 	        // Check if the pointer is valid before dereferencing

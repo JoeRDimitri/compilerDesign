@@ -8,6 +8,7 @@
 
 class parser{
 
+class first_and_follow{
 private:
 	//unordered map for the first set
 	//Key will be the name of the nonterminal symbol
@@ -61,18 +62,24 @@ public:
 	void generateFirstSet();
 	void generateFollowSet();
 
-
-	parser(){};
-	~parser(){
+	first_and_follow(){};
+	~first_and_follow(){
 		for (auto& pair : firstSet) {
 		        delete pair.second;  // Deallocate the vector pointer
 		    }
 		for (auto& pair : followSet) {
 		        delete pair.second;  // Deallocate the vector pointer
 		    }
-
-
 	}
+};
+
+
+public:
+	static first_and_follow faf;
+
+
+		parser(){};
+		~parser(){}
 
 };
 

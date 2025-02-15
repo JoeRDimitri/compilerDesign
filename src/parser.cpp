@@ -1,17 +1,20 @@
 #include "parser.h"
-std::unordered_map<std::string, std::vector<std::string>*> parser::firstSet;
-std::unordered_map<std::string, std::vector<std::string>*> parser::followSet;
 
-std::ifstream parser::inputFileStream;
-std::string parser::currentWord;
-std::string parser::currentSymbol;
-std::string parser::line;
-bool parser::virgin = true;
-bool parser::change = true;
-int parser::lineIndex;
+parser::first_and_follow parser::faf;
+
+std::unordered_map<std::string, std::vector<std::string>*> parser::first_and_follow::firstSet;
+std::unordered_map<std::string, std::vector<std::string>*> parser::first_and_follow::followSet;
+
+std::ifstream parser::first_and_follow::inputFileStream;
+std::string parser::first_and_follow::currentWord;
+std::string parser::first_and_follow::currentSymbol;
+std::string parser::first_and_follow::line;
+bool parser::first_and_follow::virgin = true;
+bool parser::first_and_follow::change = true;
+int parser::first_and_follow::lineIndex;
 
 
-bool parser::connectFile(std::string fileName){
+bool parser::first_and_follow::connectFile(std::string fileName){
 
 	if(inputFileStream.is_open()){
 			std::cout<<"The file is connected... Closing it first..."<<std::endl;
@@ -30,7 +33,7 @@ bool parser::connectFile(std::string fileName){
 	}
 }
 
-bool parser::disconnectFile(){
+bool parser::first_and_follow::disconnectFile(){
 
 	virgin = true;
 	if(!inputFileStream.is_open()){
@@ -49,7 +52,7 @@ bool parser::disconnectFile(){
 	}
 }
 
-bool parser::virginProtocol(){
+bool parser::first_and_follow::virginProtocol(){
 	//Get the file location from the user since it is the first time he is using it given we are in the virgin protocol().
 	std::string fileLocation;
 	std::cout<<"File Location:";
@@ -62,7 +65,7 @@ bool parser::virginProtocol(){
 	else return false;
 }
 
-void parser::getRidOfWhiteSpace(int&tempLineIndex){
+void parser::first_and_follow::getRidOfWhiteSpace(int&tempLineIndex){
 	//Function that moves the input stream forward if it reads white space. white space values are 9-10-11-12-13-32
 	//Will enter loop if the current character is a whitespace
 	while(tempLineIndex<line.size()&&(line.at(tempLineIndex) == 9 || line.at(tempLineIndex) == 11|| line.at(tempLineIndex) == 32)){
@@ -71,7 +74,7 @@ void parser::getRidOfWhiteSpace(int&tempLineIndex){
 	}
 }
 
-void parser::generateFirstSet(){
+void parser::first_and_follow::generateFirstSet(){
 
 	//Check if we've run this file before. IF we have not then we begin the virgin protocol
 	//Virgin protocol is used to get the establish file connection.
@@ -192,7 +195,7 @@ void parser::generateFirstSet(){
 
 }
 
-void parser:: compareSymbolVector(bool & change,std::vector<std::string>* v){
+void parser::first_and_follow:: compareSymbolVector(bool & change,std::vector<std::string>* v){
 	//Check if this vector exists.
 	bool eps;
 	if(firstSet.count(currentSymbol)==0){
@@ -240,7 +243,7 @@ void parser:: compareSymbolVector(bool & change,std::vector<std::string>* v){
 	}
 }
 
-void parser::checkTheNextSymbol(bool & eps, std::vector<std::string>*v){
+void parser::first_and_follow::checkTheNextSymbol(bool & eps, std::vector<std::string>*v){
 	getRidOfWhiteSpace();
 	currentSymbol = "";
 	if(checkT()){
@@ -277,7 +280,7 @@ void parser::checkTheNextSymbol(bool & eps, std::vector<std::string>*v){
 
 }
 
-void parser:: compareSymbolVectorRec(bool & eps,std::vector<std::string>* v){
+void parser::first_and_follow:: compareSymbolVectorRec(bool & eps,std::vector<std::string>* v){
 	//Check if this vector exists.
 	if(firstSet.count(currentSymbol)==0){
 		change = true;
@@ -305,13 +308,13 @@ void parser:: compareSymbolVectorRec(bool & eps,std::vector<std::string>* v){
 	}
 }
 
-void parser:: addAndMove(bool& change, std::vector<std::string> * v, std::string s){
+void parser::first_and_follow:: addAndMove(bool& change, std::vector<std::string> * v, std::string s){
 	v->emplace_back(s);
 	change = true;
 //	std::cout<<"Adding: "<<s<<" to the first Set of : "<<currentWord<<std::endl;
 }
 
-bool parser::checkE(){
+bool parser::first_and_follow::checkE(){
 	if(line.at(lineIndex)=='E'){
 		return true;
 	}
@@ -319,7 +322,7 @@ bool parser::checkE(){
 
 }
 
-void parser::getSymbol(std::string s,int & tempLineIndex){
+void parser::first_and_follow::getSymbol(std::string s,int & tempLineIndex){
 	if(s == "t"){while(line.at(tempLineIndex)!= '\''){
 		currentSymbol += line.at(tempLineIndex);
 		tempLineIndex++;}
@@ -336,7 +339,7 @@ void parser::getSymbol(std::string s,int & tempLineIndex){
 	getRidOfWhiteSpace(tempLineIndex);
 }
 
-bool parser::inVector(std::vector<std::string> * firstSet,std::string s ){
+bool parser::first_and_follow::inVector(std::vector<std::string> * firstSet,std::string s ){
 	for (std::string value : (*firstSet)) {
 		if(value == s)
 			return true;
@@ -344,7 +347,7 @@ bool parser::inVector(std::vector<std::string> * firstSet,std::string s ){
 	return false;
 }
 
-bool parser::checkT(int & tempLinIndex){
+bool parser::first_and_follow::checkT(int & tempLinIndex){
 	if(line.at(tempLinIndex)=='\''){
 		tempLinIndex++;
 		return true;
@@ -352,7 +355,7 @@ bool parser::checkT(int & tempLinIndex){
 	return false;
 }
 
-bool parser::checkNT(int & tempLinIndex){
+bool parser::first_and_follow::checkNT(int & tempLinIndex){
 	if(line.at(tempLinIndex)=='<'){
 		tempLinIndex ++;
 		return true;
@@ -360,7 +363,7 @@ bool parser::checkNT(int & tempLinIndex){
 	return false;
 }
 
-std::vector<std::string> * parser::findNT(int k){
+std::vector<std::string> * parser::first_and_follow::findNT(int k){
 	while(line.at(lineIndex) != '<'){
 		lineIndex++;
 	}
@@ -396,7 +399,7 @@ std::vector<std::string> * parser::findNT(int k){
 	}
 }
 
-bool parser::checkForAssignment(){
+bool parser::first_and_follow::checkForAssignment(){
 	int tempIndex = lineIndex;
 	if(line.at(tempIndex)==':'){
 		tempIndex++;
@@ -413,7 +416,7 @@ bool parser::checkForAssignment(){
 	return false;
 }
 
-void parser::generateFollowSet(){
+void parser::first_and_follow::generateFollowSet(){
 
 	//Check if we've run this file before. IF we have not then we begin the virgin protocol
 	//Virgin protocol is used to get the establish file connection.
@@ -595,7 +598,7 @@ void parser::generateFollowSet(){
 	disconnectFile();
 }
 
-bool parser :: hasEpsilon(std::vector <std::string> * b){
+bool parser::first_and_follow :: hasEpsilon(std::vector <std::string> * b){
 	for(std::string value : (*b) ){
 		if(value == "EPSILON")
 			return true;
@@ -603,12 +606,12 @@ bool parser :: hasEpsilon(std::vector <std::string> * b){
 	return false;
 }
 
-void parser::getToAssignmentOp(){
+void parser::first_and_follow::getToAssignmentOp(){
 	while(lineIndex!= line.size() && line.at(lineIndex) != ':')
 		lineIndex++;
 }
 
-void parser::getFollowSetSymbol(){
+void parser::first_and_follow::getFollowSetSymbol(){
 	while(lineIndex!= line.size() && line.at(lineIndex)!='<'){
 		lineIndex ++;
 	}
@@ -625,13 +628,13 @@ void parser::getFollowSetSymbol(){
 
 }
 
-void parser::movePointer(int & templineIndex){
+void parser::first_and_follow::movePointer(int & templineIndex){
 	while(templineIndex!=line.size()&&line.at(templineIndex)!='<' &&line.at(templineIndex)!='\''&&line.at(templineIndex)!='e' ){
 		templineIndex++;
 	}
 }
 
-std::vector<std::string> * parser:: findFollowSet(std::string s){
+std::vector<std::string> * parser::first_and_follow:: findFollowSet(std::string s){
 	if(followSet.count(s)==0){
 		followSet[s] = new std::vector<std::string>();  // Allocate memory
     	change = true;
@@ -642,7 +645,7 @@ std::vector<std::string> * parser:: findFollowSet(std::string s){
 
 }
 
-void parser:: compareAndAdd(std::vector<std::string> * followSetOfWord, std::vector<std::string> * followSetOfOriginalNT){
+void parser::first_and_follow:: compareAndAdd(std::vector<std::string> * followSetOfWord, std::vector<std::string> * followSetOfOriginalNT){
 	if(followSetOfOriginalNT->size()==0){
 		change =true;
 		return;

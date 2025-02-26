@@ -37,8 +37,8 @@
 <fParamsTail> ::= ',' 'id' ':' <type> <rept-fParamsTail4> 
 
 <factor> ::= <rept-factor> 
-<factor> ::= 'intLit' 
-<factor> ::= 'floatLit' 
+<factor> ::= 'intnum' 
+<factor> ::= 'floatnum' 
 <factor> ::= '(' <arithExpr> ')' 
 <factor> ::= 'not' <factor> 
 <factor> ::= <sign> <factor> 

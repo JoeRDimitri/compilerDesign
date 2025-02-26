@@ -1,6 +1,7 @@
 #include "parser.h"
 
 parser::first_and_follow parser::faf;
+parser::parsing_table parser::parsingTable;
 
 std::unordered_map<std::string, std::vector<std::string>*> parser::first_and_follow::firstSet;
 std::unordered_map<std::string, std::vector<std::string>*> parser::first_and_follow::followSet;
@@ -598,7 +599,7 @@ void parser::first_and_follow::generateFollowSet(){
 	disconnectFile();
 }
 
-bool parser::first_and_follow :: hasEpsilon(std::vector <std::string> * b){
+bool parser::first_and_follow::hasEpsilon(std::vector <std::string> * b){
 	for(std::string value : (*b) ){
 		if(value == "EPSILON")
 			return true;
@@ -682,4 +683,543 @@ void parser::first_and_follow:: compareAndAdd(std::vector<std::string> * followS
 
 	}
 }
+
+
+
+/*
+ *
+ *
+ *
+ * PARSING TABLE SECTION BELOW
+ *
+ *
+ *
+ */
+
+
+int parser::parsing_table:: TABLEROWSIZE;
+int parser::parsing_table:: TABLECOLUMNSIZE;
+int parser::parsing_table:: UNIT;
+std::ifstream parser::parsing_table::inputFileStream;
+std::unordered_set<std::string> parser::parsing_table::uniqueTerminalSymbols;
+std::unordered_map<std::string, int> parser::parsing_table::tableRows;
+std::unordered_map<std::string, int> parser::parsing_table::tableColumns;  // Ensure values are ints, not references
+
+bool parser::parsing_table::connectFile(std::string fileName){
+
+	if(inputFileStream.is_open()){
+			std::cout<<"The file is connected... Closing it first..."<<std::endl;
+			inputFileStream.close();
+		}
+
+	inputFileStream.open(fileName,std::ios::in);
+
+	if(inputFileStream){
+		std::cout<<"Successfully opened file: "<<fileName<<"."<<std::endl;
+		return true;
+	}
+	else{
+		std::cout<<"Failed to open file: "<<fileName<<"."<<std::endl;
+		return false;
+	}
+}
+
+bool parser::parsing_table::disconnectFile(){
+
+	if(!inputFileStream.is_open()){
+			std::cout<<"The file is not even connected. No need to close."<<std::endl;
+			return true;
+		}
+	inputFileStream.close();
+
+	if(!inputFileStream.is_open()){
+		std::cout<<"Successfully closed the inputFileStream."<<std::endl;
+		return true;
+	}
+	else{
+		std::cout<<"Failed to close the inputFileStream."<<std::endl;
+		return false;
+	}
+}
+void parser::parsing_table:: buildTable(){
+	setUniqueTerminalSymbols();
+	setRowAndColumnSize();
+	setTheTableSize();
+	setTableRow();
+	setTableColumn();
+	fillTableWithErrors();
+	createParsingTable();
+}
+void parser::parsing_table::fillTableWithErrors(){
+	for (int i = 0; i < TABLEROWSIZE; i++) {
+	    for (int j = 0; j < TABLECOLUMNSIZE; j++) {
+			tableEntry currentEntry = {i,j,"error"};
+	    	table[i][j] = currentEntry;
+	    }
+	}
+}
+
+
+void parser::parsing_table:: setUniqueTerminalSymbols(){
+    for (const auto& pair : faf.firstSet) {
+        for (const auto& value : (*pair.second)) {
+        	if(value == "EPSILON"){
+        		continue;
+        	}
+        	uniqueTerminalSymbols.insert(value);  // insert automatically handles duplicates
+        }
+    }
+    for (const auto& pair : faf.followSet) {
+        for (const auto& value : (*pair.second)) {
+        	uniqueTerminalSymbols.insert(value);  // insert automatically handles duplicates
+        }
+    }
+
+    uniqueTerminalSymbols.insert(":");
+    uniqueTerminalSymbols.insert("=>");
+    uniqueTerminalSymbols.insert(":=");
+    uniqueTerminalSymbols.insert("then");
+    uniqueTerminalSymbols.insert("invalidnum");
+
+
+
+
+}
+//THE TABLESROWS REPRESENT THE VALUE OF THE FIRST ARRAY
+int parser::parsing_table:: getTableRowSize(){
+	return faf.firstSet.size();
+}
+//TABLE COLUMNS REPRESENT THE VALUE OF THE SECOND ARRAY
+int parser::parsing_table:: getTableColumnSize(){
+	return (uniqueTerminalSymbols.size());
+}
+
+
+void parser::parsing_table:: setRowAndColumnSize(){
+	TABLEROWSIZE = getTableRowSize();
+	TABLECOLUMNSIZE = getTableColumnSize();
+	UNIT = sizeof(struct tableEntry);
+}
+
+
+void parser::parsing_table:: setTheTableSize(){
+	table = new tableEntry*[TABLEROWSIZE]; // Allocate row pointers
+	for (int i = 0; i < TABLEROWSIZE; ++i) {
+	    table[i] = new tableEntry[TABLECOLUMNSIZE]; // Allocate each row
+	}
+}
+
+void parser::parsing_table::setTableRow(){
+	int i = 0;
+//	std::cout<< "FOR THE ROWS"<<std::endl;
+	for(const auto& value : faf.firstSet){
+		tableRows[value.first] = i;
+//		std::cout<<"Row = "<< value.first <<", value = "<<i<<std::endl;
+		i++;
+	}
+}
+
+void parser::parsing_table::setTableColumn(){
+	int i = 0;
+//	std::cout<< "FOR THE COLUMNS"<<std::endl;
+	for(const auto& value: uniqueTerminalSymbols){
+		tableColumns[value]=i;
+//		std::cout<<"Column = "<< value<<", value = "<<i<<std::endl;
+
+		i++;
+	}
+
+}
+
+void parser::parsing_table::getRule(std::string & rule, std::string line, int & lineIndex){
+	 if(lineIndex == line.size())
+		 return;
+
+	 while(line.at(lineIndex)!='<'){
+		 if(lineIndex == line.size())
+			 return;
+
+		 lineIndex++;
+	 }
+	 lineIndex++;
+	 while(line.at(lineIndex)!='>'){
+		 rule+=line.at(lineIndex);
+		 lineIndex++;
+	 }
+	 while(line.at(lineIndex)!='='){
+			 lineIndex++;
+	 }
+
+	 lineIndex++;
+}
+
+void parser::parsing_table::getAlpha(std::string & alpha, const std::string line, int & lineIndex){
+	while(lineIndex!=line.size()){
+		alpha+=line.at(lineIndex);
+		lineIndex++;
+	}
+}
+
+bool parser::parsing_table::checkFirstOfAlpha(const std::string alpha,std::unordered_set<std::string> & firstOfAlpha,bool & isTerminal){
+//	std::cout<<"hello"<<std::endl;
+	int tempLineIndex = 0;
+	while(alpha.at(tempLineIndex)!= '\'' && alpha.at(tempLineIndex)!='<' && alpha.at(tempLineIndex)!= 'E'){
+		tempLineIndex++;
+	}
+	if (alpha.at(tempLineIndex)=='\''){
+		isTerminal = true;
+		tempLineIndex++;
+		std::string terminal;
+		while(alpha.at(tempLineIndex)!='\''){
+			terminal +=alpha.at(tempLineIndex);
+			tempLineIndex++;
+		}
+		firstOfAlpha.insert(terminal);
+		return false;
+	}
+
+	else if(alpha.at(tempLineIndex)== '<'){
+		isTerminal = false;
+		bool containsEpsilon = false;
+		tempLineIndex++;
+		std::string NonTerminal;
+		while(alpha.at(tempLineIndex)!='>'){
+			NonTerminal += alpha.at(tempLineIndex);
+			tempLineIndex++;
+		}
+
+		std::vector<std::string> * NonTerminalFirstSet = faf.firstSet[NonTerminal];
+		for(const auto & value:(*NonTerminalFirstSet)){
+			firstOfAlpha.insert(value);
+			if(value == "EPSILON"){
+				containsEpsilon = true;
+			}
+		}
+		if(containsEpsilon){
+			while(containsEpsilon){
+				containsEpsilon = false;
+				firstOfAlpha.erase("EPSILON");
+				std::string nextSymbol;
+
+				while(tempLineIndex != alpha.size() && alpha.at(tempLineIndex)!= '\'' && alpha.at(tempLineIndex)!='<' && alpha.at(tempLineIndex)!= 'E'){
+					tempLineIndex++;
+				}
+
+				if(tempLineIndex == alpha.size()){
+					containsEpsilon = true;
+					return true;
+				}
+
+				if (alpha.at(tempLineIndex)=='\''){
+						tempLineIndex++;
+						while(alpha.at(tempLineIndex)!='\''){
+							nextSymbol +=alpha.at(tempLineIndex);
+							tempLineIndex++;
+						}
+						firstOfAlpha.insert(nextSymbol);
+						return false;
+					}
+				else if(alpha.at(tempLineIndex)== '<'){
+					tempLineIndex++;
+					while(alpha.at(tempLineIndex)!='>'){
+						nextSymbol += alpha.at(tempLineIndex);
+						tempLineIndex++;
+					}
+					if(nextSymbol =="rept-statement4"){
+
+					}
+
+					std::vector<std::string> * NonTerminalFirstSetSecond = faf.firstSet[nextSymbol];
+					for(const auto & value:(*NonTerminalFirstSetSecond)){
+						if(value == "EPSILON"){
+							containsEpsilon = true;
+						}
+						firstOfAlpha.insert(value);
+					}
+
+
+				}
+
+
+			}
+			if(!containsEpsilon)return true;
+
+		}
+		else return false;
+//		for (const auto& val : firstOfAlpha) {
+//		        std::cout << val << std::endl;
+//		    }
+
+	}
+	else if(alpha.at(tempLineIndex)=='E'){
+		firstOfAlpha.insert("EPSILON");
+		return true;
+	}
+	else{
+		std::cout<<"Code should not reach here. You are in parser::parsing_table::checkFirstOfAlpha"<<std::endl;
+	}
+
+}
+
+void parser::parsing_table::updateTable(const std::string rule, std::unordered_set <std::string> firstOfAlpha,std::string line){
+//
+	for (const auto& value : firstOfAlpha){
+		int rowValue = tableRows[rule];
+		int columnValue = tableColumns[value];
+//		std::cout<<value<<rowValue<<","<<columnValue<<std::endl;
+		tableEntry currentEntry = {rowValue,columnValue,line};
+		table[rowValue][columnValue] = currentEntry;
+	}
+}
+
+bool parser::parsing_table::hasEpsilon(std::unordered_set <std::string> & firstOfAlpha, bool isTerminal){
+	for (auto value : firstOfAlpha){
+		if(value == "EPSILON")
+			return true;
+	}
+	return false;
+
+}
+
+void parser::parsing_table::getFollowOfRule(std::unordered_set <std::string> & followOfRule,const std::string rule ){
+	std::vector<std::string> * ruleFollowVector = faf.followSet[rule];
+	for (auto value : (*ruleFollowVector)){
+		followOfRule.insert(value);
+	}
+}
+
+
+
+void parser::parsing_table::createParsingTable(){
+	if(connectFile("/home/giusuppe/eclipse-workspace/compilerDesign/Assignment2.COMP442-6421.paquet.2025.4/assignment2.COMP442-6421.paquet.2025.4 NEW/grammars/noLeftRec.grm")){
+		//We've properly connected to the file now we need to get rid of the white space and then hand control back over getNextToken().
+	}
+	std::string line;
+
+	while (std::getline(inputFileStream, line)){
+		int lineIndex=0;
+		bool hasEpsilon;
+		std::string rule;
+		std::string alpha;
+		std::unordered_set <std::string> firstOfAlpha;
+		std::unordered_set <std::string> followOfRule;
+		bool isTerminal;
+
+		getRule(rule,line,lineIndex);
+		 if(lineIndex == line.size())
+			 continue;
+//		 std::cout<<"THE RULE IS: "<<rule<<std::endl<<std::endl;
+		getAlpha(alpha,line,lineIndex);
+//		std::cout<<"THE ALPHA IS: "<<alpha<<std::endl;
+		hasEpsilon = checkFirstOfAlpha(alpha,firstOfAlpha,isTerminal);
+//		 for (const auto& elem : firstOfAlpha) {
+//		        std::cout << elem << " ";
+//
+//		    }
+//		 std::cout<<std::endl;
+
+//		for (const auto& val : firstOfAlpha) {
+//		        std::cout << val << std::endl;
+//		    }
+
+		updateTable(rule,firstOfAlpha,line);
+
+
+		if(hasEpsilon){
+//			std::cout<<"ALPHA HAS EPSILON NEED TO ADD FOLLOW SET OF "<<rule<<std::endl;
+			getFollowOfRule(followOfRule,rule);
+			updateTable(rule,followOfRule,line);
+		}
+
+//		insertErrors();
+
+	}
+    std::ofstream file("output.txt");
+	auto rowit = tableRows.begin();
+
+    for (int i = 0; i < TABLEROWSIZE; i++) {
+    	auto columnit = tableColumns.begin();
+
+        for (int j = 0; j < TABLECOLUMNSIZE; j++) {
+
+            file << "ROW: " << rowit ->first<< ", at value: " << rowit->second<<std::endl
+                      << "COLUMN : " << columnit -> first<<", at value: "<<columnit -> second <<std::endl
+                      << "Table entry: " << table[rowit->second][columnit -> second].derivationRule << std::endl;
+            columnit++;
+        }
+        rowit++;
+    }
+    file.close();
+
+	disconnectFile();
+
+
+}
+
+
+/*
+ *
+ *
+ *
+ * MAIN PARSING SECTION BELOW
+ *
+ *
+ *
+ */
+//Forward Declaration
+std::stack<std::string> parser::parsingStack;
+
+bool parser::parse(const std::vector<token*>  & vectorOfTokens){
+    std::ofstream derivationOut("Derivation"); // Open file for writing
+    int i =0;
+	std::vector<std::string> derivation;
+	int lineIndex =0;
+	bool error;
+	parsingStack.push("$");
+	parsingStack.push("START");
+	derivation.emplace_back("START");
+	auto vectorIterator = vectorOfTokens.begin();
+	token* currentToken = (*vectorIterator);
+
+	while(parsingStack.top()!="$"){
+		if(i == 1283)
+		{
+			std::cout<<i<<std::endl;
+
+		}
+		i++;
+		std::string topOfTheStack = parsingStack.top();
+		if(parsingTable.uniqueTerminalSymbols.count(topOfTheStack)!=0){
+			if(topOfTheStack==(currentToken->getTypeName())){
+				parsingStack.pop();
+				derivation.erase(derivation.begin()+lineIndex);
+				derivation.insert(derivation.begin()+lineIndex,currentToken->getLexeme());
+				lineIndex++;
+				vectorIterator++;
+				currentToken = (*vectorIterator);
+				for(auto const & value:derivation){
+					derivationOut<<value<<" ";
+				}
+				derivationOut<<std::endl;
+			}
+			else{
+				//Handle error;
+//				skipError(derivationOut,currentToken->getTypeName(),topOfTheStack,currentToken->getLine(),currentToken->getColumn());
+				error = true;
+			}
+
+		}
+		else{
+			if(topOfTheStack == "EPSILON"){
+				parsingStack.pop();
+				derivation.erase(derivation.begin()+lineIndex);
+				for(auto const & value:derivation){
+					derivationOut<<value<<" ";
+				}
+				derivationOut<<std::endl;
+				continue;
+			}
+			//Need to find the row and column value for the table
+			//row will be whatever the top of the stack is.
+
+			int rowValue = parsingTable.tableRows[topOfTheStack];
+			int columnValue = parsingTable.tableColumns[((currentToken)->getTypeName())];
+			tableEntry currentTableEntry = parsingTable.table[rowValue][columnValue];
+			if(currentTableEntry.derivationRule!="error"){
+				parsingStack.pop();
+				derivation.erase(derivation.begin()+lineIndex);
+				inverseRHSMultiplePush(currentTableEntry,derivation,lineIndex);
+				for(auto const & value:derivation){
+					derivationOut<<value<<" ";
+				}
+				derivationOut<<std::endl;
+			}
+			else{
+				//Handle error;
+//				skipError(derivationOut,currentToken->getTypeName(),topOfTheStack,currentToken->getLine(),currentToken->getColumn());
+				error = true;
+			}
+		}
+	}
+	if((currentToken->getTypeName()!="$")||(error ==true)){
+		return false;
+	}
+	else return true;
+}
+
+void parser::inverseRHSMultiplePush(tableEntry currentTableEntry,std::vector<std::string>&derivation,const int & lineIndex){
+	std::string lineToInverseAndSplitThenPush = currentTableEntry.derivationRule;
+	std::stack<std::string> items;
+	int tempLineIndex =0;
+	while(lineToInverseAndSplitThenPush.at(tempLineIndex)!= '>'){tempLineIndex++;}
+	while(lineToInverseAndSplitThenPush.at(tempLineIndex)!= '='){tempLineIndex++;}
+	tempLineIndex++;
+	while(tempLineIndex!=lineToInverseAndSplitThenPush.size()){
+		std::string currentString;
+		while(tempLineIndex != lineToInverseAndSplitThenPush.size() && lineToInverseAndSplitThenPush.at(tempLineIndex)!= '\'' && lineToInverseAndSplitThenPush.at(tempLineIndex)!='<' && lineToInverseAndSplitThenPush.at(tempLineIndex)!= 'E'){
+			tempLineIndex++;
+		}
+		if(tempLineIndex==lineToInverseAndSplitThenPush.size())break;
+		if (lineToInverseAndSplitThenPush.at(tempLineIndex)=='\''){
+			tempLineIndex++;
+
+			while(lineToInverseAndSplitThenPush.at(tempLineIndex)!='\''){
+				currentString +=lineToInverseAndSplitThenPush.at(tempLineIndex);
+				tempLineIndex++;
+
+			}
+			tempLineIndex++;
+			items.push(currentString);
+
+			continue;
+		}
+		else if(lineToInverseAndSplitThenPush.at(tempLineIndex)=='<'){
+			tempLineIndex++;
+
+			while(lineToInverseAndSplitThenPush.at(tempLineIndex)!='>'){
+				currentString +=lineToInverseAndSplitThenPush.at(tempLineIndex);
+				tempLineIndex++;
+
+			}
+			tempLineIndex++;
+			items.push(currentString);
+
+			continue;
+		}
+		else if(lineToInverseAndSplitThenPush.at(tempLineIndex)=='E'){
+//			items.push("EPSILON");
+			break;
+		}
+
+
+
+	}
+
+	while(!items.empty()){
+		 parsingStack.push(items.top());
+			derivation.insert(derivation.begin()+lineIndex,items.top());
+
+		 items.pop();
+	}
+}
+
+void parser::skipError(std::ofstream & derivationOut,const std::string &lexeme, const std::string &topOfTheStack,const int & line, const int & column){
+//	derivationOut<<"Syntax error at ("<< line<<", "<<column<<")"<<std::endl;
+//	if(lexeme == "$"|| search(lexeme,topOfTheStack)){
+//		parsingStack.pop();
+//	}
+//	else{
+//		while(searchFirst(lexeme,topOfTheStack)||(searchFirst("EPSILON",topOfTheStack)&&search(lexeme,topOfTheStack))){
+//
+//
+//		}
+//	}
+//
+//}
+//bool parser::search(const std::string & lexeme, const std::string & topOfTheStack){
+//	if(faf.followSet[topOfTheStack])
+//		return true;
+//	else return false;
+}
+
 

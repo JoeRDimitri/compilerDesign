@@ -26,6 +26,8 @@ int main (){
 
 		}
 		catch (const EndOfFileException& e) {
+			token * lastToken = new token("$","$",-1,-1);
+			vectorOfTokens.emplace_back(lastToken);
 		        std::cerr << "EOF reached.\n";
 		    }
 		catch(const std::exception & e){

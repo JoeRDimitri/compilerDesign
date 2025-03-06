@@ -51,7 +51,6 @@ private:
 	bool checkNT(int & tempLineIndex = lineIndex);
 	bool checkE();
 	//Function that checks if the current symbol is in the vector that is provided as an argument
-	bool inVector(std::vector<std::string> * v, const std::string s = currentSymbol);
 	void getSymbol(std::string t,int & tempLineIndex = lineIndex);
 	void addAndMove(bool & change, std::vector<std::string>* v, std::string s = currentSymbol);
 	void compareSymbolVector(bool & change, std::vector<std::string>* v);
@@ -65,6 +64,8 @@ private:
 	void compareAndAdd(std::vector<std::string>* v1, std::vector<std::string>* v2);
 	bool hasEpsilon(std::vector<std::string> * v);
 public:
+	bool static inVector(std::vector<std::string> * v, const std::string s = currentSymbol);
+
 	static std::unordered_map<std::string, std::vector<std::string>*> firstSet;
 	static std::unordered_map<std::string, std::vector<std::string>*> followSet;
 
@@ -142,9 +143,10 @@ public:
 	static parsing_table parsingTable;
 	static std::stack<std::string> parsingStack;
 
+	bool searchFirst(std::string lookahead, std::string topOfTheStack);
 	bool parse(const  std::vector<token*> &);
 	void inverseRHSMultiplePush(tableEntry t,std::vector<std::string>& vec,const int & lineIndex);
-	void skipError(std::ofstream &,const std::string & lexeme,const std::string & topOfTheStack,const int & line, const int & column);
+	void skipError(token * & currentToken,std::vector<token*>::const_iterator& vectorIterator,std::ofstream &,const std::string & lexeme,const std::string & topOfTheStack,const int & line, const int & column);
 	bool search(const std::string & lexeme, const std::string & topOfTheStack);
 
 		parser(){};

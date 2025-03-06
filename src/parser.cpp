@@ -1082,7 +1082,7 @@ bool parser::parse(const std::vector<token*>  & vectorOfTokens){
 	token* currentToken = (*vectorIterator);
 
 	while(parsingStack.top()!="$"){
-		if(i == 1283)
+		if(i >= 1280)
 		{
 			std::cout<<i<<std::endl;
 
@@ -1135,8 +1135,30 @@ bool parser::parse(const std::vector<token*>  & vectorOfTokens){
 				derivationOut<<std::endl;
 			}
 			else{
+				//Need to check the follow set of the current the top of the stack.
+				std::vector<std::string> * topStackFollow = faf.followSet[topOfTheStack];
+				std::string topOfStack;
+				if(first_and_follow::inVector(topStackFollow, "$")){
+					//if it has EOF symbol in the follow set then we need to check if the $ symbol is the next symbol.
+					topOfStack = parsingStack.top();
+					parsingStack.pop();
+					if(parsingStack.top()=="$"){
+						std::cout<<"Parsing of the file completed all the way to the end!"<<std::endl;
+						derivation.erase(derivation.end());
+						derivation.insert(derivation.end(), "$");
+						for(auto const & value:derivation){
+							derivationOut<<value<<" ";
+						}
+						derivationOut<<std::endl;
+
+//						break;
+					}
+					else{
+					}
+				}
+
 				//Handle error;
-//				skipError(derivationOut,currentToken->getTypeName(),topOfTheStack,currentToken->getLine(),currentToken->getColumn());
+				skipError(currentToken,vectorIterator,derivationOut,topOfStack,topOfTheStack,currentToken->getLine(),currentToken->getColumn());
 				error = true;
 			}
 		}
@@ -1187,7 +1209,7 @@ void parser::inverseRHSMultiplePush(tableEntry currentTableEntry,std::vector<std
 			continue;
 		}
 		else if(lineToInverseAndSplitThenPush.at(tempLineIndex)=='E'){
-//			items.push("EPSILON");
+			//items.push("EPSILON");
 			break;
 		}
 
@@ -1202,24 +1224,41 @@ void parser::inverseRHSMultiplePush(tableEntry currentTableEntry,std::vector<std
 		 items.pop();
 	}
 }
+//				skipError(derivationOut,currentToken->getTypeName(),topOfTheStack,currentToken->getLine(),currentToken->getColumn());
 
-void parser::skipError(std::ofstream & derivationOut,const std::string &lexeme, const std::string &topOfTheStack,const int & line, const int & column){
-//	derivationOut<<"Syntax error at ("<< line<<", "<<column<<")"<<std::endl;
-//	if(lexeme == "$"|| search(lexeme,topOfTheStack)){
-//		parsingStack.pop();
-//	}
-//	else{
-//		while(searchFirst(lexeme,topOfTheStack)||(searchFirst("EPSILON",topOfTheStack)&&search(lexeme,topOfTheStack))){
-//
-//
-//		}
-//	}
-//
-//}
-//bool parser::search(const std::string & lexeme, const std::string & topOfTheStack){
-//	if(faf.followSet[topOfTheStack])
-//		return true;
-//	else return false;
+
+void parser::skipError(token * & currentToken,std::vector<token*>::const_iterator& vectorIterator,std::ofstream & derivationOut,const std::string &lookahead, const std::string &topOfTheStack,const int & line, const int & column){
+	derivationOut<<"Syntax error at ("<< line<<", "<<column<<")"<<std::endl;
+	std::string nextToken = (*(vectorIterator +1))->getLexeme();
+	if(nextToken == "$"|| search(nextToken,topOfTheStack)){
+		parsingStack.pop();
+	}
+	else{
+		while((!searchFirst(nextToken,topOfTheStack))&&(searchFirst("EPSILON",topOfTheStack)&&!search(nextToken,topOfTheStack))){
+			vectorIterator++;
+			nextToken = (*(vectorIterator+1))->getLexeme();
+			currentToken = (*vectorIterator);
+		}
+		vectorIterator++;
+		currentToken = (*vectorIterator);
+
+	}
+
+}
+bool parser::search(const std::string & nextToken, const std::string & topOfTheStack){
+	if(first_and_follow::inVector(faf.followSet[topOfTheStack],nextToken)){
+		return true;
+	}
+	else return false;
+}
+
+bool parser::searchFirst(std::string nextToken, std::string topOfTheStack){
+	if(first_and_follow::inVector(faf.firstSet[topOfTheStack],nextToken)){
+		return true;
+	}
+	else return false;
+
+
 }
 
 

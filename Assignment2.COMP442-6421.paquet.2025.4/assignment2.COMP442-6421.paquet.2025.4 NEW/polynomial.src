@@ -1,5 +1,5 @@
 // ====== struct declarations ====== //
-class POLYNOMIAL {
+class POLYNOMIAL - - -  {
 	public function evaluate(x: float) => float;
 };
 

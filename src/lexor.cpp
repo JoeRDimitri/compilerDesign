@@ -213,7 +213,7 @@ bool lexor::virginProtocol(){
 	std::cout<<"File Location:";
 	std::cin>>fileLocation;
 	//File Location acquired, check if we can properly connect.
-	if(connectFile("/home/giusuppe/eclipse-workspace/compilerDesign/Assignment3.COMP442-6421.paquet.2025.4/assignment3.COMP442-6421.paquet.2025.4/source files/testingdot.txt"))
+	if(connectFile("/home/giusuppe/eclipse-workspace/compilerDesign/Assignment3.COMP442-6421.paquet.2025.4/assignment3.COMP442-6421.paquet.2025.4/source files/polynomial.src"))
 	{
 		handler.setFileName(fileLocation);
 

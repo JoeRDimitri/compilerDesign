@@ -18,7 +18,7 @@
 
 <assignOp> ::= ':=' #assign
 
-<attributeDecl> ::= 'attribute' <varDecl> #attributdecl
+<attributeDecl> ::= 'attribute' <varDecl> #attributedecl
 
 <classDecl> ::= 'class' 'id' #id <opt-classDecl2> '{' #p <rept-classDecl4> #reptclassdecl4 '}' ';' #classdecl
 
@@ -83,8 +83,8 @@
 <localVarDeclOrStat> ::= <localVarDecl> 
 <localVarDeclOrStat> ::= <statement> 
 
-<memberDecl> ::= <funcDecl>
-<memberDecl> ::= <attributeDecl>
+<memberDecl> ::= <funcDecl> #funcdeclfam
+<memberDecl> ::= <attributeDecl> #attributedeclfam
 
 <multOp> ::= '*' #multop
 <multOp> ::= '/' #multop
@@ -103,7 +103,7 @@
 <rept-aParams1> ::= <aParamsTail> <rept-aParams1>  
 <rept-aParams1> ::= EPSILON 
 
-<rept-classDecl4> ::= <visibility> <memberDecl> #visibilityandmemberdecl <rept-classDecl4> 
+<rept-classDecl4> ::= <visibility> <memberDecl> <rept-classDecl4> 
 <rept-classDecl4> ::= EPSILON 
 
 <rept-fParams3> ::= <arraySize> <rept-fParams3>

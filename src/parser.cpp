@@ -1287,7 +1287,7 @@ void parser::semanticActions::handleAction(std::string semanticFunction){
 	else if(semanticFunction == "arithexpr"){ semanticHandler.passAlong("arithexpr");}
 	else if(semanticFunction == "arraysize"){ semanticHandler.passAlong("arraysize");}
 	else if(semanticFunction == "assign"){semanticHandler.makeLeaf("assign");}
-	else if(semanticFunction == "attributdecl"){ semanticHandler.passAlong("attributdecl");}
+	else if(semanticFunction == "attributedecl"){ semanticHandler.passAlong("attributedecl");}
 	else if(semanticFunction == "id"){semanticHandler.makeLeaf("id");}
 	else if(semanticFunction == "reptclassdecl4"){std::vector<std::string> v = {"epsilon"}; semanticHandler.makeSubTree("reptclassdecl4","{",'E',v);}
 	else if(semanticFunction == "classdecl"){std::vector<std::string> v = {"id","optclassdecl2","reptclassdecl4"}; semanticHandler.makeSubTree("classdecl","classdecl",3,v);}
@@ -1323,11 +1323,13 @@ void parser::semanticActions::handleAction(std::string semanticFunction){
 //	else if(semanticFunction == "memberdecl"){ semanticHandler.passAlong("memberdecl");}
 	else if(semanticFunction == "multop"){semanticHandler.makeLeaf("multop");}
 	else if(semanticFunction == "reptoptclassdecl22"){std::vector<std::string> v = {"epsilon"}; semanticHandler.makeSubTree("reptoptclassdecl22","reptoptclassdecl22",'E',v);}
-	else if(semanticFunction == "optclassdecl2"){std::vector<std::string> v = {"epsilon"}; semanticHandler.makeSubTree("optclassdecl2","optclassdecl2",'E',v);}
+	else if(semanticFunction == "optclassdecl2"){std::vector<std::string> v = {"epsilon"}; semanticHandler.makeSubTree("optclassdecl2","isalist",'E',v);}
 	else if(semanticFunction == "reptprog0"){std::vector<std::string> v = {"epsilon"}; semanticHandler.makeSubTree("reptprog0","prog",'E',v);}
 	else if(semanticFunction == "prog"){ semanticHandler.passAlong("prog");}
 	else if(semanticFunction == "relexpr"){std::vector<std::string> v = {"arithexpr","relop","arithexpr"}; semanticHandler.makeSubTree("relexpr","relexpr",3,v);}
-	else if(semanticFunction == "visibilityandmemberdecl"){std::vector<std::string> v = {"visibility","attributdecl","funcdecl"}; semanticHandler.makeSubTree("visibilityandmemberdecl","classmember",2,v);}
+	else if(semanticFunction == "funcdeclfam"){std::vector<std::string> v = {"visibility","funcdecl"}; semanticHandler.makeSubTree("funcdecl","funcdecl",2,v);}
+	else if(semanticFunction == "attributedeclfam"){std::vector<std::string> v = {"visibility","attributedecl"}; semanticHandler.makeSubTree("attributedecl","attributedecl",2,v);}
+
 	else if(semanticFunction == "void"){semanticHandler.makeLeaf("void");}
 	else if(semanticFunction == "returntype"){ semanticHandler.passAlong("returntype","returntype");}
 	else if(semanticFunction == "rightrecterm"){semanticHandler.makeBinarySubTree("rightrecterm",1);}
@@ -1456,7 +1458,7 @@ void parser::semanticActions::makeBinarySubTree(std::string nodeType,int i){
 
 }
 
-void parser::semanticActions:: makeSubTree(std::string nodeType, std::string nodeValue,int amountOfPops,std::vector<std::string> match){
+void parser::semanticActions:: makeSubTree(std::string nodeType, std::string semanticMeaning,int amountOfPops,std::vector<std::string> match){
 	std::vector<abstractSyntaxTree::node *> nodesFromTheStack;
 	if(amountOfPops == 'E'){
 		abstractSyntaxTree::node * n = semanticStack.top();
@@ -1530,14 +1532,14 @@ void parser::semanticActions:: makeSubTree(std::string nodeType, std::string nod
 	}
 
 
-	abstractSyntaxTree::node * parentNode= new abstractSyntaxTree::node(nodesFromTheStack,nodeType,nodeValue);
+	abstractSyntaxTree::node * parentNode= new abstractSyntaxTree::node(nodesFromTheStack,nodeType,semanticMeaning);
 
 	for(abstractSyntaxTree::node * value : nodesFromTheStack){
 		value->parent = parentNode;
 	}
 
 	if(nodesFromTheStack.size()==0){
-			parentNode->nodeValue="epsilon";
+			parentNode->semanticMeaning="epsilon";
 		}
 	semanticStack.push(parentNode);
 }
@@ -1547,8 +1549,8 @@ void parser::semanticActions:: passAlong(std::string nodeType){
 	semanticStack.pop();
 	abstractSyntaxTree::node * n = new abstractSyntaxTree::node (topofthestack,nodeType);
 	adoptChildren(n,topofthestack);
-	if(topofthestack->nodeType =="epsilon" || topofthestack->nodeValue == "epsilon"){
-		n->nodeValue ="epsilon";
+	if(topofthestack->nodeType =="epsilon" || topofthestack->semanticMeaning == "epsilon"){
+		n->semanticMeaning ="epsilon";
 	}
 	delete topofthestack;
 	if(nodeType == "start"){
@@ -1561,13 +1563,13 @@ void parser::semanticActions:: passAlong(std::string nodeType){
 
 }
 
-void parser::semanticActions:: passAlong(std::string nodeType,std::string nodeValue){
+void parser::semanticActions:: passAlong(std::string nodeType,std::string semanticMeaning){
 	abstractSyntaxTree::node * topofthestack = semanticStack.top();
 	semanticStack.pop();
-	abstractSyntaxTree::node * n = new abstractSyntaxTree::node (topofthestack,nodeType,nodeValue);
+	abstractSyntaxTree::node * n = new abstractSyntaxTree::node (topofthestack,nodeType,semanticMeaning);
 	adoptChildren(n,topofthestack);
-	if(topofthestack->nodeType =="epsilon" || topofthestack->nodeValue == "epsilon"){
-		n->nodeValue ="epsilon";
+	if(topofthestack->nodeType =="epsilon" || topofthestack->semanticMeaning == "epsilon"){
+		n->semanticMeaning ="epsilon";
 	}
 	delete topofthestack;
 	if(nodeType == "start"){
@@ -1595,7 +1597,7 @@ void parser::abstractSyntaxTree::printTree(){
 	abstractSyntaxTree::node * head = AST.treeHead;
 	std::vector<abstractSyntaxTree::node*> v = head->children;
 	int counter = 0;
-	astout<<head->nodeValue<<std::endl;
+	astout<<head->semanticMeaning<<std::endl;
 	for(int k = v.size()-1;k>=0;k--){
 		traverseTree(v.at(k),counter,astout);
 	}
@@ -1607,7 +1609,7 @@ void parser::abstractSyntaxTree::traverseTree(abstractSyntaxTree::node* head, in
 		for(int i = 0; i<counter; i++){
 			ao<<"| ";
 		}
-		if(head->nodeValue !="epsilon")ao<<head->nodeValue<<std::endl;
+		if(head->semanticMeaning !="epsilon")ao<<head->semanticMeaning<<std::endl;
 		std::vector<abstractSyntaxTree::node*> v = head->children;
 		for(int k = v.size()-1;k>=0;k--){
 			traverseTree(v.at(k),counter,ao);
@@ -1615,13 +1617,13 @@ void parser::abstractSyntaxTree::traverseTree(abstractSyntaxTree::node* head, in
 		counter--;
 	}
 	else if(head->children.size() == 0){
-		if(head->nodeValue !="epsilon"){
+		if(head->semanticMeaning !="epsilon"){
 
 
 		for(int i = 0; i<counter; i++){
 					ao<<"| ";
 				}
-		ao<<head->nodeValue<<std::endl;
+		ao<<head->semanticMeaning<<std::endl;
 		}
 		counter--;
 	}

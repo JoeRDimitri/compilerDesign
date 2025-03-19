@@ -15,21 +15,22 @@ class parser{
 class abstractSyntaxTree{
 
 public:
-	struct node{
+	class node{
+	public:
 		node * headOfSibling;
 		node * leftSibling;
 		node * rightSibling;
 		node * parent;
 		std::vector<node *> children;
 		std::string nodeType;
-		std::string nodeValue;
+		std::string semanticMeaning;
 
 		node();
-		node(std::string type,std::string nodeValue) : headOfSibling(nullptr),leftSibling(nullptr),rightSibling(nullptr),children(),parent(nullptr),nodeType(type),nodeValue(nodeValue){}
-		node(node * n, std::string type) : headOfSibling(n->headOfSibling),leftSibling(n->leftSibling),rightSibling(n->rightSibling),children(n->children),parent(n->parent),nodeType(type),nodeValue(n->nodeValue){}
-		node(node * n, std::string type,std::string value) : headOfSibling(n->headOfSibling),leftSibling(n->leftSibling),rightSibling(n->rightSibling),children(n->children),parent(n->parent),nodeType(type),nodeValue(value){}
-		node(std::vector<node*> v,std::string type) : headOfSibling(nullptr),leftSibling(nullptr),rightSibling(nullptr),children(v),parent(nullptr),nodeType(type),nodeValue(type){}
-		node(std::vector<node*> v,std::string type,std::string value) : headOfSibling(nullptr),leftSibling(nullptr),rightSibling(nullptr),children(v),parent(nullptr),nodeType(type),nodeValue(value){}
+		node(std::string type,std::string nodeValue) : headOfSibling(nullptr),leftSibling(nullptr),rightSibling(nullptr),children(),parent(nullptr),nodeType(type),semanticMeaning(nodeValue){}
+		node(node * n, std::string type) : headOfSibling(n->headOfSibling),leftSibling(n->leftSibling),rightSibling(n->rightSibling),children(n->children),parent(n->parent),nodeType(type),semanticMeaning(n->semanticMeaning){}
+		node(node * n, std::string type,std::string value) : headOfSibling(n->headOfSibling),leftSibling(n->leftSibling),rightSibling(n->rightSibling),children(n->children),parent(n->parent),nodeType(type),semanticMeaning(value){}
+		node(std::vector<node*> v,std::string type) : headOfSibling(nullptr),leftSibling(nullptr),rightSibling(nullptr),children(v),parent(nullptr),nodeType(type),semanticMeaning(type){}
+		node(std::vector<node*> v,std::string type,std::string value) : headOfSibling(nullptr),leftSibling(nullptr),rightSibling(nullptr),children(v),parent(nullptr),nodeType(type),semanticMeaning(value){}
 
 	};
 

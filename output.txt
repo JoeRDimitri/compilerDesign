@@ -525,7 +525,7 @@ COLUMN : private, at value: 9
 Table entry: error
 ROW: memberDecl, at value: 60
 COLUMN : attribute, at value: 6
-Table entry: <memberDecl> ::= <attributeDecl>
+Table entry: <memberDecl> ::= <attributeDecl> #attributedeclfam
 ROW: memberDecl, at value: 60
 COLUMN : }, at value: 4
 Table entry: error
@@ -582,7 +582,7 @@ COLUMN : not, at value: 20
 Table entry: error
 ROW: memberDecl, at value: 60
 COLUMN : function, at value: 28
-Table entry: <memberDecl> ::= <funcDecl>
+Table entry: <memberDecl> ::= <funcDecl> #funcdeclfam
 ROW: memberDecl, at value: 60
 COLUMN : -, at value: 27
 Table entry: error
@@ -6375,7 +6375,7 @@ COLUMN : private, at value: 9
 Table entry: error
 ROW: attributeDecl, at value: 37
 COLUMN : attribute, at value: 6
-Table entry: <attributeDecl> ::= 'attribute' <varDecl> #attributdecl
+Table entry: <attributeDecl> ::= 'attribute' <varDecl> #attributedecl
 ROW: attributeDecl, at value: 37
 COLUMN : }, at value: 4
 Table entry: error
@@ -7395,7 +7395,7 @@ COLUMN : implementation, at value: 36
 Table entry: error
 ROW: rept-classDecl4, at value: 45
 COLUMN : public, at value: 35
-Table entry: <rept-classDecl4> ::= <visibility> <memberDecl> #visibilityandmemberdecl <rept-classDecl4> 
+Table entry: <rept-classDecl4> ::= <visibility> <memberDecl> <rept-classDecl4> 
 ROW: rept-classDecl4, at value: 45
 COLUMN : ==, at value: 34
 Table entry: error
@@ -7422,7 +7422,7 @@ COLUMN : ], at value: 10
 Table entry: error
 ROW: rept-classDecl4, at value: 45
 COLUMN : private, at value: 9
-Table entry: <rept-classDecl4> ::= <visibility> <memberDecl> #visibilityandmemberdecl <rept-classDecl4> 
+Table entry: <rept-classDecl4> ::= <visibility> <memberDecl> <rept-classDecl4> 
 ROW: rept-classDecl4, at value: 45
 COLUMN : attribute, at value: 6
 Table entry: error

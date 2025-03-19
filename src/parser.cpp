@@ -341,6 +341,7 @@ void parser::first_and_follow::getSymbol(std::string s,int & tempLineIndex){
 }
 
 bool parser::first_and_follow::inVector(std::vector<std::string> * firstSet,std::string s ){
+//	std::cout<<(*firstSet)<<std::end
 	for (std::string value : (*firstSet)) {
 		if(value == s)
 			return true;
@@ -991,7 +992,9 @@ void parser::parsing_table::getFollowOfRule(std::unordered_set <std::string> & f
 
 
 void parser::parsing_table::createParsingTable(){
-	if(connectFile("/home/giusuppe/eclipse-workspace/compilerDesign/Assignment2.COMP442-6421.paquet.2025.4/assignment2.COMP442-6421.paquet.2025.4 NEW/grammars/noLeftRec.grm")){
+	if(connectFile("/home/giusuppe/eclipse-workspace/compilerDesign/AttributeGrammar.txt")){
+//	if(connectFile("/home/giusuppe/eclipse-workspace/compilerDesign/Assignment2.COMP442-6421.paquet.2025.4/assignment2.COMP442-6421.paquet.2025.4 NEW/grammars/noLeftRec.grm")){
+
 		//We've properly connected to the file now we need to get rid of the white space and then hand control back over getNextToken().
 	}
 	std::string line;
@@ -1068,6 +1071,9 @@ void parser::parsing_table::createParsingTable(){
  */
 //Forward Declaration
 std::stack<std::string> parser::parsingStack;
+std::stack<parser::abstractSyntaxTree::node *> parser::semanticStack;
+parser::semanticActions parser::semanticHandler;
+parser::abstractSyntaxTree parser::AST;
 
 bool parser::parse(const std::vector<token*>  & vectorOfTokens){
     std::ofstream derivationOut("Derivation"); // Open file for writing
@@ -1084,7 +1090,7 @@ bool parser::parse(const std::vector<token*>  & vectorOfTokens){
 	while(parsingStack.top()!="$"){
 		if(i >= 1280)
 		{
-			std::cout<<i<<std::endl;
+//			std::cout<<i<<std::endl;
 
 		}
 		i++;
@@ -1097,19 +1103,32 @@ bool parser::parse(const std::vector<token*>  & vectorOfTokens){
 				lineIndex++;
 				vectorIterator++;
 				currentToken = (*vectorIterator);
-				for(auto const & value:derivation){
-					derivationOut<<value<<" ";
-				}
-				derivationOut<<std::endl;
+//				for(auto const & value:derivation){
+//					derivationOut<<value<<" ";
+//				}
+//				derivationOut<<std::endl;
 			}
 			else{
 				//Handle error;
-//				skipError(derivationOut,currentToken->getTypeName(),topOfTheStack,currentToken->getLine(),currentToken->getColumn());
+				std::string topOfStack;
+				topOfStack = parsingStack.top();
+				skipError(currentToken,vectorIterator,derivationOut,topOfStack,topOfTheStack,currentToken->getLine(),currentToken->getColumn());
 				error = true;
 			}
 
 		}
-		else{
+
+		else if(topOfTheStack.at(0) == '#'){
+			std::string semanticFunction;
+			parsingStack.pop();
+			for(int i = 1; i<topOfTheStack.size();i++){
+				semanticFunction +=topOfTheStack[i];
+			}
+			semanticHandler.handleAction(semanticFunction);
+			derivation.erase(derivation.begin()+lineIndex);
+
+		}
+		else {
 			if(topOfTheStack == "EPSILON"){
 				parsingStack.pop();
 				derivation.erase(derivation.begin()+lineIndex);
@@ -1119,9 +1138,9 @@ bool parser::parse(const std::vector<token*>  & vectorOfTokens){
 				derivationOut<<std::endl;
 				continue;
 			}
+
 			//Need to find the row and column value for the table
 			//row will be whatever the top of the stack is.
-
 			int rowValue = parsingTable.tableRows[topOfTheStack];
 			int columnValue = parsingTable.tableColumns[((currentToken)->getTypeName())];
 			tableEntry currentTableEntry = parsingTable.table[rowValue][columnValue];
@@ -1138,30 +1157,14 @@ bool parser::parse(const std::vector<token*>  & vectorOfTokens){
 				//Need to check the follow set of the current the top of the stack.
 				std::vector<std::string> * topStackFollow = faf.followSet[topOfTheStack];
 				std::string topOfStack;
-				if(first_and_follow::inVector(topStackFollow, "$")){
-					//if it has EOF symbol in the follow set then we need to check if the $ symbol is the next symbol.
-					topOfStack = parsingStack.top();
-					parsingStack.pop();
-					if(parsingStack.top()=="$"){
-						std::cout<<"Parsing of the file completed all the way to the end!"<<std::endl;
-						derivation.erase(derivation.end());
-						derivation.insert(derivation.end(), "$");
-						for(auto const & value:derivation){
-							derivationOut<<value<<" ";
-						}
-						derivationOut<<std::endl;
-
-//						break;
-					}
-					else{
-					}
-				}
-
+				topOfStack = parsingStack.top();
 				//Handle error;
 				skipError(currentToken,vectorIterator,derivationOut,topOfStack,topOfTheStack,currentToken->getLine(),currentToken->getColumn());
 				error = true;
 			}
 		}
+
+
 	}
 	if((currentToken->getTypeName()!="$")||(error ==true)){
 		return false;
@@ -1176,9 +1179,9 @@ void parser::inverseRHSMultiplePush(tableEntry currentTableEntry,std::vector<std
 	while(lineToInverseAndSplitThenPush.at(tempLineIndex)!= '>'){tempLineIndex++;}
 	while(lineToInverseAndSplitThenPush.at(tempLineIndex)!= '='){tempLineIndex++;}
 	tempLineIndex++;
-	while(tempLineIndex!=lineToInverseAndSplitThenPush.size()){
+	while(tempLineIndex<lineToInverseAndSplitThenPush.size()){
 		std::string currentString;
-		while(tempLineIndex != lineToInverseAndSplitThenPush.size() && lineToInverseAndSplitThenPush.at(tempLineIndex)!= '\'' && lineToInverseAndSplitThenPush.at(tempLineIndex)!='<' && lineToInverseAndSplitThenPush.at(tempLineIndex)!= 'E'){
+		while(tempLineIndex != lineToInverseAndSplitThenPush.size() && lineToInverseAndSplitThenPush.at(tempLineIndex)!= '\'' && lineToInverseAndSplitThenPush.at(tempLineIndex)!='<' &&lineToInverseAndSplitThenPush.at(tempLineIndex)!='#'  && lineToInverseAndSplitThenPush.at(tempLineIndex)!= 'E'){
 			tempLineIndex++;
 		}
 		if(tempLineIndex==lineToInverseAndSplitThenPush.size())break;
@@ -1208,9 +1211,29 @@ void parser::inverseRHSMultiplePush(tableEntry currentTableEntry,std::vector<std
 
 			continue;
 		}
+		else if(lineToInverseAndSplitThenPush.at(tempLineIndex)=='#' ){
+
+					while(tempLineIndex!=lineToInverseAndSplitThenPush.size()&&lineToInverseAndSplitThenPush.at(tempLineIndex)!='\ '){
+						currentString +=lineToInverseAndSplitThenPush.at(tempLineIndex);
+						tempLineIndex++;
+
+					}
+					tempLineIndex++;
+					items.push(currentString);
+
+					continue;
+		}
 		else if(lineToInverseAndSplitThenPush.at(tempLineIndex)=='E'){
+
+			while(tempLineIndex!=lineToInverseAndSplitThenPush.size()&&currentString != "EPSILON"){
+				currentString +=lineToInverseAndSplitThenPush.at(tempLineIndex);
+				tempLineIndex++;
+
+			}
+			tempLineIndex++;
+
 			//items.push("EPSILON");
-			break;
+//			break;
 		}
 
 
@@ -1232,6 +1255,7 @@ void parser::skipError(token * & currentToken,std::vector<token*>::const_iterato
 	std::string nextToken = (*(vectorIterator +1))->getLexeme();
 	if(nextToken == "$"|| search(nextToken,topOfTheStack)){
 		parsingStack.pop();
+		vectorIterator++;
 	}
 	else{
 		while((!searchFirst(nextToken,topOfTheStack))&&(searchFirst("EPSILON",topOfTheStack)&&!search(nextToken,topOfTheStack))){
@@ -1245,6 +1269,8 @@ void parser::skipError(token * & currentToken,std::vector<token*>::const_iterato
 	}
 
 }
+
+
 bool parser::search(const std::string & nextToken, const std::string & topOfTheStack){
 	if(first_and_follow::inVector(faf.followSet[topOfTheStack],nextToken)){
 		return true;
@@ -1257,7 +1283,359 @@ bool parser::searchFirst(std::string nextToken, std::string topOfTheStack){
 		return true;
 	}
 	else return false;
+}
 
+void parser::semanticActions::handleAction(std::string semanticFunction){
+
+
+
+
+	if(semanticFunction == "start"){semanticHandler.passAlong("start");}
+	else if(semanticFunction == "intnum"){semanticHandler.makeLeaf("intnum");}
+	else if(semanticFunction == "p"){semanticHandler.makeLeaf("epsilon");}
+	else if(semanticFunction == "reptaparams1"){std::vector<std::string> v = {"epsilon"}; semanticHandler.makeSubTree("reptaparams1","reptaparams1",'E',v);}
+	else if(semanticFunction == "aparams"){std::vector<std::string> v = {"expr","reptaparams1"}; semanticHandler.makeSubTree("aparams","aparams",2,v);}
+	else if(semanticFunction == "aparamstail"){ semanticHandler.passAlong("aparamstail");}
+	else if(semanticFunction == "addop"){semanticHandler.makeLeaf("addop");}
+	else if(semanticFunction == "arithexpr"){ semanticHandler.passAlong("arithexpr");}
+	else if(semanticFunction == "arraysize"){ semanticHandler.passAlong("arraysize");}
+	else if(semanticFunction == "assign"){semanticHandler.makeLeaf("assign");}
+	else if(semanticFunction == "attributdecl"){ semanticHandler.passAlong("attributdecl");}
+	else if(semanticFunction == "id"){semanticHandler.makeLeaf("id");}
+	else if(semanticFunction == "reptclassdecl4"){std::vector<std::string> v = {"epsilon"}; semanticHandler.makeSubTree("reptclassdecl4","{",'E',v);}
+	else if(semanticFunction == "classdecl"){std::vector<std::string> v = {"id","optclassdecl2","reptclassdecl4"}; semanticHandler.makeSubTree("classdecl","classdecl",3,v);}
+	else if(semanticFunction == "class"){ semanticHandler.passAlong("class");}
+	else if(semanticFunction == "impl"){ semanticHandler.passAlong("impl");}
+	else if(semanticFunction == "func"){ semanticHandler.passAlong("func");}
+	else if(semanticFunction == "expr"){std::vector<std::string> v = {"arithexpr","expr2","epsilon"}; semanticHandler.makeSubTree("expr","expr",2,v);}
+	else if(semanticFunction == "expr2"){std::vector<std::string> v = {"relop","arithexpr"}; semanticHandler.makeSubTree("expr2","expr2",2,v);}
+	else if(semanticFunction == "relop"){semanticHandler.makeLeaf("relop");}
+	else if(semanticFunction == "reptfparams3"){std::vector<std::string> v = {"epsilon"}; semanticHandler.makeSubTree("reptfparams3","dimlist",'E',v);}
+	else if(semanticFunction == "reptfparams4"){std::vector<std::string> v = {"epsilon"}; semanticHandler.makeSubTree("reptfparams4","param",'E',v);}
+	else if(semanticFunction == "fparams"){std::vector<std::string> v = {"id","type","reptfparams3","reptfparams4"}; semanticHandler.makeSubTree("fparams","funcparams",4,v);}
+//	else if(semanticFunction == "fparamstail"){std::vector<std::string> v = {"id","type","reptfparams3"}; semanticHandler.makeSubTree("fparamstail",3,v);}
+	else if(semanticFunction == "factor"){ semanticHandler.passAlong("factor");}
+	else if(semanticFunction == "factor2"){std::vector<std::string> v = {"not","sign","factor"}; semanticHandler.makeSubTree("factor2","factor2",2,v);}
+	else if(semanticFunction == "self"){semanticHandler.makeLeaf("self");}
+	else if(semanticFunction == "selfandidnest2"){std::vector<std::string> v = {"self","idnest2"}; semanticHandler.makeSubTree("selfandidnest2","selfandidnest2",2,v);}
+	else if(semanticFunction == "dot"){semanticHandler.makeBinarySubTree("dot");}
+	else if(semanticFunction == "idnest2"){semanticHandler.passAlong("idnest2");}
+	else if(semanticFunction == "reptvariable2"){std::vector<std::string> v = {"epsilon"}; semanticHandler.makeSubTree("reptvariable2","reptvariable2",'E',v);}
+	else if(semanticFunction == "aparamsandid"){std::vector<std::string> v = {"id","aparams"}; semanticHandler.makeSubTree("aparamsandid","functioncall",2,v);}
+	else if(semanticFunction == "reptvariable2andid"){std::vector<std::string> v = {"id","reptvariable2"}; semanticHandler.makeSubTree("reptvariable2andid","term",2,v);}
+	else if(semanticFunction == "reptfuncbody1"){std::vector<std::string> v = {"epsilon"}; semanticHandler.makeSubTree("reptfuncbody1","funcbody",'E',v);}
+	else if(semanticFunction == "funcbody"){ semanticHandler.passAlong("funcbody");}
+	else if(semanticFunction == "funcdecl"){ semanticHandler.passAlong("funcdecl");}
+	else if(semanticFunction == "funcdef"){std::vector<std::string> v = {"funchead","funcbody"}; semanticHandler.makeSubTree("funcdef","funcdecl",2,v);}
+	else if(semanticFunction == "funchead"){std::vector<std::string> v = {"epsilon"}; semanticHandler.makeSubTree("funchead","funchead",'E',v);}
+	else if(semanticFunction == "reptimpldef3"){std::vector<std::string> v = {"epsilon"}; semanticHandler.makeSubTree("reptimpldef3","reptimpldef3",'E',v);}
+	else if(semanticFunction == "impldef"){std::vector<std::string> v = {"id","reptimpldef3"}; semanticHandler.makeSubTree("impldef","impldef",2,v);}
+	else if(semanticFunction == "indice"){ semanticHandler.passAlong("indice");}
+	else if(semanticFunction == "localvardecl"){ semanticHandler.passAlong("localvardecl");}
+	else if(semanticFunction == "localvardeclorstat"){ semanticHandler.passAlong("localvardeclorstat");}
+//	else if(semanticFunction == "memberdecl"){ semanticHandler.passAlong("memberdecl");}
+	else if(semanticFunction == "multop"){semanticHandler.makeLeaf("multop");}
+	else if(semanticFunction == "reptoptclassdecl22"){std::vector<std::string> v = {"epsilon"}; semanticHandler.makeSubTree("reptoptclassdecl22","reptoptclassdecl22",'E',v);}
+	else if(semanticFunction == "optclassdecl2"){std::vector<std::string> v = {"epsilon"}; semanticHandler.makeSubTree("optclassdecl2","optclassdecl2",'E',v);}
+	else if(semanticFunction == "reptprog0"){std::vector<std::string> v = {"epsilon"}; semanticHandler.makeSubTree("reptprog0","prog",'E',v);}
+	else if(semanticFunction == "prog"){ semanticHandler.passAlong("prog");}
+	else if(semanticFunction == "relexpr"){std::vector<std::string> v = {"arithexpr","relop","arithexpr"}; semanticHandler.makeSubTree("relexpr","relexpr",3,v);}
+	else if(semanticFunction == "visibilityandmemberdecl"){std::vector<std::string> v = {"visibility","attributdecl","funcdecl"}; semanticHandler.makeSubTree("visibilityandmemberdecl","classmember",2,v);}
+	else if(semanticFunction == "void"){semanticHandler.makeLeaf("void");}
+	else if(semanticFunction == "returntype"){ semanticHandler.passAlong("returntype","returntype");}
+	else if(semanticFunction == "rightrecterm"){semanticHandler.makeBinarySubTree("rightrecterm",1);}
+	else if(semanticFunction == "sign"){semanticHandler.makeLeaf("sign");}
+	else if(semanticFunction == "reptstatblock1"){std::vector<std::string> v = {"epsilon"}; semanticHandler.makeSubTree("reptstatblock1","reptstatblock1",'E',v);}
+	else if(semanticFunction == "statblock"){ semanticHandler.passAlong("statblock");}
+	else if(semanticFunction == "ifstatement"){semanticHandler.makeBinarySubTreeWithHead("ifstatement",4);}
+	else if(semanticFunction == "if"){semanticHandler.makeLeaf("if");}
+	else if(semanticFunction == "condition"){ semanticHandler.passAlong("condition");}
+	else if(semanticFunction == "then"){ semanticHandler.passAlong("then");}
+	else if(semanticFunction == "felse"){ semanticHandler.passAlong("felse");}
+	else if(semanticFunction == "whilestatement"){semanticHandler.makeBinarySubTreeWithHead("whilestatement",3);}
+	else if(semanticFunction == "while"){semanticHandler.makeLeaf("while");}
+	else if(semanticFunction == "read"){semanticHandler.makeLeaf("read");}
+	else if(semanticFunction == "readstatement"){semanticHandler.makeBinarySubTreeWithHead("readstatement",2);}
+	else if(semanticFunction == "write"){semanticHandler.makeLeaf("write");}
+	else if(semanticFunction == "writestatement"){semanticHandler.makeBinarySubTreeWithHead("writestatement",2);}
+	else if(semanticFunction == "return"){semanticHandler.makeLeaf("return");}
+	else if(semanticFunction == "freturnstatement"){semanticHandler.makeBinarySubTreeWithHead("freturnstatement",2);}
+	else if(semanticFunction == "felse"){ semanticHandler.passAlong("statement");}
+	else if(semanticFunction == "reptstatement4"){semanticHandler.makeBinarySubTree("reptstatement4",1);}
+	else if(semanticFunction == "term"){std::vector<std::string> v = {"factor","rightrecterm","epsilon"}; semanticHandler.passAlong("term");}
+	else if(semanticFunction == "type"){semanticHandler.makeLeaf("type");}
+	else if(semanticFunction == "vardecl"){std::vector<std::string> v = {"id","type","reptvardecl3"}; semanticHandler.makeSubTree("vardecl","vardecl",3,v);}
+	else if(semanticFunction == "visibility"){semanticHandler.makeLeaf("visibility");}
+	else if(semanticFunction == "reptvardecl3"){std::vector<std::string> v = {"epsilon"}; semanticHandler.makeSubTree("reptvardecl3","dimlist",'E',v);}
+	else if(semanticFunction == "rightrecarithexpr"){semanticHandler.makeBinarySubTree("rightrecarithexpr",1);}
+	else if(semanticFunction == "intnum"){semanticHandler.makeLeaf("intnum");}
+	else if(semanticFunction == "floatnum"){semanticHandler.makeLeaf("floatnum");}
+
+
+
+}
+
+void parser::semanticActions:: makeLeaf(std::string nodeType){
+	abstractSyntaxTree::node * n = new abstractSyntaxTree::node (nodeType,nodeType);
+	semanticStack.push(n);
+}
+void parser::semanticActions::makeBinarySubTreeWithHead(std::string nodeType,int numOfPops){
+	std::vector <abstractSyntaxTree::node *>nodesOnStack;
+	std::vector <abstractSyntaxTree::node *>children;
+
+	for(int i = numOfPops -1; i>=0; i--){
+		nodesOnStack.emplace_back(semanticStack.top());
+		semanticStack.pop();
+	}
+	abstractSyntaxTree::node * parentNode = nodesOnStack[nodesOnStack.size()-1];
+
+	for(int k = nodesOnStack.size()-2; k>=0; k--){
+		children.emplace_back(nodesOnStack.at(k));
+	}
+	for(int i = 0; i<children.size();i++){
+		if(i ==0){
+			if(i + 1<children.size()){
+				children.at(i)->headOfSibling = children.at(i);
+				children.at(i)->rightSibling = children.at(i+1);
+			}
+		}
+		else if(i==children.size()-1){
+			if(i -1 > -1 ){
+				children.at(i)->headOfSibling = children.at(0);
+				children.at(i)->leftSibling = children.at(i-1);
+			}
+		}
+		else{
+			children.at(i)->headOfSibling = children.at(0);
+			children.at(i)->rightSibling = children.at(i+1);
+			children.at(i)->leftSibling = children.at(i-1);
+
+		}
+
+	}
+	for(abstractSyntaxTree::node * value : children){
+		value->parent = parentNode;
+	}
+	parentNode->children = children;
+
+
+}
+
+void parser::semanticActions::makeBinarySubTree(std::string nodeType,int i){
+	if(i ==0){
+		abstractSyntaxTree::node * first = semanticStack.top();
+		semanticStack.pop();
+		abstractSyntaxTree::node * second = semanticStack.top();
+		semanticStack.pop();
+
+		std::vector<abstractSyntaxTree::node* > v = {first,second};
+		abstractSyntaxTree::node * newnode = new abstractSyntaxTree :: node (v,nodeType);
+		first->headOfSibling = first;
+		first->leftSibling = nullptr;
+		first->rightSibling=second;
+		first->parent = newnode;
+		second ->headOfSibling = first;
+		second ->leftSibling = first;
+		second -> rightSibling = nullptr;
+		second ->parent = newnode;
+		newnode ->children =v;
+		semanticStack.push(newnode);
+
+	}
+	else if(i == 1){
+		abstractSyntaxTree::node * first = semanticStack.top();
+		semanticStack.pop();
+		abstractSyntaxTree::node * second = semanticStack.top();
+		semanticStack.pop();
+		abstractSyntaxTree::node * third  = semanticStack.top();
+		semanticStack.pop();
+
+
+		std::vector<abstractSyntaxTree::node* > v = {first,third};
+		first->headOfSibling = first;
+		first->leftSibling = nullptr;
+		first->rightSibling=third;
+		first->parent = second;
+		third ->headOfSibling = first;
+		third ->leftSibling = first;
+		third -> rightSibling = nullptr;
+		third ->parent = second;
+		second ->children =v;
+		semanticStack.push(second);
+
+	}
+
+}
+
+void parser::semanticActions:: makeSubTree(std::string nodeType, std::string nodeValue,int amountOfPops,std::vector<std::string> match){
+	std::vector<abstractSyntaxTree::node *> nodesFromTheStack;
+	if(amountOfPops == 'E'){
+		abstractSyntaxTree::node * n = semanticStack.top();
+		while(n->nodeType!="epsilon"){
+			nodesFromTheStack.emplace_back(n);
+			semanticStack.pop();
+			n = semanticStack.top();
+		}
+		semanticStack.pop();
+
+
+	}
+	//First if statement handles if the amount that we are about to pop matches the amount we need to match.
+	else if(amountOfPops == match.size()){
+		for(int i = amountOfPops-1; i>=0;i--){
+			abstractSyntaxTree::node * n = semanticStack.top();
+			if(n->nodeType==match.at(i)){
+				nodesFromTheStack.emplace_back(n);
+				semanticStack.pop();
+			}
+			else{
+				std::cout<<"Mistake matching in " + nodeType + "with : " + match.at(i);
+				exit(1);
+			}
+		}
+	}
+	//If it does not match then we need to match just one of them
+	else{
+		for(int i = 0; i<amountOfPops;i++){
+			abstractSyntaxTree::node * n = semanticStack.top();
+			int k = 0;
+			for(; k<match.size(); k++){
+				if(n->nodeType==match.at(k)){
+					nodesFromTheStack.emplace_back(n);
+					semanticStack.pop();
+					break;
+				}
+				else{
+					continue;
+				}
+			}
+
+			if(k == match.size()){
+				std::cout<<"problem with stack cant find the matching items  : " + nodeType;
+				exit(1);
+			}
+		}
+	}
+
+
+	for(int i = 0; i<nodesFromTheStack.size();i++){
+		if(i ==0){
+			if(i + 1<nodesFromTheStack.size()){
+				nodesFromTheStack.at(i)->headOfSibling = nodesFromTheStack.at(i);
+				nodesFromTheStack.at(i)->rightSibling = nodesFromTheStack.at(i+1);
+			}
+		}
+		else if(i==nodesFromTheStack.size()-1){
+			if(i -1 > -1 ){
+				nodesFromTheStack.at(i)->headOfSibling = nodesFromTheStack.at(0);
+				nodesFromTheStack.at(i)->leftSibling = nodesFromTheStack.at(i-1);
+			}
+		}
+		else{
+			nodesFromTheStack.at(i)->headOfSibling = nodesFromTheStack.at(0);
+			nodesFromTheStack.at(i)->rightSibling = nodesFromTheStack.at(i+1);
+			nodesFromTheStack.at(i)->leftSibling = nodesFromTheStack.at(i-1);
+
+		}
+
+	}
+
+
+	abstractSyntaxTree::node * parentNode= new abstractSyntaxTree::node(nodesFromTheStack,nodeType,nodeValue);
+
+	for(abstractSyntaxTree::node * value : nodesFromTheStack){
+		value->parent = parentNode;
+	}
+
+	if(nodesFromTheStack.size()==0){
+			parentNode->nodeValue="epsilon";
+		}
+	semanticStack.push(parentNode);
+}
+
+void parser::semanticActions:: passAlong(std::string nodeType){
+	abstractSyntaxTree::node * topofthestack = semanticStack.top();
+	semanticStack.pop();
+	abstractSyntaxTree::node * n = new abstractSyntaxTree::node (topofthestack,nodeType);
+	adoptChildren(n,topofthestack);
+	if(topofthestack->nodeType =="epsilon" || topofthestack->nodeValue == "epsilon"){
+		n->nodeValue ="epsilon";
+	}
+	delete topofthestack;
+	if(nodeType == "start"){
+		AST.treeHead = n;
+
+	}
+	else {
+		semanticStack.push(n);
+	}
+
+}
+void parser::semanticActions:: passAlong(std::string nodeType,std::string nodeValue){
+	abstractSyntaxTree::node * topofthestack = semanticStack.top();
+	semanticStack.pop();
+	abstractSyntaxTree::node * n = new abstractSyntaxTree::node (topofthestack,nodeType,nodeValue);
+	adoptChildren(n,topofthestack);
+	if(topofthestack->nodeType =="epsilon" || topofthestack->nodeValue == "epsilon"){
+		n->nodeValue ="epsilon";
+	}
+	delete topofthestack;
+	if(nodeType == "start"){
+		AST.treeHead = n;
+
+	}
+	else {
+		semanticStack.push(n);
+	}
+
+}
+
+
+void parser::semanticActions::adoptChildren(abstractSyntaxTree::node* newparent,abstractSyntaxTree::node* oldparent){
+	if(oldparent->children.size()==0)
+		return;
+	else if(oldparent->children.size()>0){
+		for(abstractSyntaxTree::node* child : oldparent->children){
+			child->parent = newparent;
+		}
+	}
+}
+
+void parser::abstractSyntaxTree::printTree(){
+    std::ofstream astout("example1.ast.outast"); // Open file for writing
+	abstractSyntaxTree::node * head = AST.treeHead;
+	std::vector<abstractSyntaxTree::node*> v = head->children;
+	int counter = 0;
+	astout<<head->nodeValue<<std::endl;
+	for(int k = v.size()-1;k>=0;k--){
+		traverseTree(v.at(k),counter,astout);
+	}
+}
+
+void parser::abstractSyntaxTree::traverseTree(abstractSyntaxTree::node* head, int& counter,std::ofstream & ao){
+	counter++;
+	if(head->children.size()!= 0){
+		for(int i = 0; i<counter; i++){
+			ao<<"| ";
+		}
+		if(head->nodeValue !="epsilon")ao<<head->nodeValue<<std::endl;
+		std::vector<abstractSyntaxTree::node*> v = head->children;
+		for(int k = v.size()-1;k>=0;k--){
+			traverseTree(v.at(k),counter,ao);
+		}
+		counter--;
+	}
+	else if(head->children.size() == 0){
+		if(head->nodeValue !="epsilon"){
+
+
+		for(int i = 0; i<counter; i++){
+					ao<<"| ";
+				}
+		ao<<head->nodeValue<<std::endl;
+		}
+		counter--;
+	}
 
 }
 

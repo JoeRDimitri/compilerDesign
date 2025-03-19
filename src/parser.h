@@ -11,7 +11,50 @@
 #include <deque>
 
 class parser{
-	struct tableEntry{
+
+class abstractSyntaxTree{
+
+public:
+	struct node{
+		node * headOfSibling;
+		node * leftSibling;
+		node * rightSibling;
+		node * parent;
+		std::vector<node *> children;
+		std::string nodeType;
+		std::string nodeValue;
+
+		node();
+		node(std::string type,std::string nodeValue) : headOfSibling(nullptr),leftSibling(nullptr),rightSibling(nullptr),children(),parent(nullptr),nodeType(type),nodeValue(nodeValue){}
+		node(node * n, std::string type) : headOfSibling(n->headOfSibling),leftSibling(n->leftSibling),rightSibling(n->rightSibling),children(n->children),parent(n->parent),nodeType(type),nodeValue(n->nodeValue){}
+		node(node * n, std::string type,std::string value) : headOfSibling(n->headOfSibling),leftSibling(n->leftSibling),rightSibling(n->rightSibling),children(n->children),parent(n->parent),nodeType(type),nodeValue(value){}
+		node(std::vector<node*> v,std::string type) : headOfSibling(nullptr),leftSibling(nullptr),rightSibling(nullptr),children(v),parent(nullptr),nodeType(type),nodeValue(type){}
+		node(std::vector<node*> v,std::string type,std::string value) : headOfSibling(nullptr),leftSibling(nullptr),rightSibling(nullptr),children(v),parent(nullptr),nodeType(type),nodeValue(value){}
+
+	};
+
+	node * treeHead;
+	void printTree();
+	void traverseTree(abstractSyntaxTree::node* head, int& counter,std::ofstream & ao);
+
+};
+
+class semanticActions{
+public:
+	void makeLeaf(std::string nodeType);
+	void handleAction(std::string semanticAction);
+	void makeSubTree(std::string nodeType,std::string nodeValue, int amountOfPops,std::vector<std::string> v);
+	void passAlong(std::string nodeType,std::string nodeValue);
+	void passAlong(std::string nodeType);
+	void adoptChildren(abstractSyntaxTree:: node* newparent,abstractSyntaxTree:: node* oldparent);
+	void makeBinarySubTree(std::string nodeType,int i = 0);
+	void makeBinarySubTreeWithHead(std::string nodeType, int numOfPops);
+
+
+
+};
+
+struct tableEntry{
 		int row;
 		int column;
 		std::string derivationRule;
@@ -142,6 +185,9 @@ public:
 	static first_and_follow faf;
 	static parsing_table parsingTable;
 	static std::stack<std::string> parsingStack;
+	static semanticActions semanticHandler;
+	static std::stack<abstractSyntaxTree::node *> semanticStack;
+	static abstractSyntaxTree AST;
 
 	bool searchFirst(std::string lookahead, std::string topOfTheStack);
 	bool parse(const  std::vector<token*> &);

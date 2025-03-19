@@ -28,10 +28,10 @@ int main (){
 		catch (const EndOfFileException& e) {
 			token * lastToken = new token("$","$",-1,-1);
 			vectorOfTokens.emplace_back(lastToken);
-		        std::cerr << "EOF reached.\n";
+		        std::cerr << "EOF reached."<<std::endl;
 		    }
 		catch(const std::exception & e){
-	        std::cerr << "Caught a generic exception: " << e.what() << '\n';
+	        std::cerr << "Caught a generic exception: " << e.what() << std::endl;
 		}
 
 		delete lex;
@@ -78,6 +78,7 @@ int main (){
 	p.parsingTable.buildTable();
 	p.parse(vectorOfTokens);
 	std::cout<<"Finished Parsing"<<std::endl;
+	p.AST.printTree();
 
 	return 0;
 

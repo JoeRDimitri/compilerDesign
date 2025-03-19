@@ -1,5 +1,5 @@
 // ====== struct declarations ====== //
-class POLYNOMIAL {
+class POLYNOMIAL ------ {
 	public function evaluate(x: float) => float;
 };
 
@@ -64,17 +64,18 @@ implementation LINEAR {
 } 
 
 // ====== main ====== //
-func main() => void
+function main() => void
 {
   local f1: LINEAR;
   local f2: QUADRATIC;
   local counter: int;
   f1 := f1.build(2, 3.5);
-  f2 := f2.build(-2.0, 1.0, 0.0);
+  f2 := f2.build(-2, 1, 0);
   counter := 1;
 	
   while(counter <= 10)
   {
+    write(f1.f2.evaluate(counter));
     write(counter);
     write(f1.evaluate(counter));
     write(f2.evaluate(counter));

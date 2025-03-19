@@ -1,0 +1,300 @@
+prog
+| classdecl
+| | id
+| | {
+| | | classmember
+| | | | visibility
+| | | | funchead
+| | | | | id
+| | | | | funcparams
+| | | | | | id
+| | | | | | type
+| | | | | returntype
+| classdecl
+| | id
+| | optclassdecl2
+| | | id
+| | {
+| | | classmember
+| | | | visibility
+| | | | vardecl
+| | | | | id
+| | | | | type
+| | | classmember
+| | | | visibility
+| | | | vardecl
+| | | | | id
+| | | | | type
+| | | classmember
+| | | | visibility
+| | | | funchead
+| | | | | id
+| | | | | funcparams
+| | | | | | id
+| | | | | | type
+| | | | | | param
+| | | | | | | id
+| | | | | | | type
+| | | | | returntype
+| | | classmember
+| | | | visibility
+| | | | funchead
+| | | | | id
+| | | | | funcparams
+| | | | | | id
+| | | | | | type
+| | | | | returntype
+| classdecl
+| | id
+| | optclassdecl2
+| | | id
+| | {
+| | | classmember
+| | | | visibility
+| | | | vardecl
+| | | | | id
+| | | | | type
+| | | classmember
+| | | | visibility
+| | | | vardecl
+| | | | | id
+| | | | | type
+| | | classmember
+| | | | visibility
+| | | | vardecl
+| | | | | id
+| | | | | type
+| | | classmember
+| | | | visibility
+| | | | funchead
+| | | | | id
+| | | | | funcparams
+| | | | | | id
+| | | | | | type
+| | | | | | param
+| | | | | | | id
+| | | | | | | type
+| | | | | | | id
+| | | | | | | type
+| | | | | returntype
+| | | classmember
+| | | | visibility
+| | | | funchead
+| | | | | id
+| | | | | funcparams
+| | | | | | id
+| | | | | | type
+| | | | | returntype
+| impldef
+| | id
+| | reptimpldef3
+| | | funcdecl
+| | | | funchead
+| | | | | id
+| | | | | funcparams
+| | | | | | id
+| | | | | | type
+| | | | | returntype
+| impldef
+| | id
+| | reptimpldef3
+| | | funcdecl
+| | | | funchead
+| | | | | id
+| | | | | funcparams
+| | | | | | id
+| | | | | | type
+| | | | | returntype
+| | | | funcbody
+| | | | | vardecl
+| | | | | | id
+| | | | | | type
+| | | | | assign
+| | | | | | term
+| | | | | | | id
+| | | | | | expr
+| | | | | | | term
+| | | | | | | | id
+| | | | | assign
+| | | | | | term
+| | | | | | | id
+| | | | | | expr
+| | | | | | | addop
+| | | | | | | | multop
+| | | | | | | | | term
+| | | | | | | | | | id
+| | | | | | | | | term
+| | | | | | | | | | id
+| | | | | | | | term
+| | | | | | | | | id
+| | | | | assign
+| | | | | | term
+| | | | | | | id
+| | | | | | expr
+| | | | | | | addop
+| | | | | | | | multop
+| | | | | | | | | term
+| | | | | | | | | | id
+| | | | | | | | | term
+| | | | | | | | | | id
+| | | | | | | | term
+| | | | | | | | | id
+| | | funcdecl
+| | | | funchead
+| | | | | id
+| | | | | funcparams
+| | | | | | id
+| | | | | | type
+| | | | | | param
+| | | | | | | id
+| | | | | | | type
+| | | | | | | id
+| | | | | | | type
+| | | | | returntype
+| | | | funcbody
+| | | | | vardecl
+| | | | | | id
+| | | | | | type
+| | | | | dot
+| | | | | | term
+| | | | | | | id
+| | | | | | assign
+| | | | | | | term
+| | | | | | | | id
+| | | | | | | expr
+| | | | | | | | term
+| | | | | | | | | id
+| | | | | dot
+| | | | | | term
+| | | | | | | id
+| | | | | | assign
+| | | | | | | term
+| | | | | | | | id
+| | | | | | | expr
+| | | | | | | | term
+| | | | | | | | | id
+| | | | | dot
+| | | | | | term
+| | | | | | | id
+| | | | | | assign
+| | | | | | | term
+| | | | | | | | id
+| | | | | | | expr
+| | | | | | | | term
+| | | | | | | | | id
+| impldef
+| | id
+| | reptimpldef3
+| | | funcdecl
+| | | | funchead
+| | | | | id
+| | | | | funcparams
+| | | | | | id
+| | | | | | type
+| | | | | | param
+| | | | | | | id
+| | | | | | | type
+| | | | | returntype
+| | | | funcbody
+| | | | | vardecl
+| | | | | | id
+| | | | | | type
+| | | | | dot
+| | | | | | term
+| | | | | | | id
+| | | | | | assign
+| | | | | | | term
+| | | | | | | | id
+| | | | | | | expr
+| | | | | | | | term
+| | | | | | | | | id
+| | | | | dot
+| | | | | | term
+| | | | | | | id
+| | | | | | assign
+| | | | | | | term
+| | | | | | | | id
+| | | | | | | expr
+| | | | | | | | term
+| | | | | | | | | id
+| | | funcdecl
+| | | | funchead
+| | | | | id
+| | | | | funcparams
+| | | | | | id
+| | | | | | type
+| | | | | returntype
+| | | | funcbody
+| | | | | vardecl
+| | | | | | id
+| | | | | | type
+| | | | | assign
+| | | | | | term
+| | | | | | | id
+| | | | | | expr
+| | | | | | | floatnum
+| | | | | assign
+| | | | | | term
+| | | | | | | id
+| | | | | | expr
+| | | | | | | addop
+| | | | | | | | multop
+| | | | | | | | | term
+| | | | | | | | | | id
+| | | | | | | | | term
+| | | | | | | | | | id
+| | | | | | | | term
+| | | | | | | | | id
+| funcdecl
+| | funchead
+| | | id
+| | | returntype
+| | funcbody
+| | | vardecl
+| | | | id
+| | | | type
+| | | vardecl
+| | | | id
+| | | | type
+| | | vardecl
+| | | | id
+| | | | type
+| | | assign
+| | | | term
+| | | | | id
+| | | | expr
+| | | | | dot
+| | | | | | term
+| | | | | | | id
+| | | | | | functioncall
+| | | | | | | id
+| | | | | | | aparams
+| | | | | | | | expr
+| | | | | | | | | intnum
+| | | | | | | | reptaparams1
+| | | | | | | | | expr
+| | | | | | | | | | floatnum
+| | | assign
+| | | | term
+| | | | | id
+| | | | expr
+| | | | | dot
+| | | | | | term
+| | | | | | | id
+| | | | | | functioncall
+| | | | | | | id
+| | | | | | | aparams
+| | | | | | | | expr
+| | | | | | | | | factor2
+| | | | | | | | | | sign
+| | | | | | | | | | intnum
+| | | | | | | | reptaparams1
+| | | | | | | | | expr
+| | | | | | | | | | intnum
+| | | | | | | | | expr
+| | | | | | | | | | intnum
+| | | assign
+| | | | term
+| | | | | id
+| | | | expr
+| | | | | intnum

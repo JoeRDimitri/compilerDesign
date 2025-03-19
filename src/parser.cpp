@@ -2,10 +2,8 @@
 
 parser::first_and_follow parser::faf;
 parser::parsing_table parser::parsingTable;
-
 std::unordered_map<std::string, std::vector<std::string>*> parser::first_and_follow::firstSet;
 std::unordered_map<std::string, std::vector<std::string>*> parser::first_and_follow::followSet;
-
 std::ifstream parser::first_and_follow::inputFileStream;
 std::string parser::first_and_follow::currentWord;
 std::string parser::first_and_follow::currentSymbol;
@@ -685,8 +683,6 @@ void parser::first_and_follow:: compareAndAdd(std::vector<std::string> * followS
 	}
 }
 
-
-
 /*
  *
  *
@@ -696,7 +692,6 @@ void parser::first_and_follow:: compareAndAdd(std::vector<std::string> * followS
  *
  *
  */
-
 
 int parser::parsing_table:: TABLEROWSIZE;
 int parser::parsing_table:: TABLECOLUMNSIZE;
@@ -742,6 +737,7 @@ bool parser::parsing_table::disconnectFile(){
 		return false;
 	}
 }
+
 void parser::parsing_table:: buildTable(){
 	setUniqueTerminalSymbols();
 	setRowAndColumnSize();
@@ -751,6 +747,7 @@ void parser::parsing_table:: buildTable(){
 	fillTableWithErrors();
 	createParsingTable();
 }
+
 void parser::parsing_table::fillTableWithErrors(){
 	for (int i = 0; i < TABLEROWSIZE; i++) {
 	    for (int j = 0; j < TABLECOLUMNSIZE; j++) {
@@ -759,7 +756,6 @@ void parser::parsing_table::fillTableWithErrors(){
 	    }
 	}
 }
-
 
 void parser::parsing_table:: setUniqueTerminalSymbols(){
     for (const auto& pair : faf.firstSet) {
@@ -795,13 +791,11 @@ int parser::parsing_table:: getTableColumnSize(){
 	return (uniqueTerminalSymbols.size());
 }
 
-
 void parser::parsing_table:: setRowAndColumnSize(){
 	TABLEROWSIZE = getTableRowSize();
 	TABLECOLUMNSIZE = getTableColumnSize();
 	UNIT = sizeof(struct tableEntry);
 }
-
 
 void parser::parsing_table:: setTheTableSize(){
 	table = new tableEntry*[TABLEROWSIZE]; // Allocate row pointers
@@ -989,8 +983,6 @@ void parser::parsing_table::getFollowOfRule(std::unordered_set <std::string> & f
 	}
 }
 
-
-
 void parser::parsing_table::createParsingTable(){
 	if(connectFile("/home/giusuppe/eclipse-workspace/compilerDesign/AttributeGrammar.txt")){
 //	if(connectFile("/home/giusuppe/eclipse-workspace/compilerDesign/Assignment2.COMP442-6421.paquet.2025.4/assignment2.COMP442-6421.paquet.2025.4 NEW/grammars/noLeftRec.grm")){
@@ -1058,7 +1050,6 @@ void parser::parsing_table::createParsingTable(){
 
 
 }
-
 
 /*
  *
@@ -1155,7 +1146,6 @@ bool parser::parse(const std::vector<token*>  & vectorOfTokens){
 			}
 			else{
 				//Need to check the follow set of the current the top of the stack.
-				std::vector<std::string> * topStackFollow = faf.followSet[topOfTheStack];
 				std::string topOfStack;
 				topOfStack = parsingStack.top();
 				//Handle error;
@@ -1247,8 +1237,6 @@ void parser::inverseRHSMultiplePush(tableEntry currentTableEntry,std::vector<std
 		 items.pop();
 	}
 }
-//				skipError(derivationOut,currentToken->getTypeName(),topOfTheStack,currentToken->getLine(),currentToken->getColumn());
-
 
 void parser::skipError(token * & currentToken,std::vector<token*>::const_iterator& vectorIterator,std::ofstream & derivationOut,const std::string &lookahead, const std::string &topOfTheStack,const int & line, const int & column){
 	derivationOut<<"Syntax error at ("<< line<<", "<<column<<")"<<std::endl;
@@ -1269,7 +1257,6 @@ void parser::skipError(token * & currentToken,std::vector<token*>::const_iterato
 	}
 
 }
-
 
 bool parser::search(const std::string & nextToken, const std::string & topOfTheStack){
 	if(first_and_follow::inVector(faf.followSet[topOfTheStack],nextToken)){
@@ -1379,6 +1366,7 @@ void parser::semanticActions:: makeLeaf(std::string nodeType){
 	abstractSyntaxTree::node * n = new abstractSyntaxTree::node (nodeType,nodeType);
 	semanticStack.push(n);
 }
+
 void parser::semanticActions::makeBinarySubTreeWithHead(std::string nodeType,int numOfPops){
 	std::vector <abstractSyntaxTree::node *>nodesOnStack;
 	std::vector <abstractSyntaxTree::node *>children;
@@ -1417,6 +1405,7 @@ void parser::semanticActions::makeBinarySubTreeWithHead(std::string nodeType,int
 		value->parent = parentNode;
 	}
 	parentNode->children = children;
+	semanticStack.push(parentNode);
 
 
 }
@@ -1571,6 +1560,7 @@ void parser::semanticActions:: passAlong(std::string nodeType){
 	}
 
 }
+
 void parser::semanticActions:: passAlong(std::string nodeType,std::string nodeValue){
 	abstractSyntaxTree::node * topofthestack = semanticStack.top();
 	semanticStack.pop();
@@ -1589,7 +1579,6 @@ void parser::semanticActions:: passAlong(std::string nodeType,std::string nodeVa
 	}
 
 }
-
 
 void parser::semanticActions::adoptChildren(abstractSyntaxTree::node* newparent,abstractSyntaxTree::node* oldparent){
 	if(oldparent->children.size()==0)

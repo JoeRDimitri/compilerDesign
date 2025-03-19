@@ -37,7 +37,7 @@ int main (){
 		delete lex;
 //		*/
 	std::cout<<"------------------------------------------------------------------------------------"<<std::endl;
-
+	std::cout<<std::endl;
 
 	parser p;
 	p.faf.generateFirstSet();

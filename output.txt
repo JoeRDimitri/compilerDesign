@@ -2100,7 +2100,7 @@ COLUMN : void, at value: 25
 Table entry: error
 ROW: rept-fParams4, at value: 19
 COLUMN : EPSILON, at value: 0
-Table entry: <rept-fParams4> ::= EPSILON 
+Table entry: <rept-fParams4> ::= EPSILON
 ROW: rept-fParams4, at value: 19
 COLUMN : intnum, at value: 49
 Table entry: error
@@ -2130,7 +2130,7 @@ COLUMN : and, at value: 41
 Table entry: error
 ROW: rept-fParams4, at value: 19
 COLUMN : ,, at value: 40
-Table entry: <rept-fParams4> ::= <fParamsTail> <rept-fParams4> 
+Table entry: <rept-fParams4> ::= #p <fParamsTail> #param <rept-fParams4> 
 ROW: rept-fParams4, at value: 19
 COLUMN : :=, at value: 39
 Table entry: error
@@ -2181,7 +2181,7 @@ COLUMN : }, at value: 4
 Table entry: error
 ROW: rept-fParams4, at value: 19
 COLUMN : then, at value: 0
-Table entry: <rept-fParams4> ::= EPSILON 
+Table entry: <rept-fParams4> ::= EPSILON
 ROW: rept-fParams4, at value: 19
 COLUMN : :, at value: 3
 Table entry: error
@@ -2196,7 +2196,7 @@ COLUMN : or, at value: 7
 Table entry: error
 ROW: rept-fParams4, at value: 19
 COLUMN : ), at value: 5
-Table entry: <rept-fParams4> ::= EPSILON 
+Table entry: <rept-fParams4> ::= EPSILON
 ROW: rept-fParams4, at value: 19
 COLUMN : =>, at value: 1
 Table entry: error
@@ -5103,7 +5103,7 @@ COLUMN : EPSILON, at value: 0
 Table entry: <aParams> ::= EPSILON 
 ROW: aParams, at value: 29
 COLUMN : intnum, at value: 49
-Table entry: <aParams> ::= <expr> #p <rept-aParams1> #reptaparams1 #aparams 
+Table entry: <aParams> ::= #p <expr> <rept-aParams1> #aparams 
 ROW: aParams, at value: 29
 COLUMN : if, at value: 48
 Table entry: error
@@ -5115,7 +5115,7 @@ COLUMN : float, at value: 46
 Table entry: error
 ROW: aParams, at value: 29
 COLUMN : +, at value: 45
-Table entry: <aParams> ::= <expr> #p <rept-aParams1> #reptaparams1 #aparams 
+Table entry: <aParams> ::= #p <expr> <rept-aParams1> #aparams 
 ROW: aParams, at value: 29
 COLUMN : int, at value: 44
 Table entry: error
@@ -5166,7 +5166,7 @@ COLUMN : ., at value: 29
 Table entry: error
 ROW: aParams, at value: 29
 COLUMN : id, at value: 21
-Table entry: <aParams> ::= <expr> #p <rept-aParams1> #reptaparams1 #aparams 
+Table entry: <aParams> ::= #p <expr> <rept-aParams1> #aparams 
 ROW: aParams, at value: 29
 COLUMN : ], at value: 10
 Table entry: error
@@ -5223,25 +5223,25 @@ COLUMN : write, at value: 17
 Table entry: error
 ROW: aParams, at value: 29
 COLUMN : (, at value: 18
-Table entry: <aParams> ::= <expr> #p <rept-aParams1> #reptaparams1 #aparams 
+Table entry: <aParams> ::= #p <expr> <rept-aParams1> #aparams 
 ROW: aParams, at value: 29
 COLUMN : local, at value: 19
 Table entry: error
 ROW: aParams, at value: 29
 COLUMN : not, at value: 20
-Table entry: <aParams> ::= <expr> #p <rept-aParams1> #reptaparams1 #aparams 
+Table entry: <aParams> ::= #p <expr> <rept-aParams1> #aparams 
 ROW: aParams, at value: 29
 COLUMN : function, at value: 28
 Table entry: error
 ROW: aParams, at value: 29
 COLUMN : -, at value: 27
-Table entry: <aParams> ::= <expr> #p <rept-aParams1> #reptaparams1 #aparams 
+Table entry: <aParams> ::= #p <expr> <rept-aParams1> #aparams 
 ROW: aParams, at value: 29
 COLUMN : self, at value: 22
-Table entry: <aParams> ::= <expr> #p <rept-aParams1> #reptaparams1 #aparams 
+Table entry: <aParams> ::= #p <expr> <rept-aParams1> #aparams 
 ROW: aParams, at value: 29
 COLUMN : floatnum, at value: 26
-Table entry: <aParams> ::= <expr> #p <rept-aParams1> #reptaparams1 #aparams 
+Table entry: <aParams> ::= #p <expr> <rept-aParams1> #aparams 
 ROW: aParams, at value: 29
 COLUMN : $, at value: 23
 Table entry: error
@@ -5316,7 +5316,7 @@ COLUMN : ., at value: 29
 Table entry: error
 ROW: fParams, at value: 30
 COLUMN : id, at value: 21
-Table entry: <fParams> ::= 'id' #id ':' <type> #p <rept-fParams3> #reptfparams3 #p <rept-fParams4> #reptfparams4 #fparams
+Table entry: <fParams> ::= #p #p 'id' #id ':' <type>  #p <rept-fParams3> #reptfparams3 #param <rept-fParams4>  #fparams
 ROW: fParams, at value: 30
 COLUMN : ], at value: 10
 Table entry: error

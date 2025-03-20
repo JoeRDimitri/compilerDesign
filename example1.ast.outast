@@ -7,8 +7,9 @@ prog
 | | | | funchead
 | | | | | id
 | | | | | funcparams
-| | | | | | id
-| | | | | | type
+| | | | | | param
+| | | | | | | id
+| | | | | | | type
 | | | | | returntype
 | classdecl
 | | id
@@ -30,8 +31,9 @@ prog
 | | | | funchead
 | | | | | id
 | | | | | funcparams
-| | | | | | id
-| | | | | | type
+| | | | | | param
+| | | | | | | id
+| | | | | | | type
 | | | | | | param
 | | | | | | | id
 | | | | | | | type
@@ -41,8 +43,9 @@ prog
 | | | | funchead
 | | | | | id
 | | | | | funcparams
-| | | | | | id
-| | | | | | type
+| | | | | | param
+| | | | | | | id
+| | | | | | | type
 | | | | | returntype
 | classdecl
 | | id
@@ -69,11 +72,13 @@ prog
 | | | | funchead
 | | | | | id
 | | | | | funcparams
-| | | | | | id
-| | | | | | type
 | | | | | | param
 | | | | | | | id
 | | | | | | | type
+| | | | | | param
+| | | | | | | id
+| | | | | | | type
+| | | | | | param
 | | | | | | | id
 | | | | | | | type
 | | | | | returntype
@@ -82,8 +87,9 @@ prog
 | | | | funchead
 | | | | | id
 | | | | | funcparams
-| | | | | | id
-| | | | | | type
+| | | | | | param
+| | | | | | | id
+| | | | | | | type
 | | | | | returntype
 | impldef
 | | id
@@ -92,8 +98,9 @@ prog
 | | | | funchead
 | | | | | id
 | | | | | funcparams
-| | | | | | id
-| | | | | | type
+| | | | | | param
+| | | | | | | id
+| | | | | | | type
 | | | | | returntype
 | | | | funcbody
 | | | | | return
@@ -106,8 +113,9 @@ prog
 | | | | funchead
 | | | | | id
 | | | | | funcparams
-| | | | | | id
-| | | | | | type
+| | | | | | param
+| | | | | | | id
+| | | | | | | type
 | | | | | returntype
 | | | | funcbody
 | | | | | vardecl
@@ -151,11 +159,13 @@ prog
 | | | | funchead
 | | | | | id
 | | | | | funcparams
-| | | | | | id
-| | | | | | type
 | | | | | | param
 | | | | | | | id
 | | | | | | | type
+| | | | | | param
+| | | | | | | id
+| | | | | | | type
+| | | | | | param
 | | | | | | | id
 | | | | | | | type
 | | | | | returntype
@@ -201,8 +211,9 @@ prog
 | | | | funchead
 | | | | | id
 | | | | | funcparams
-| | | | | | id
-| | | | | | type
+| | | | | | param
+| | | | | | | id
+| | | | | | | type
 | | | | | | param
 | | | | | | | id
 | | | | | | | type
@@ -237,8 +248,9 @@ prog
 | | | | funchead
 | | | | | id
 | | | | | funcparams
-| | | | | | id
-| | | | | | type
+| | | | | | param
+| | | | | | | id
+| | | | | | | type
 | | | | | returntype
 | | | | funcbody
 | | | | | vardecl
@@ -291,9 +303,8 @@ prog
 | | | | | | | aparams
 | | | | | | | | expr
 | | | | | | | | | intnum
-| | | | | | | | reptaparams1
-| | | | | | | | | expr
-| | | | | | | | | | floatnum
+| | | | | | | | expr
+| | | | | | | | | floatnum
 | | | assign
 | | | | term
 | | | | | id
@@ -308,11 +319,10 @@ prog
 | | | | | | | | | factor2
 | | | | | | | | | | sign
 | | | | | | | | | | intnum
-| | | | | | | | reptaparams1
-| | | | | | | | | expr
-| | | | | | | | | | intnum
-| | | | | | | | | expr
-| | | | | | | | | | intnum
+| | | | | | | | expr
+| | | | | | | | | intnum
+| | | | | | | | expr
+| | | | | | | | | intnum
 | | | assign
 | | | | term
 | | | | | id

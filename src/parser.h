@@ -24,15 +24,253 @@ public:
 		std::vector<node *> children;
 		std::string nodeType;
 		std::string semanticMeaning;
+		std::string nodeValue;
 
-		node();
-		node(std::string type,std::string nodeValue) : headOfSibling(nullptr),leftSibling(nullptr),rightSibling(nullptr),children(),parent(nullptr),nodeType(type),semanticMeaning(nodeValue){}
+		void copyNode(node* oldnode,node* newnode, std::string nameOfNewNode);
+
+		node(){};
+		node(std::string type,std::string semanticMeaning) : headOfSibling(nullptr),leftSibling(nullptr),rightSibling(nullptr),children(),parent(nullptr),nodeType(type),semanticMeaning(semanticMeaning){}
+		node(std::string type,std::string semanticMeaning,std::string lastTokenValue) : headOfSibling(nullptr),leftSibling(nullptr),rightSibling(nullptr),children(),parent(nullptr),nodeType(type),semanticMeaning(semanticMeaning),nodeValue(lastTokenValue){}
 		node(node * n, std::string type) : headOfSibling(n->headOfSibling),leftSibling(n->leftSibling),rightSibling(n->rightSibling),children(n->children),parent(n->parent),nodeType(type),semanticMeaning(n->semanticMeaning){}
 		node(node * n, std::string type,std::string value) : headOfSibling(n->headOfSibling),leftSibling(n->leftSibling),rightSibling(n->rightSibling),children(n->children),parent(n->parent),nodeType(type),semanticMeaning(value){}
 		node(std::vector<node*> v,std::string type) : headOfSibling(nullptr),leftSibling(nullptr),rightSibling(nullptr),children(v),parent(nullptr),nodeType(type),semanticMeaning(type){}
 		node(std::vector<node*> v,std::string type,std::string value) : headOfSibling(nullptr),leftSibling(nullptr),rightSibling(nullptr),children(v),parent(nullptr),nodeType(type),semanticMeaning(value){}
+	};
+	class paramNode : public node{
 
 	};
+	class startNode : public node{
+
+	};
+	class intNode : public node{
+
+	};
+	class floatNode : public node{
+
+	};
+	class epsilonNode  : public node{
+
+	};
+	class aparamsNode  : public node{
+
+	};
+	class aparamstailNode  : public node{
+
+	};
+	class addopNode : public node{
+
+	};
+	class arithexprNode  : public node{
+
+	};
+	class arraysizeNode  : public node{
+
+	};
+	class assignNode  : public node{
+
+	};
+	class attributedeclNode  : public node{
+
+	};
+	class idNode  : public node{
+
+	};
+	class reptclassdecl4Node  : public node{
+
+	};
+	class classdeclNode  : public node{
+
+	};
+	class classNode  : public node{
+
+	};
+	class implNode  : public node{
+
+	};
+	class funcNode  : public node{
+
+	};
+	class exprNode  : public node{
+
+	};
+	class expr2Node  : public node{
+
+	};
+	class relopNode  : public node{
+
+	};
+	class reptfparams3Node  : public node{
+
+	};
+	class reptfparams4Node  : public node{
+
+	};
+	class fparamsNode  : public node{
+
+	};
+	class factorNode  : public node{
+
+	};
+	class factor2Node  : public node{
+
+	};
+	class selfNode  : public node{
+
+	};
+	class selfandidnest2Node  : public node{
+
+	};
+	class dotNode  : public node{
+
+	};
+	class idnest2Node  : public node{
+
+	};
+	class reptvariable2Node  : public node{
+
+	};
+	class aparamsandidNode  : public node{
+
+	};
+	class reptvariable2andidNode  : public node{
+
+	};
+	class reptfuncbody1Node  : public node{
+
+	};
+	class funcbodyNode  : public node{
+
+	};
+	class funcdeclNode  : public node{
+
+	};
+	class funcdefNode  : public node{
+
+	};
+	class funcheadNode  : public node{
+
+	};
+	class reptimpldef3Node  : public node{
+
+	};
+	class impldefNode  : public node{
+
+	};
+	class indiceNode  : public node{
+
+	};
+	class localvardeclNode  : public node{
+
+	};
+	class localvardeclorstatNode  : public node{
+
+	};
+	class multopNode  : public node{
+
+	};
+	class reptoptclassdecl22Node  : public node{
+
+	};
+	class optclassdecl2Node  : public node{
+
+	};
+	class reptprog0Node  : public node{
+
+	};
+	class progNode  : public node{
+
+	};
+	class relexprNode  : public node{
+
+	};
+	class funcdeclfamNode  : public node{
+
+	};
+	class attributedeclfamNode  : public node{
+
+	};
+	class voidNode  : public node{
+
+	};
+	class returntypeNode  : public node{
+
+	};
+	class rightrectermNode  : public node{
+
+	};
+	class signNode  : public node{
+
+	};
+	class reptstatblock1Node  : public node{
+
+	};
+	class statblockNode  : public node{
+
+	};
+	class ifstatementNode  : public node{
+
+	};
+	class ifNode  : public node{
+
+	};
+	class conditionNode  : public node{
+
+	};
+	class thenNode  : public node{
+
+	};
+	class felseNode  : public node{
+
+	};
+	class whilestatementNode  : public node{
+
+	};
+	class whileNode  : public node{
+
+	};
+	class readNode  : public node{
+
+	};
+	class readstatementNode  : public node{
+
+	};
+	class writeNode  : public node{
+
+	};
+	class writestatementNode  : public node{
+
+	};
+	class returnNode  : public node{
+
+	};
+	class freturnstatementNode  : public node{
+
+	};
+	class reptstatement4Node  : public node{
+
+	};
+	class termNode  : public node{
+
+	};
+	class typeNode  : public node{
+
+	};
+	class vardeclNode  : public node{
+
+	};
+	class visibilityNode  : public node{
+
+	};
+	class reptvardecl3Node  : public node{
+
+	};
+	class rightrecarithexprNode  : public node{
+
+	};
+	class floatnumNode  : public node{
+
+	};
+
 
 	node * treeHead;
 	void printTree();
@@ -42,14 +280,14 @@ public:
 
 class semanticActions{
 public:
-	void makeLeaf(std::string nodeType);
-	void handleAction(std::string semanticAction);
-	void makeSubTree(std::string nodeType,std::string nodeValue, int amountOfPops,std::vector<std::string> v);
-	void passAlong(std::string nodeType,std::string nodeValue);
-	void passAlong(std::string nodeType);
+	void makeLeaf(std::string nodeType,std::string lastTokenValue,abstractSyntaxTree::node* newnode);
+	void handleAction(std::string semanticAction,std::string lastTokenValue);
+	void makeSubTree(std::string nodeType,std::string semanticMeaning, int amountOfPops,std::vector<std::string> v,abstractSyntaxTree::node * newnode);
+	void passAlong(std::string nodeType,std::string semanticMeaning,abstractSyntaxTree::node * newnode);
+	void passAlong(std::string nodeType,abstractSyntaxTree::node * newnode);
 	void adoptChildren(abstractSyntaxTree:: node* newparent,abstractSyntaxTree:: node* oldparent);
-	void makeBinarySubTree(std::string nodeType,int i = 0);
-	void makeBinarySubTreeWithHead(std::string nodeType, int numOfPops);
+	void makeBinarySubTree(std::string nodeType,int i,abstractSyntaxTree::node*newnode);
+	void makeBinarySubTreeWithHead(std::string nodeType, int numOfPops,abstractSyntaxTree::node* newnode);
 
 
 

@@ -1,6 +1,6 @@
 <START> ::= <prog> #start 
 
-<aParams> ::= <expr> #p <rept-aParams1> #reptaparams1 #aparams 
+<aParams> ::= #p <expr> <rept-aParams1> #aparams 
 <aParams> ::= EPSILON 
 
 <aParamsTail> ::= ',' <expr> #aparamstail 
@@ -38,7 +38,7 @@
 <relOp> ::= '<=' #relop
 <relOp> ::= '>=' #relop
 
-<fParams> ::= 'id' #id ':' <type> #p <rept-fParams3> #reptfparams3 #p <rept-fParams4> #reptfparams4 #fparams
+<fParams> ::= #p #p 'id' #id ':' <type>  #p <rept-fParams3> #reptfparams3 #param <rept-fParams4>  #fparams
 <fParams> ::= EPSILON
 
 <fParamsTail> ::= ',' 'id' #id ':' <type> #p <rept-fParams3> #reptfparams3 
@@ -109,8 +109,8 @@
 <rept-fParams3> ::= <arraySize> <rept-fParams3>
 <rept-fParams3> ::= EPSILON 
 
-<rept-fParams4> ::= <fParamsTail> <rept-fParams4> 
-<rept-fParams4> ::= EPSILON 
+<rept-fParams4> ::= #p <fParamsTail> #param <rept-fParams4> 
+<rept-fParams4> ::= EPSILON
 
 <rept-funcBody1> ::= <localVarDeclOrStat> <rept-funcBody1>
 <rept-funcBody1> ::= EPSILON 

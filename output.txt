@@ -1230,7 +1230,7 @@ COLUMN : and, at value: 41
 Table entry: error
 ROW: aParamsTail, at value: 28
 COLUMN : ,, at value: 40
-Table entry: <aParamsTail> ::= ',' <expr> #aparamstail 
+Table entry: <aParamsTail> ::= ',' <expr>  
 ROW: aParamsTail, at value: 28
 COLUMN : :=, at value: 39
 Table entry: error

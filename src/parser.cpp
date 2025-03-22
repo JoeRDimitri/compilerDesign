@@ -1326,6 +1326,7 @@ void parser::semanticActions::handleAction(std::string semanticFunction,std::str
 	else if(semanticFunction == "reptclassdecl4"){abstractSyntaxTree::reptclassdecl4Node * newnode = new abstractSyntaxTree::reptclassdecl4Node();std::vector<std::string> v = {"epsilon"}; semanticHandler.makeSubTree("reptclassdecl4","{",'E',v,newnode);}
 	else if(semanticFunction == "classdecl"){abstractSyntaxTree::classdeclNode * newnode = new abstractSyntaxTree::classdeclNode();std::vector<std::string> v = {"id","optclassdecl2","reptclassdecl4"}; semanticHandler.makeSubTree("classdecl","classdecl",3,v,newnode);}
 	else if(semanticFunction == "aparams"){abstractSyntaxTree::aparamsNode * newnode = new abstractSyntaxTree::aparamsNode(); std::vector<std::string> v = {"epsilon"}; semanticHandler.makeSubTree("aparams","aparams",'E',v,newnode);}
+	else if(semanticFunction == "funcdef"){abstractSyntaxTree::classdeclNode * newnode = new abstractSyntaxTree::classdeclNode();std::vector<std::string> v = {"funchead","funcbody"}; semanticHandler.makeSubTree("funcdef","funcdef",2,v,newnode);}
 	else if(semanticFunction == "expr"){abstractSyntaxTree::exprNode*newnode = new abstractSyntaxTree::exprNode(); std::vector<std::string> v = {"arithexpr","expr2","epsilon"}; semanticHandler.makeSubTree("expr","expr",2,v,newnode);}
 	else if(semanticFunction == "expr2"){abstractSyntaxTree::expr2Node*newnode = new abstractSyntaxTree::expr2Node();std::vector<std::string> v = {"relop","arithexpr"}; semanticHandler.makeSubTree("expr2","expr2",2,v,newnode);}
 	else if(semanticFunction == "reptfparams3"){abstractSyntaxTree::reptfparams3Node*newnode = new abstractSyntaxTree::reptfparams3Node();std::vector<std::string> v = {"epsilon"}; semanticHandler.makeSubTree("reptfparams3","dimlist",'E',v,newnode);}
@@ -1338,7 +1339,6 @@ void parser::semanticActions::handleAction(std::string semanticFunction,std::str
 	else if(semanticFunction == "aparamsandid"){abstractSyntaxTree::aparamsandidNode*newnode = new abstractSyntaxTree::aparamsandidNode();std::vector<std::string> v = {"id","aparams"}; semanticHandler.makeSubTree("aparamsandid","functioncall",2,v,newnode);}
 	else if(semanticFunction == "reptvariable2andid"){abstractSyntaxTree::reptvariable2andidNode*newnode = new abstractSyntaxTree::reptvariable2andidNode();std::vector<std::string> v = {"id","reptvariable2"}; semanticHandler.makeSubTree("reptvariable2andid","term",2,v,newnode);}
 	else if(semanticFunction == "reptfuncbody1"){abstractSyntaxTree::reptfuncbody1Node*newnode = new abstractSyntaxTree::reptfuncbody1Node();std::vector<std::string> v = {"epsilon"}; semanticHandler.makeSubTree("reptfuncbody1","funcbody",'E',v,newnode);}
-	else if(semanticFunction == "funcdef"){abstractSyntaxTree::funcdefNode*newnode = new abstractSyntaxTree::funcdefNode();std::vector<std::string> v = {"funchead","funcbody"}; semanticHandler.makeSubTree("funcdef","funcdecl",2,v,newnode);}
 	else if(semanticFunction == "funchead"){abstractSyntaxTree::funcheadNode*newnode = new abstractSyntaxTree::funcheadNode();std::vector<std::string> v = {"epsilon"}; semanticHandler.makeSubTree("funchead","funchead",'E',v,newnode);}
 	else if(semanticFunction == "reptimpldef3"){abstractSyntaxTree::reptimpldef3Node*newnode = new abstractSyntaxTree::reptimpldef3Node();std::vector<std::string> v = {"epsilon"}; semanticHandler.makeSubTree("reptimpldef3","reptimpldef3",'E',v,newnode);}
 	else if(semanticFunction == "impldef"){abstractSyntaxTree::impldefNode*newnode = new abstractSyntaxTree::impldefNode();std::vector<std::string> v = {"id","reptimpldef3"}; semanticHandler.makeSubTree("impldef","impldef",2,v,newnode);}
@@ -1372,6 +1372,8 @@ void parser::semanticActions:: makeLeaf(std::string nodeType,std::string lastTok
 	newnode->nodeType = nodeType;
 	newnode->semanticMeaning = nodeType;
 	newnode->nodeValue = lastTokenValue;
+	newnode->isLeaf = true;
+
 	semanticStack.push(newnode);
 }
 
@@ -1570,7 +1572,7 @@ void parser::abstractSyntaxTree::node::copyNode(node* oldnode,node* newnode, std
 	newnode->children = oldnode->children;
 	newnode->nodeType = nameOfNewNode;
 	newnode->semanticMeaning = oldnode ->semanticMeaning;
-
+	newnode->nodeValue = oldnode->nodeValue;
 }
 
 void parser::semanticActions:: passAlong(std::string nodeType,abstractSyntaxTree::node * newnode){
@@ -1609,8 +1611,11 @@ void parser::semanticActions:: passAlong(std::string nodeType,std::string semant
 }
 
 void parser::semanticActions::adoptChildren(abstractSyntaxTree::node* newparent,abstractSyntaxTree::node* oldparent){
-	if(oldparent->children.size()==0)
+	if(oldparent->children.size()==0){
+		newparent->isLeaf = true;
 		return;
+	}
+
 	else if(oldparent->children.size()>0){
 		for(abstractSyntaxTree::node* child : oldparent->children){
 			child->parent = newparent;
@@ -1650,6 +1655,8 @@ void parser::abstractSyntaxTree::traverseTree(abstractSyntaxTree::node* head, in
 					ao<<"| ";
 				}
 		ao<<head->semanticMeaning<<std::endl;
+		std::cout << typeid(*head).name() << std::endl; // Dereference to get dynamic type
+
 		}
 		counter--;
 	}

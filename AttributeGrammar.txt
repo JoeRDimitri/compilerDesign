@@ -3,7 +3,7 @@
 <aParams> ::= #p <expr> <rept-aParams1> #aparams 
 <aParams> ::= EPSILON 
 
-<aParamsTail> ::= ',' <expr> #aparamstail 
+<aParamsTail> ::= ',' <expr>  
 
 <addOp> ::= '+' #addop 
 <addOp> ::= '-' #addop 

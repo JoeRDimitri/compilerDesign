@@ -9,14 +9,24 @@
 #include <stack>
 #include "lexor.h";
 #include <deque>
-
+#include <typeinfo>
 class parser{
 
 class abstractSyntaxTree{
 
 public:
+
+	class symbolTable;
+	class visitor;
 	class node{
 	public:
+		struct symbolTableEntry{
+			std::string name;
+			std::string kind;
+			std::string type;
+			std::unordered_map<std::string,symbolTableEntry> * link;
+		};
+
 		node * headOfSibling;
 		node * leftSibling;
 		node * rightSibling;
@@ -25,6 +35,9 @@ public:
 		std::string nodeType;
 		std::string semanticMeaning;
 		std::string nodeValue;
+		bool isLeaf = false;
+		std::unordered_map<std::string, symbolTableEntry> stMap;
+
 
 		void copyNode(node* oldnode,node* newnode, std::string nameOfNewNode);
 
@@ -35,248 +48,765 @@ public:
 		node(node * n, std::string type,std::string value) : headOfSibling(n->headOfSibling),leftSibling(n->leftSibling),rightSibling(n->rightSibling),children(n->children),parent(n->parent),nodeType(type),semanticMeaning(value){}
 		node(std::vector<node*> v,std::string type) : headOfSibling(nullptr),leftSibling(nullptr),rightSibling(nullptr),children(v),parent(nullptr),nodeType(type),semanticMeaning(type){}
 		node(std::vector<node*> v,std::string type,std::string value) : headOfSibling(nullptr),leftSibling(nullptr),rightSibling(nullptr),children(v),parent(nullptr),nodeType(type),semanticMeaning(value){}
-	};
-	class paramNode : public node{
-
-	};
-	class startNode : public node{
-
-	};
-	class intNode : public node{
-
-	};
-	class floatNode : public node{
-
-	};
-	class epsilonNode  : public node{
-
-	};
-	class aparamsNode  : public node{
-
-	};
-	class aparamstailNode  : public node{
-
-	};
-	class addopNode : public node{
-
-	};
-	class arithexprNode  : public node{
-
-	};
-	class arraysizeNode  : public node{
-
-	};
-	class assignNode  : public node{
-
-	};
-	class attributedeclNode  : public node{
-
-	};
-	class idNode  : public node{
-
-	};
-	class reptclassdecl4Node  : public node{
-
-	};
-	class classdeclNode  : public node{
-
-	};
-	class classNode  : public node{
-
-	};
-	class implNode  : public node{
-
-	};
-	class funcNode  : public node{
-
-	};
-	class exprNode  : public node{
-
-	};
-	class expr2Node  : public node{
-
-	};
-	class relopNode  : public node{
-
-	};
-	class reptfparams3Node  : public node{
-
-	};
-	class reptfparams4Node  : public node{
-
-	};
-	class fparamsNode  : public node{
-
-	};
-	class factorNode  : public node{
-
-	};
-	class factor2Node  : public node{
-
-	};
-	class selfNode  : public node{
-
-	};
-	class selfandidnest2Node  : public node{
-
-	};
-	class dotNode  : public node{
 
+	    virtual void accept(visitor& visitor) = 0; // Pure virtual function
+	    virtual ~node() {} // Virtual destructor
+	};
+	//Composite Element
+	class paramNode : public node {
+	public:
+	    void accept(visitor& v) override {
+	    	for(node * child : this->children){child->accept(v);}
+	    	v.visit(*this);
+	    	}
+	};
+	//Composite Element
+	class startNode : public node {
+	public:
+	    void accept(visitor& v) override {
+	    	if(this->isLeaf ==true){v.visit(*this);}
+	    	else{for(node * child : this->children){child->accept(v);}
+	    	v.visit(*this);
+	    	}
+	    	}
+	};
+
+	class intNode : public node {
+	public:
+	    void accept(visitor& v) override { v.visit(*this); }
+	};
+
+	class floatNode : public node {
+	public:
+	    void accept(visitor& v) override { v.visit(*this); }
+	};
+
+	class epsilonNode : public node {
+	public:
+	    void accept(visitor& v) override { v.visit(*this); }
+	};
+	//Composite Element
+	class aparamsNode : public node {
+	public:
+	    void accept(visitor& v) override {
+	    	for(node * child : this->children){child->accept(v);}
+	    	v.visit(*this);
+	    	}
+	};
+
+	class aparamstailNode : public node {
+	public:
+	    void accept(visitor& v) override {
+	    	if(this->isLeaf ==true){v.visit(*this);}
+	    	else{for(node * child : this->children){child->accept(v);}
+	    	v.visit(*this);
+	    	}
+	    	}
+	};
+	class addopNode : public node {
+	public:
+	    void accept(visitor& v) override { v.visit(*this); }
+	};
+
+	class arithexprNode : public node {
+	public:
+	    void accept(visitor& v) override {
+	    	if(this->isLeaf ==true){v.visit(*this);}
+	    	else{for(node * child : this->children){child->accept(v);}
+	    	v.visit(*this);
+	    	}
+	    	}
+	};
+
+	class arraysizeNode : public node {
+	public:
+	    void accept(visitor& v) override {
+	    	if(this->isLeaf ==true){v.visit(*this);}
+	    	else{for(node * child : this->children){child->accept(v);}
+	    	v.visit(*this);
+	    	}
+	    	}
+	};
+
+	class assignNode : public node {
+	public:
+	    void accept(visitor& v) override { v.visit(*this); }
+	};
+
+	class attributedeclNode : public node {
+	public:
+	    void accept(visitor& v) override {
+	    	if(this->isLeaf ==true){v.visit(*this);}
+	    	else{for(node * child : this->children){child->accept(v);}
+	    	v.visit(*this);
+	    	}
+	    	}
+	};
+
+	class idNode : public node {
+	public:
+	    void accept(visitor& v) override { v.visit(*this); }
+	};
+
+	class reptclassdecl4Node : public node {
+	public:
+	    void accept(visitor& v) override {
+	    	for(node * child : this->children){child->accept(v);}
+	    	v.visit(*this);
+	    	}
+	};
+
+	class classdeclNode : public node {
+	public:
+	    void accept(visitor& v) override {
+	    	for(node * child : this->children){child->accept(v);}
+	    	v.visit(*this);
+	    	}
+	};
+
+	class classNode : public node {
+	public:
+	    void accept(visitor& v) override {
+	    	if(this->isLeaf ==true){v.visit(*this);}
+	    	else{for(node * child : this->children){(*child).accept(v);}
+	    	v.visit(*this);
+	    	}
+	    	}
+	};
+
+	class implNode : public node {
+	public:
+	    void accept(visitor& v) override {
+	    	if(this->isLeaf ==true){v.visit(*this);}
+	    	else{for(node * child : this->children){child->accept(v);}
+	    	v.visit(*this);
+	    	}
+	    	}
+	};
+
+	class funcNode : public node {
+	public:
+	    void accept(visitor& v) override {
+	    	if(this->isLeaf ==true){v.visit(*this);}
+	    	else{for(node * child : this->children){child->accept(v);}
+	    	v.visit(*this);
+	    	}
+	    	}
+	};
+
+	class exprNode : public node {
+	public:
+	    void accept(visitor& v) override {
+	    	for(node * child : this->children){child->accept(v);}
+	    	v.visit(*this);
+	    	}
+	};
+
+	class expr2Node : public node {
+	public:
+	    void accept(visitor& v) override {
+	    	for(node * child : this->children){child->accept(v);}
+	    	v.visit(*this);
+	    	}
+	};
+
+	class relopNode : public node {
+	public:
+	    void accept(visitor& v) override { v.visit(*this); }
+	};
+
+	class reptfparams3Node : public node {
+	public:
+	    void accept(visitor& v) override {
+	    	for(node * child : this->children){child->accept(v);}
+	    	v.visit(*this);
+	    	}
+	};
+
+	class reptfparams4Node : public node {
+	public:
+	    void accept(visitor& v) override {
+	    	for(node * child : this->children){child->accept(v);}
+	    	v.visit(*this);
+	    	}
+	};
+
+	class fparamsNode : public node {
+	public:
+	    void accept(visitor& v) override {
+	    	for(node * child : this->children){child->accept(v);}
+	    	v.visit(*this);
+	    	}
+	};
+
+	class factorNode : public node {
+	public:
+	    void accept(visitor& v) override {
+	    	if(this->isLeaf ==true){v.visit(*this);}
+	    	else{for(node * child : this->children){child->accept(v);}
+	    	v.visit(*this);
+	    	}
+	    	}
+	};
+
+	class factor2Node : public node {
+	public:
+	    void accept(visitor& v) override {
+	    	for(node * child : this->children){child->accept(v);}
+	    	v.visit(*this);
+	    	}
+	};
+
+	class selfNode : public node {
+	public:
+	    void accept(visitor& v) override { v.visit(*this); }
+	};
+
+	class selfandidnest2Node : public node {
+	public:
+	    void accept(visitor& v) override {
+	    	for(node * child : this->children){child->accept(v);}
+	    	v.visit(*this);
+	    	}
+	};
+
+	class dotNode : public node {
+	public:
+	    void accept(visitor& v) override {
+	    	for(node * child : this->children){child->accept(v);}
+	    	v.visit(*this);
+	    	}
+	};
+
+	class idnest2Node : public node {
+	public:
+	    void accept(visitor& v) override {
+	    	if(this->isLeaf ==true){v.visit(*this);}
+	    	else{for(node * child : this->children){child->accept(v);}
+	    	v.visit(*this);
+	    	}
+	    	}
+	};
+
+	class reptvariable2Node : public node {
+	public:
+	    void accept(visitor& v) override {
+	    	for(node * child : this->children){child->accept(v);}
+	    	v.visit(*this);
+	    	}
+	};
+
+	class aparamsandidNode : public node {
+	public:
+	    void accept(visitor& v) override {
+	    	for(node * child : this->children){child->accept(v);}
+	    	v.visit(*this);
+	    	}
+	};
+
+	class reptvariable2andidNode : public node {
+	public:
+	    void accept(visitor& v) override {
+	    	for(node * child : this->children){child->accept(v);}
+	    	v.visit(*this);
+	    	}
+	};
+
+	class reptfuncbody1Node : public node {
+	public:
+	    void accept(visitor& v) override {
+	    	for(node * child : this->children){child->accept(v);}
+	    	v.visit(*this);
+	    	}
+	};
+
+	class funcbodyNode : public node {
+	public:
+	    void accept(visitor& v) override {
+	    	if(this->isLeaf ==true){v.visit(*this);}
+	    	else{for(node * child : this->children){child->accept(v);}
+	    	v.visit(*this);
+	    	}
+	    	}
+	};
+
+	class funcdeclNode : public node {
+	public:
+	    void accept(visitor& v) override {
+	    	if(this->isLeaf ==true){v.visit(*this);}
+	    	else{for(node * child : this->children){child->accept(v);}
+	    	v.visit(*this);
+	    	}
+	    	}
+	};
+
+	class funcdefNode : public node {
+	public:
+	    void accept(visitor& v) override { v.visit(*this); }
+	};
+
+	class funcheadNode : public node {
+	public:
+	    void accept(visitor& v) override {
+	    	for(node * child : this->children){child->accept(v);}
+	    	v.visit(*this);
+	    	}
+	};
+
+	class reptimpldef3Node : public node {
+	public:
+	    void accept(visitor& v) override {
+	    	for(node * child : this->children){child->accept(v);}
+	    	v.visit(*this);
+	    	}
+	};
+
+	class impldefNode : public node {
+	public:
+	    void accept(visitor& v) override {
+	    	for(node * child : this->children){child->accept(v);}
+	    	v.visit(*this);
+	    	}
+	};
+
+	class indiceNode : public node {
+	public:
+	    void accept(visitor& v) override {
+	    	if(this->isLeaf ==true){v.visit(*this);}
+	    	else{for(node * child : this->children){child->accept(v);}
+	    	v.visit(*this);
+	    	}
+	    	}
+	};
+
+	class localvardeclNode : public node {
+	public:
+	    void accept(visitor& v) override {
+	    	if(this->isLeaf ==true){v.visit(*this);}
+	    	else{for(node * child : this->children){child->accept(v);}
+	    	v.visit(*this);
+	    	}
+	    	}
+	};
+
+	class localvardeclorstatNode : public node {
+	public:
+	    void accept(visitor& v) override {
+	    	if(this->isLeaf ==true){v.visit(*this);}
+	    	else{for(node * child : this->children){child->accept(v);}
+	    	v.visit(*this);
+	    	}
+	    	}
+	};
+
+	class multopNode : public node {
+	public:
+	    void accept(visitor& v) override { v.visit(*this); }
+	};
+
+	class reptoptclassdecl22Node : public node {
+	public:
+	    void accept(visitor& v) override {
+	    	for(node * child : this->children){child->accept(v);}
+	    	v.visit(*this);
+	    	}
+	};
+
+	class optclassdecl2Node : public node {
+	public:
+	    void accept(visitor& v) override {
+	    	for(node * child : this->children){child->accept(v);}
+	    	v.visit(*this);
+	    	}
+	};
+
+	class reptprog0Node : public node {
+	public:
+	    void accept(visitor& v) override {
+	    	for(node * child : this->children){child->accept(v);}
+	    	v.visit(*this);
+	    	}
+	};
+
+	class progNode : public node {
+	public:
+	    void accept(visitor& v) override {
+	    	if(this->isLeaf ==true){v.visit(*this);}
+	    	else{for(node * child : this->children){child->accept(v);}
+	    	v.visit(*this);
+	    	}
+	    	}
+	};
+
+	class relexprNode : public node {
+	public:
+	    void accept(visitor& v) override {
+	    	for(node * child : this->children){child->accept(v);}
+	    	v.visit(*this);
+	    	}
+	};
+
+	class funcdeclfamNode : public node {
+	public:
+	    void accept(visitor& v) override {
+	    	for(node * child : this->children){child->accept(v);}
+	    	v.visit(*this);
+	    	}
+	};
+
+	class attributedeclfamNode : public node {
+	public:
+	    void accept(visitor& v) override {
+	    	for(node * child : this->children){child->accept(v);}
+	    	v.visit(*this);
+	    	}
+	};
+
+	class voidNode : public node {
+	public:
+	    void accept(visitor& v) override { v.visit(*this); }
+	};
+
+	class returntypeNode : public node {
+	public:
+	    void accept(visitor& v) override {
+	    	if(this->isLeaf ==true){v.visit(*this);}
+	    	else{for(node * child : this->children){child->accept(v);}
+	    	v.visit(*this);
+	    	}
+	    	}
+	};
+
+	class rightrectermNode : public node {
+	public:
+	    void accept(visitor& v) override {
+	    	for(node * child : this->children){child->accept(v);}
+	    	v.visit(*this);
+	    	}
+	};
+
+	class signNode : public node {
+	public:
+	    void accept(visitor& v) override { v.visit(*this); }
+	};
+
+	class reptstatblock1Node : public node {
+	public:
+	    void accept(visitor& v) override {
+	    	for(node * child : this->children){child->accept(v);}
+	    	v.visit(*this);
+	    	}
 	};
-	class idnest2Node  : public node{
+
+	class statblockNode : public node {
+	public:
+	    void accept(visitor& v) override {
+	    	if(this->isLeaf ==true){v.visit(*this);}
+	    	else{for(node * child : this->children){child->accept(v);}
+	    	v.visit(*this);
+	    	}
+	    	}
+	};
 
-	};
-	class reptvariable2Node  : public node{
-
-	};
-	class aparamsandidNode  : public node{
-
-	};
-	class reptvariable2andidNode  : public node{
-
-	};
-	class reptfuncbody1Node  : public node{
-
-	};
-	class funcbodyNode  : public node{
-
-	};
-	class funcdeclNode  : public node{
-
-	};
-	class funcdefNode  : public node{
-
-	};
-	class funcheadNode  : public node{
-
-	};
-	class reptimpldef3Node  : public node{
-
-	};
-	class impldefNode  : public node{
-
-	};
-	class indiceNode  : public node{
-
-	};
-	class localvardeclNode  : public node{
-
-	};
-	class localvardeclorstatNode  : public node{
-
-	};
-	class multopNode  : public node{
-
-	};
-	class reptoptclassdecl22Node  : public node{
-
-	};
-	class optclassdecl2Node  : public node{
-
-	};
-	class reptprog0Node  : public node{
-
-	};
-	class progNode  : public node{
-
-	};
-	class relexprNode  : public node{
-
-	};
-	class funcdeclfamNode  : public node{
-
-	};
-	class attributedeclfamNode  : public node{
-
-	};
-	class voidNode  : public node{
-
-	};
-	class returntypeNode  : public node{
-
-	};
-	class rightrectermNode  : public node{
-
-	};
-	class signNode  : public node{
+	class ifstatementNode : public node {
+	public:
+	    void accept(visitor& v) override {
+	    	for(node * child : this->children){child->accept(v);}
+	    	v.visit(*this);
+	    	}
+	};
 
+	class ifNode : public node {
+	public:
+	    void accept(visitor& v) override { v.visit(*this); }
 	};
-	class reptstatblock1Node  : public node{
 
-	};
-	class statblockNode  : public node{
-
-	};
-	class ifstatementNode  : public node{
-
-	};
-	class ifNode  : public node{
-
-	};
-	class conditionNode  : public node{
+	class conditionNode : public node {
+	public:
+	    void accept(visitor& v) override {
+	    	if(this->isLeaf ==true){v.visit(*this);}
+	    	else{for(node * child : this->children){child->accept(v);}
+	    	v.visit(*this);
+	    	}
+	    	}
+	};
 
+	class thenNode : public node {
+	public:
+	    void accept(visitor& v) override {
+	    	if(this->isLeaf ==true){v.visit(*this);}
+	    	else{for(node * child : this->children){child->accept(v);}
+	    	v.visit(*this);
+	    	}
+	    	}
 	};
-	class thenNode  : public node{
 
+	class felseNode : public node {
+	public:
+	    void accept(visitor& v) override {
+	    	if(this->isLeaf ==true){v.visit(*this);}
+	    	else{for(node * child : this->children){child->accept(v);}
+	    	v.visit(*this);
+	    	}
+	    	}
 	};
-	class felseNode  : public node{
 
+	class whilestatementNode : public node {
+	public:
+	    void accept(visitor& v) override {
+	    	for(node * child : this->children){child->accept(v);}
+	    	v.visit(*this);
+	    	}
 	};
-	class whilestatementNode  : public node{
 
+	class whileNode : public node {
+	public:
+	    void accept(visitor& v) override { v.visit(*this); }
 	};
-	class whileNode  : public node{
 
+	class readNode : public node {
+	public:
+	    void accept(visitor& v) override { v.visit(*this); }
 	};
-	class readNode  : public node{
 
+	class readstatementNode : public node {
+	public:
+	    void accept(visitor& v) override {
+	    	for(node * child : this->children){child->accept(v);}
+	    	v.visit(*this);
+	    	}
 	};
-	class readstatementNode  : public node{
 
+	class writeNode : public node {
+	public:
+	    void accept(visitor& v) override { v.visit(*this); }
 	};
-	class writeNode  : public node{
 
+	class writestatementNode : public node {
+	public:
+	    void accept(visitor& v) override {
+	    	for(node * child : this->children){child->accept(v);}
+	    	v.visit(*this);
+	    	}
 	};
-	class writestatementNode  : public node{
 
+	class returnNode : public node {
+	public:
+	    void accept(visitor& v) override { v.visit(*this); }
 	};
-	class returnNode  : public node{
 
+	class floatnumNode : public node {
+	public:
+	    void accept(visitor& v) override { v.visit(*this); }
 	};
-	class freturnstatementNode  : public node{
 
+	class freturnstatementNode : public node {
+	public:
+	    void accept(visitor& v) override {
+	    	for(node * child : this->children){child->accept(v);}
+	    	v.visit(*this);
+	    	}
 	};
-	class reptstatement4Node  : public node{
 
+	class reptstatement4Node : public node {
+	public:
+	    void accept(visitor& v) override {
+	    	for(node * child : this->children){child->accept(v);}
+	    	v.visit(*this);
+	    	}
 	};
-	class termNode  : public node{
 
+	class termNode : public node {
+	public:
+	    void accept(visitor& v) override {
+	    	if(this->isLeaf ==true){v.visit(*this);}
+	    	else{for(node * child : this->children){child->accept(v);}
+	    	v.visit(*this);
+	    	}
+	    	}
 	};
-	class typeNode  : public node{
 
+	class typeNode : public node {
+	public:
+	    void accept(visitor& v) override { v.visit(*this); }
 	};
-	class vardeclNode  : public node{
 
+	class vardeclNode : public node {
+	public:
+	    void accept(visitor& v) override {
+	    	for(node * child : this->children){child->accept(v);}
+	    	v.visit(*this);
+	    	}
 	};
-	class visibilityNode  : public node{
 
+	class visibilityNode : public node {
+	public:
+	    void accept(visitor& v) override { v.visit(*this); }
 	};
-	class reptvardecl3Node  : public node{
 
+	class reptvardecl3Node : public node {
+	public:
+	    void accept(visitor& v) override {
+	    	for(node * child : this->children){child->accept(v);}
+	    	v.visit(*this);
+	    	}
 	};
-	class rightrecarithexprNode  : public node{
 
+	class rightrecarithexprNode : public node {
+	public:
+	    void accept(visitor& v) override {
+	    	for(parser::abstractSyntaxTree::node * child : this->children){
+	    		child->accept(v);}
+	    	v.visit(*this);
+	    	}
 	};
-	class floatnumNode  : public node{
 
-	};
 
 
 	node * treeHead;
 	void printTree();
 	void traverseTree(abstractSyntaxTree::node* head, int& counter,std::ofstream & ao);
 
+	class visitor{
+	public:
+	    virtual void visit(abstractSyntaxTree::paramNode& n) = 0;
+	    virtual void visit(abstractSyntaxTree::startNode& n) = 0;
+	    virtual void visit(abstractSyntaxTree::intNode& n) = 0;
+	    virtual void visit(abstractSyntaxTree::floatNode& n) = 0;
+	    virtual void visit(abstractSyntaxTree::epsilonNode& n) = 0;
+	    virtual void visit(abstractSyntaxTree::aparamsNode& n) = 0;
+	    virtual void visit(abstractSyntaxTree::aparamstailNode& n) = 0;
+	    virtual void visit(abstractSyntaxTree::addopNode& n) = 0;
+	    virtual void visit(abstractSyntaxTree::arithexprNode& n) = 0;
+	    virtual void visit(abstractSyntaxTree::arraysizeNode& n) = 0;
+	    virtual void visit(abstractSyntaxTree::assignNode& n) = 0;
+	    virtual void visit(abstractSyntaxTree::attributedeclNode& n) = 0;
+	    virtual void visit(abstractSyntaxTree::idNode& n) = 0;
+	    virtual void visit(abstractSyntaxTree::reptclassdecl4Node& n) = 0;
+	    virtual void visit(abstractSyntaxTree::classdeclNode& n) = 0;
+	    virtual void visit(abstractSyntaxTree::classNode& n) = 0;
+	    virtual void visit(abstractSyntaxTree::implNode& n) = 0;
+	    virtual void visit(abstractSyntaxTree::funcNode& n) = 0;
+	    virtual void visit(abstractSyntaxTree::exprNode& n) = 0;
+	    virtual void visit(abstractSyntaxTree::expr2Node& n) = 0;
+	    virtual void visit(abstractSyntaxTree::relopNode& n) = 0;
+	    virtual void visit(abstractSyntaxTree::reptfparams3Node& n) = 0;
+	    virtual void visit(abstractSyntaxTree::reptfparams4Node& n) = 0;
+	    virtual void visit(abstractSyntaxTree::fparamsNode& n) = 0;
+	    virtual void visit(abstractSyntaxTree::factorNode& n) = 0;
+	    virtual void visit(abstractSyntaxTree::factor2Node& n) = 0;
+	    virtual void visit(abstractSyntaxTree::selfNode& n) = 0;
+	    virtual void visit(abstractSyntaxTree::selfandidnest2Node& n) = 0;
+	    virtual void visit(abstractSyntaxTree::dotNode& n) = 0;
+	    virtual void visit(abstractSyntaxTree::idnest2Node& n) = 0;
+	    virtual void visit(abstractSyntaxTree::reptvariable2Node& n) = 0;
+	    virtual void visit(abstractSyntaxTree::aparamsandidNode& n) = 0;
+	    virtual void visit(abstractSyntaxTree::reptvariable2andidNode& n) = 0;
+	    virtual void visit(abstractSyntaxTree::reptfuncbody1Node& n) = 0;
+	    virtual void visit(abstractSyntaxTree::funcbodyNode& n) = 0;
+	    virtual void visit(abstractSyntaxTree::funcdeclNode& n) = 0;
+	    virtual void visit(abstractSyntaxTree::funcdefNode& n) = 0;
+	    virtual void visit(abstractSyntaxTree::funcheadNode& n) = 0;
+	    virtual void visit(abstractSyntaxTree::reptimpldef3Node& n) = 0;
+	    virtual void visit(abstractSyntaxTree::impldefNode& n) = 0;
+	    virtual void visit(abstractSyntaxTree::indiceNode& n) = 0;
+	    virtual void visit(abstractSyntaxTree::localvardeclNode& n) = 0;
+	    virtual void visit(abstractSyntaxTree::localvardeclorstatNode& n) = 0;
+	    virtual void visit(abstractSyntaxTree::multopNode& n) = 0;
+	    virtual void visit(abstractSyntaxTree::reptoptclassdecl22Node& n) = 0;
+	    virtual void visit(abstractSyntaxTree::optclassdecl2Node& n) = 0;
+	    virtual void visit(abstractSyntaxTree::reptprog0Node& n) = 0;
+	    virtual void visit(abstractSyntaxTree::progNode& n) = 0;
+	    virtual void visit(abstractSyntaxTree::relexprNode& n) = 0;
+	    virtual void visit(abstractSyntaxTree::funcdeclfamNode& n) = 0;
+	    virtual void visit(abstractSyntaxTree::attributedeclfamNode& n) = 0;
+	    virtual void visit(abstractSyntaxTree::voidNode& n) = 0;
+	    virtual void visit(abstractSyntaxTree::returntypeNode& n) = 0;
+	    virtual void visit(abstractSyntaxTree::rightrectermNode& n) = 0;
+	    virtual void visit(abstractSyntaxTree::signNode& n) = 0;
+	    virtual void visit(abstractSyntaxTree::reptstatblock1Node& n) = 0;
+	    virtual void visit(abstractSyntaxTree::statblockNode& n) = 0;
+	    virtual void visit(abstractSyntaxTree::ifstatementNode& n) = 0;
+	    virtual void visit(abstractSyntaxTree::ifNode& n) = 0;
+	    virtual void visit(abstractSyntaxTree::conditionNode& n) = 0;
+	    virtual void visit(abstractSyntaxTree::thenNode& n) = 0;
+	    virtual void visit(abstractSyntaxTree::felseNode& n) = 0;
+	    virtual void visit(abstractSyntaxTree::whilestatementNode& n) = 0;
+	    virtual void visit(abstractSyntaxTree::whileNode& n) = 0;
+	    virtual void visit(abstractSyntaxTree::readNode& n) = 0;
+	    virtual void visit(abstractSyntaxTree::readstatementNode& n) = 0;
+	    virtual void visit(abstractSyntaxTree::writeNode& n) = 0;
+	    virtual void visit(abstractSyntaxTree::writestatementNode& n) = 0;
+	    virtual void visit(abstractSyntaxTree::returnNode& n) = 0;
+	    virtual void visit(abstractSyntaxTree::freturnstatementNode& n) = 0;
+	    virtual void visit(abstractSyntaxTree::reptstatement4Node& n) = 0;
+	    virtual void visit(abstractSyntaxTree::termNode& n) = 0;
+	    virtual void visit(abstractSyntaxTree::typeNode& n) = 0;
+	    virtual void visit(abstractSyntaxTree::vardeclNode& n) = 0;
+	    virtual void visit(abstractSyntaxTree::visibilityNode& n) = 0;
+	    virtual void visit(abstractSyntaxTree::reptvardecl3Node& n) = 0;
+	    virtual void visit(abstractSyntaxTree::rightrecarithexprNode& n) = 0;
+	    virtual void visit(abstractSyntaxTree::floatnumNode& n) = 0;
+		    virtual ~visitor() {} // Virtual destructor for proper cleanup
+
+	};
+
+	class SymTabCreationVisitor : visitor{
+	public:
+		void accept(){};
+		void visit(startNode& head){
+
+			for(node * child : head.children){
+				if(child->semanticMeaning == "classdecl" || child->semanticMeaning =="funcdecl"||child->semanticMeaning == "vardecl"){
+					node::symbolTableEntry ste;
+					std::string type;
+					if(child->semanticMeaning=="funcdef"){
+						ste.kind = "function";
+						ste.link = & child->stMap;
+						std::vector<node*> findTheType = child -> children;
+						for(node* childrenOfChild:findTheType){
+							if(childrenOfChild->semanticMeaning =="returntype"){
+								type = childrenOfChild->nodeValue;
+								break;
+							}
+						}
+					}
+					else if(child->semanticMeaning=="vardecl"){
+						ste.kind = "variable";
+						std::vector<node*> findTheType = child -> children;
+						for(node* childrenOfChild:findTheType){
+							if(childrenOfChild->semanticMeaning =="type"){
+								type = childrenOfChild->nodeValue;
+								break;
+							}
+						}
+					}
+					else{
+						ste.link = & child->stMap;
+						ste.kind = "classdecl";
+						type = "";}
+					ste.name = child->nodeValue;
+					ste.type = type;
+					head.stMap[child->nodeValue] = ste;
+
+				}
+			}
+		}
+
+		void visit(aparamstailNode& head){
+
+		}
+
+	};
+
+
 };
+//struct symbolTableEntry{
+//	std::string name;
+//	std::string kind;
+//	std::string type;
+//	symbolTable * link;
+//};
 
 class semanticActions{
 public:
@@ -417,6 +947,22 @@ public:
 	};
 
 	std::unordered_set <std::string> getUniqueTerminalSymbols(){return this -> uniqueTerminalSymbols;}
+};
+
+class symbolTable{
+
+// When is there a new symbol table?
+	/*
+	 * - One is made at the beginning for the global scope.
+	 * - One is maded for Each class gets a symbol table
+	 * - Each class gets an entyr
+	 * - Each variable gets an entry
+	 * - each function gets an entry. This entry is a link to another symbol table. The symbol table of the function
+	 * Report errors like if a variable with the same name has already been declared. That means whenever we want to add a new entry we need to check if it exists already.
+	 *
+	 *
+	 */
+
 };
 
 

@@ -1628,7 +1628,7 @@ void parser::abstractSyntaxTree::printTree(){
 	abstractSyntaxTree::node * head = AST.treeHead;
 	std::vector<abstractSyntaxTree::node*> v = head->children;
 	int counter = 0;
-	astout<<head->semanticMeaning<<std::endl;
+	astout<<head->nodeType<<std::endl;
 	for(int k = v.size()-1;k>=0;k--){
 		traverseTree(v.at(k),counter,astout);
 	}
@@ -1640,7 +1640,7 @@ void parser::abstractSyntaxTree::traverseTree(abstractSyntaxTree::node* head, in
 		for(int i = 0; i<counter; i++){
 			ao<<"| ";
 		}
-		if(head->semanticMeaning !="epsilon")ao<<head->semanticMeaning<<std::endl;
+		if(head->semanticMeaning !="epsilon")ao<<head->nodeType<<std::endl;
 		std::vector<abstractSyntaxTree::node*> v = head->children;
 		for(int k = v.size()-1;k>=0;k--){
 			traverseTree(v.at(k),counter,ao);
@@ -1654,7 +1654,7 @@ void parser::abstractSyntaxTree::traverseTree(abstractSyntaxTree::node* head, in
 		for(int i = 0; i<counter; i++){
 					ao<<"| ";
 				}
-		ao<<head->semanticMeaning<<std::endl;
+		ao<<head->nodeType<<std::endl;
 		std::cout << typeid(*head).name() << std::endl; // Dereference to get dynamic type
 
 		}

@@ -8,6 +8,7 @@ class LINEAR isa POLYNOMIAL {
 	private attribute b: float;
 	public  function build(A: float, B: float) => LINEAR;
 	public  function evaluate(x: float) => float;
+
 };
 
 class QUADRATIC isa POLYNOMIAL {

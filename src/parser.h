@@ -784,7 +784,8 @@ public:
 					else{
 						ste.link = & child->stMap;
 						ste.kind = "classdecl";
-						type = "";}
+						type = "";
+					}
 					ste.name = child->nodeValue;
 					ste.type = type;
 					head.stMap[child->nodeValue] = ste;
@@ -793,13 +794,52 @@ public:
 			}
 		}
 
-		void visit(aparamstailNode& head){
+		void visit(classNode& head){
+			for(node * child : head.children){
+				if(child->semanticMeaning == "{" ){
+					std::vector<node*> classBodyChildren = child ->children;
+					for(node* actualChild : classBodyChildren){
+						if(actualChild->semanticMeaning=="funcdecl"){
+							node::symbolTableEntry ste;
+							std::string type;
+							ste.kind = "function";
+							ste.link = & actualChild->stMap;
+							std::vector<node*> findTheType = actualChild -> children;
+							for(node* childrenOfChild:findTheType){
+								if(childrenOfChild->semanticMeaning =="returntype"){
+									type = childrenOfChild->nodeValue;
+									break;
+								}
+							}
+							ste.name = actualChild->nodeValue;
+							ste.type = type;
+							head.stMap[actualChild->nodeValue] = ste;
 
+						}
+						if(actualChild->semanticMeaning=="attributedecl"){
+							node::symbolTableEntry ste;
+							std::string type;
+							ste.kind = "Class Variable";
+							std::vector<node*> findVarDecl = actualChild -> children;
+							for(node* possibleVarDecl:findVarDecl){
+								if(possibleVarDecl->semanticMeaning =="vardDecl"){
+									std::vector<node*> findTheTypeAndId = possibleVarDecl->children;
+									for(node* possibleTypeAndId : findTheTypeAndId){
+										if (possibleTypeAndId ->semanticMeaning == "type"){
+											ste.type = possibleTypeAndId->nodeValue;
+										}
+										else if(possibleTypeAndId -> semanticMeaning== "id"){
+											ste.name = possibleTypeAndId -> nodeValue;
+										}
+									}
+								}
+							}
+						}
+					}
+				}
+			}
 		}
-
 	};
-
-
 };
 //struct symbolTableEntry{
 //	std::string name;

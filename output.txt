@@ -5100,7 +5100,7 @@ COLUMN : void, at value: 25
 Table entry: error
 ROW: aParams, at value: 29
 COLUMN : EPSILON, at value: 0
-Table entry: <aParams> ::= EPSILON 
+Table entry: <aParams> ::= EPSILON #p #aparams 
 ROW: aParams, at value: 29
 COLUMN : intnum, at value: 49
 Table entry: <aParams> ::= #p <expr> <rept-aParams1> #aparams 
@@ -5181,7 +5181,7 @@ COLUMN : }, at value: 4
 Table entry: error
 ROW: aParams, at value: 29
 COLUMN : then, at value: 0
-Table entry: <aParams> ::= EPSILON 
+Table entry: <aParams> ::= EPSILON #p #aparams 
 ROW: aParams, at value: 29
 COLUMN : :, at value: 3
 Table entry: error
@@ -5196,7 +5196,7 @@ COLUMN : or, at value: 7
 Table entry: error
 ROW: aParams, at value: 29
 COLUMN : ), at value: 5
-Table entry: <aParams> ::= EPSILON 
+Table entry: <aParams> ::= EPSILON #p #aparams 
 ROW: aParams, at value: 29
 COLUMN : =>, at value: 1
 Table entry: error

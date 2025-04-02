@@ -80,6 +80,13 @@ int main (){
 	std::cout<<"Finished Parsing"<<std::endl;
 	p.AST.printTree();
 
+
+	std::cout<<"------------------------------------------------------------------------------------"<<std::endl;
+
+	p.AST.treeHead->accept(p.first);
+	p.AST.printSymbolTable(p.AST.treeHead);
+	std::cout<<"Finished Building Symbol Table"<<std::endl;
+
 	return 0;
 
 }

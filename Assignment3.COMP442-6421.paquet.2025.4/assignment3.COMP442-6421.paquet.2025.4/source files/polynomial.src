@@ -1,6 +1,5 @@
 // ====== struct declarations ====== //
-class POLYNOMIAL ------ {
-	public function evaluate(x: float) => float;
+class POLYNOMIAL {
 };
 
 class LINEAR isa POLYNOMIAL {
@@ -67,6 +66,7 @@ implementation LINEAR {
 // ====== main ====== //
 function main() => void
 {
+  local f1: LINEAR;
   local f1: LINEAR;
   local f2: QUADRATIC;
   local counter: int;

@@ -1,36 +1,71 @@
-start
-| class
+prog
+| classdecl
 | | id
-| | reptclassdecl4
+| | {
 | | | funcdecl
 | | | | visibility
-| | | | funcdecl
+| | | | funchead
 | | | | | id
-| | | | | fparams
+| | | | | funcparams
 | | | | | | param
 | | | | | | | id
 | | | | | | | type
 | | | | | returntype
-| class
+| | | funcdecl
+| | | | visibility
+| | | | funchead
+| | | | | id
+| | | | | funcparams
+| | | | | | param
+| | | | | | | id
+| | | | | | | type
+| | | | | returntype
+| classdecl
 | | id
-| | optclassdecl2
+| | {
+| | | funcdecl
+| | | | visibility
+| | | | funchead
+| | | | | id
+| | | | | funcparams
+| | | | | | param
+| | | | | | | id
+| | | | | | | type
+| | | | | returntype
+| | | funcdecl
+| | | | visibility
+| | | | funchead
+| | | | | id
+| | | | | funcparams
+| | | | | | param
+| | | | | | | id
+| | | | | | | type
+| | | | | returntype
+| classdecl
+| | id
+| | isalist
 | | | id
-| | reptclassdecl4
+| | {
 | | | attributedecl
 | | | | visibility
-| | | | attributedecl
+| | | | vardecl
 | | | | | id
 | | | | | type
 | | | attributedecl
 | | | | visibility
-| | | | attributedecl
+| | | | vardecl
+| | | | | id
+| | | | | type
+| | | attributedecl
+| | | | visibility
+| | | | vardecl
 | | | | | id
 | | | | | type
 | | | funcdecl
 | | | | visibility
-| | | | funcdecl
+| | | | funchead
 | | | | | id
-| | | | | fparams
+| | | | | funcparams
 | | | | | | param
 | | | | | | | id
 | | | | | | | type
@@ -40,38 +75,38 @@ start
 | | | | | returntype
 | | | funcdecl
 | | | | visibility
-| | | | funcdecl
+| | | | funchead
 | | | | | id
-| | | | | fparams
+| | | | | funcparams
 | | | | | | param
 | | | | | | | id
 | | | | | | | type
 | | | | | returntype
-| class
+| classdecl
 | | id
-| | optclassdecl2
+| | isalist
 | | | id
-| | reptclassdecl4
+| | {
 | | | attributedecl
 | | | | visibility
-| | | | attributedecl
+| | | | vardecl
 | | | | | id
 | | | | | type
 | | | attributedecl
 | | | | visibility
-| | | | attributedecl
+| | | | vardecl
 | | | | | id
 | | | | | type
 | | | attributedecl
 | | | | visibility
-| | | | attributedecl
+| | | | vardecl
 | | | | | id
 | | | | | type
 | | | funcdecl
 | | | | visibility
-| | | | funcdecl
+| | | | funchead
 | | | | | id
-| | | | | fparams
+| | | | | funcparams
 | | | | | | param
 | | | | | | | id
 | | | | | | | type
@@ -84,294 +119,451 @@ start
 | | | | | returntype
 | | | funcdecl
 | | | | visibility
-| | | | funcdecl
+| | | | funchead
 | | | | | id
-| | | | | fparams
+| | | | | funcparams
 | | | | | | param
 | | | | | | | id
 | | | | | | | type
 | | | | | returntype
-| impl
+| classdecl
+| | id
+| | isalist
+| | | id
+| | {
+| | | attributedecl
+| | | | visibility
+| | | | vardecl
+| | | | | id
+| | | | | type
+| classdecl
+| | id
+| | isalist
+| | | id
+| | {
+| | | attributedecl
+| | | | visibility
+| | | | vardecl
+| | | | | id
+| | | | | type
+| classdecl
+| | id
+| | isalist
+| | | id
+| | {
+| | | attributedecl
+| | | | visibility
+| | | | vardecl
+| | | | | id
+| | | | | type
+| impldef
 | | id
 | | reptimpldef3
 | | | funcdef
 | | | | funchead
 | | | | | id
-| | | | | fparams
+| | | | | funcparams
 | | | | | | param
 | | | | | | | id
 | | | | | | | type
 | | | | | returntype
 | | | | funcbody
-| | | | | freturnstatement
-| | | | | | expr
-| | | | | | | arithexpr
-| impl
+| | | | | expr
+| | | | | | return
+| impldef
 | | id
 | | reptimpldef3
 | | | funcdef
 | | | | funchead
 | | | | | id
-| | | | | fparams
+| | | | | funcparams
+| | | | | | param
+| | | | | | | id
+| | | | | | | type
 | | | | | | param
 | | | | | | | id
 | | | | | | | type
 | | | | | returntype
 | | | | funcbody
-| | | | | localvardecl
+| | | | | vardecl
 | | | | | | id
 | | | | | | type
-| | | | | reptstatement4
-| | | | | | reptvariable2andid
-| | | | | | | id
-| | | | | | expr
-| | | | | | | arithexpr
-| | | | | | | | id
-| | | | | reptstatement4
-| | | | | | reptvariable2andid
-| | | | | | | id
-| | | | | | expr
-| | | | | | | arithexpr
-| | | | | | | | term
-| | | | | | | | | factor
-| | | | | | | | | | id
-| | | | | | | | | factor
-| | | | | | | | | | id
+| | | | | dot
+| | | | | | assign
+| | | | | | | expr
 | | | | | | | | term
 | | | | | | | | | id
-| | | | | reptstatement4
-| | | | | | reptvariable2andid
+| | | | | | | term
+| | | | | | | | id
+| | | | | | term
 | | | | | | | id
-| | | | | | expr
-| | | | | | | arithexpr
-| | | | | | | | term
-| | | | | | | | | factor
-| | | | | | | | | | id
-| | | | | | | | | factor
-| | | | | | | | | | id
+| | | | | dot
+| | | | | | assign
+| | | | | | | expr
 | | | | | | | | term
 | | | | | | | | | id
-| | | | | freturnstatement
-| | | | | | expr
-| | | | | | | arithexpr
+| | | | | | | term
 | | | | | | | | id
+| | | | | | term
+| | | | | | | id
+| | | | | expr
+| | | | | | return
 | | | funcdef
 | | | | funchead
 | | | | | id
-| | | | | fparams
-| | | | | | param
-| | | | | | | id
-| | | | | | | type
-| | | | | | param
-| | | | | | | id
-| | | | | | | type
+| | | | | funcparams
 | | | | | | param
 | | | | | | | id
 | | | | | | | type
 | | | | | returntype
 | | | | funcbody
-| | | | | localvardecl
+| | | | | vardecl
 | | | | | | id
 | | | | | | type
-| | | | | dot
-| | | | | | reptvariable2andid
-| | | | | | | id
-| | | | | | reptstatement4
-| | | | | | | reptvariable2andid
-| | | | | | | | id
-| | | | | | | expr
-| | | | | | | | arithexpr
-| | | | | | | | | id
-| | | | | dot
-| | | | | | reptvariable2andid
-| | | | | | | id
-| | | | | | reptstatement4
-| | | | | | | reptvariable2andid
-| | | | | | | | id
-| | | | | | | expr
-| | | | | | | | arithexpr
-| | | | | | | | | id
-| | | | | dot
-| | | | | | reptvariable2andid
-| | | | | | | id
-| | | | | | reptstatement4
-| | | | | | | reptvariable2andid
-| | | | | | | | id
-| | | | | | | expr
-| | | | | | | | arithexpr
-| | | | | | | | | id
-| | | | | freturnstatement
+| | | | | assign
 | | | | | | expr
-| | | | | | | arithexpr
-| | | | | | | | id
-| impl
+| | | | | | | floatnum
+| | | | | | term
+| | | | | | | id
+| | | | | assign
+| | | | | | expr
+| | | | | | | addop
+| | | | | | | | term
+| | | | | | | | | id
+| | | | | | | | multop
+| | | | | | | | | term
+| | | | | | | | | | id
+| | | | | | | | | term
+| | | | | | | | | | id
+| | | | | | term
+| | | | | | | id
+| | | | | expr
+| | | | | | return
+| impldef
 | | id
 | | reptimpldef3
 | | | funcdef
 | | | | funchead
 | | | | | id
-| | | | | fparams
-| | | | | | param
-| | | | | | | id
-| | | | | | | type
+| | | | | funcparams
 | | | | | | param
 | | | | | | | id
 | | | | | | | type
 | | | | | returntype
 | | | | funcbody
-| | | | | localvardecl
+| | | | | vardecl
 | | | | | | id
 | | | | | | type
-| | | | | dot
-| | | | | | reptvariable2andid
-| | | | | | | id
-| | | | | | reptstatement4
-| | | | | | | reptvariable2andid
-| | | | | | | | id
-| | | | | | | expr
-| | | | | | | | arithexpr
-| | | | | | | | | id
-| | | | | dot
-| | | | | | reptvariable2andid
-| | | | | | | id
-| | | | | | reptstatement4
-| | | | | | | reptvariable2andid
-| | | | | | | | id
-| | | | | | | expr
-| | | | | | | | arithexpr
-| | | | | | | | | id
-| | | | | freturnstatement
+| | | | | assign
 | | | | | | expr
-| | | | | | | arithexpr
+| | | | | | | term
 | | | | | | | | id
+| | | | | | term
+| | | | | | | id
+| | | | | assign
+| | | | | | expr
+| | | | | | | addop
+| | | | | | | | term
+| | | | | | | | | id
+| | | | | | | | multop
+| | | | | | | | | term
+| | | | | | | | | | id
+| | | | | | | | | term
+| | | | | | | | | | id
+| | | | | | term
+| | | | | | | id
+| | | | | assign
+| | | | | | expr
+| | | | | | | addop
+| | | | | | | | term
+| | | | | | | | | id
+| | | | | | | | multop
+| | | | | | | | | term
+| | | | | | | | | | id
+| | | | | | | | | term
+| | | | | | | | | | id
+| | | | | | term
+| | | | | | | id
+| | | | | expr
+| | | | | | return
 | | | funcdef
 | | | | funchead
 | | | | | id
-| | | | | fparams
+| | | | | funcparams
+| | | | | | param
+| | | | | | | id
+| | | | | | | type
+| | | | | | param
+| | | | | | | id
+| | | | | | | type
 | | | | | | param
 | | | | | | | id
 | | | | | | | type
 | | | | | returntype
 | | | | funcbody
-| | | | | localvardecl
+| | | | | vardecl
 | | | | | | id
 | | | | | | type
-| | | | | reptstatement4
-| | | | | | reptvariable2andid
-| | | | | | | id
-| | | | | | expr
-| | | | | | | arithexpr
-| | | | | reptstatement4
-| | | | | | reptvariable2andid
-| | | | | | | id
-| | | | | | expr
-| | | | | | | arithexpr
-| | | | | | | | term
-| | | | | | | | | factor
+| | | | | dot
+| | | | | | assign
+| | | | | | | expr
+| | | | | | | | addop
+| | | | | | | | | multop
+| | | | | | | | | | intnum
+| | | | | | | | | | term
+| | | | | | | | | | | id
+| | | | | | | | | term
 | | | | | | | | | | id
-| | | | | | | | | factor
-| | | | | | | | | | id
+| | | | | | | term
+| | | | | | | | id
+| | | | | | term
+| | | | | | | id
+| | | | | dot
+| | | | | | assign
+| | | | | | | expr
 | | | | | | | | term
 | | | | | | | | | id
-| | | | | freturnstatement
-| | | | | | expr
-| | | | | | | arithexpr
+| | | | | | | term
 | | | | | | | | id
-| func
+| | | | | | term
+| | | | | | | id
+| | | | | dot
+| | | | | | assign
+| | | | | | | expr
+| | | | | | | | intnum
+| | | | | | | term
+| | | | | | | | id
+| | | | | | term
+| | | | | | | id
+| | | | | expr
+| | | | | | return
+| | | funcdef
+| | | | funchead
+| | | | | id
+| | | | | funcparams
+| | | | | | param
+| | | | | | | id
+| | | | | | | type
+| | | | | | param
+| | | | | | | id
+| | | | | | | type
+| | | | | | param
+| | | | | | | id
+| | | | | | | type
+| | | | | returntype
+| | | | funcbody
+| | | | | vardecl
+| | | | | | id
+| | | | | | type
+| | | | | dot
+| | | | | | assign
+| | | | | | | expr
+| | | | | | | | term
+| | | | | | | | | id
+| | | | | | | term
+| | | | | | | | id
+| | | | | | term
+| | | | | | | id
+| | | | | dot
+| | | | | | assign
+| | | | | | | expr
+| | | | | | | | term
+| | | | | | | | | id
+| | | | | | | term
+| | | | | | | | id
+| | | | | | term
+| | | | | | | id
+| | | | | dot
+| | | | | | assign
+| | | | | | | expr
+| | | | | | | | term
+| | | | | | | | | id
+| | | | | | | term
+| | | | | | | | id
+| | | | | | term
+| | | | | | | id
+| | | | | expr
+| | | | | | return
+| funcdef
+| | funchead
+| | | id
+| | | funcparams
+| | | | param
+| | | | | id
+| | | | | type
+| | | returntype
+| funcdef
+| | funchead
+| | | id
+| | | funcparams
+| | | | param
+| | | | | id
+| | | | | type
+| | | returntype
+| funcdef
+| | funchead
+| | | id
+| | | funcparams
+| | | | param
+| | | | | id
+| | | | | type
+| | | | param
+| | | | | id
+| | | | | type
+| | | returntype
+| funcdef
+| | funchead
+| | | id
+| | | funcparams
+| | | | param
+| | | | | id
+| | | | | type
+| | | | | dimlist
+| | | | | | intnum
+| | | | | | intnum
+| | | returntype
+| funcdef
 | | funchead
 | | | id
 | | | returntype
 | | funcbody
-| | | localvardecl
+| | | vardecl
 | | | | id
 | | | | type
-| | | localvardecl
+| | | vardecl
 | | | | id
 | | | | type
-| | | localvardecl
+| | | vardecl
 | | | | id
 | | | | type
-| | | reptstatement4
-| | | | reptvariable2andid
-| | | | | id
+| | | vardecl
+| | | | id
+| | | | type
+| | | vardecl
+| | | | id
+| | | | type
+| | | vardecl
+| | | | id
+| | | | type
+| | | vardecl
+| | | | id
+| | | | type
+| | | | dimlist
+| | | | | intnum
+| | | | | intnum
+| | | vardecl
+| | | | id
+| | | | type
+| | | | dimlist
+| | | | | intnum
+| | | | | intnum
+| | | | | intnum
+| | | assign
 | | | | expr
-| | | | | arithexpr
-| | | | | | reptvariable2andid
-| | | | | | | id
-| | | | | | aparamsandid
+| | | | | dot
+| | | | | | functioncall
 | | | | | | | id
 | | | | | | | aparams
 | | | | | | | | expr
-| | | | | | | | | arithexpr
+| | | | | | | | | intnum
 | | | | | | | | expr
-| | | | | | | | | arithexpr
-| | | reptstatement4
-| | | | reptvariable2andid
-| | | | | id
-| | | | expr
-| | | | | arithexpr
-| | | | | | reptvariable2andid
+| | | | | | | | | floatnum
+| | | | | | term
 | | | | | | | id
-| | | | | | aparamsandid
+| | | | term
+| | | | | id
+| | | assign
+| | | | expr
+| | | | | dot
+| | | | | | functioncall
 | | | | | | | id
 | | | | | | | aparams
 | | | | | | | | expr
-| | | | | | | | | arithexpr
+| | | | | | | | | factor2
+| | | | | | | | | | floatnum
 | | | | | | | | | | sign
-| | | | | | | | | | factor
 | | | | | | | | expr
-| | | | | | | | | arithexpr
+| | | | | | | | | floatnum
 | | | | | | | | expr
-| | | | | | | | | arithexpr
-| | | reptstatement4
-| | | | reptvariable2andid
+| | | | | | | | | floatnum
+| | | | | | term
+| | | | | | | id
+| | | | term
 | | | | | id
+| | | dot
+| | | | assign
+| | | | | expr
+| | | | | | intnum
+| | | | | term
+| | | | | | id
+| | | | term
+| | | | | id
+| | | assign
 | | | | expr
-| | | | | arithexpr
-| | | whilestatement
-| | | | then
-| | | | | writestatement
-| | | | | | expr
-| | | | | | | arithexpr
-| | | | | | | | reptvariable2andid
-| | | | | | | | | id
-| | | | | | | | dot
-| | | | | | | | | reptvariable2andid
-| | | | | | | | | | id
-| | | | | | | | | aparamsandid
-| | | | | | | | | | id
-| | | | | | | | | | aparams
-| | | | | | | | | | | expr
-| | | | | | | | | | | | arithexpr
-| | | | | | | | | | | | | id
-| | | | | writestatement
-| | | | | | expr
-| | | | | | | arithexpr
-| | | | | | | | id
-| | | | | writestatement
-| | | | | | expr
-| | | | | | | arithexpr
-| | | | | | | | reptvariable2andid
-| | | | | | | | | id
-| | | | | | | | aparamsandid
-| | | | | | | | | id
-| | | | | | | | | aparams
-| | | | | | | | | | expr
-| | | | | | | | | | | arithexpr
-| | | | | | | | | | | | id
-| | | | | writestatement
-| | | | | | expr
-| | | | | | | arithexpr
-| | | | | | | | reptvariable2andid
-| | | | | | | | | id
-| | | | | | | | aparamsandid
-| | | | | | | | | id
-| | | | | | | | | aparams
-| | | | | | | | | | expr
-| | | | | | | | | | | arithexpr
-| | | | | | | | | | | | id
-| | | | condition
-| | | | | arithexpr
+| | | | | dot
+| | | | | | functioncall
+| | | | | | | id
+| | | | | | term
+| | | | | | | id
+| | | | term
+| | | | | id
+| | | functioncall
+| | | | id
+| | | assign
+| | | | expr
+| | | | | term
+| | | | | | id
+| | | | term
+| | | | | id
+| | | functioncall
+| | | | id
+| | | | aparams
+| | | | | expr
+| | | | | | intnum
+| | | | | expr
+| | | | | | intnum
+| | | | | expr
+| | | | | | intnum
+| | | functioncall
+| | | | id
+| | | | aparams
+| | | | | expr
+| | | | | | floatnum
+| | | | | expr
+| | | | | | intnum
+| | | assign
+| | | | expr
+| | | | | intnum
+| | | | term
+| | | | | id
+| | | | | reptvariable2
+| | | | | | intnum
+| | | assign
+| | | | expr
+| | | | | intnum
+| | | | term
+| | | | | id
+| | | | | reptvariable2
+| | | | | | intnum
+| | | | | | floatnum
+| | | functioncall
+| | | | id
+| | | | aparams
+| | | | | expr
+| | | | | | term
+| | | | | | | id
+| | | dot
+| | | | assign
+| | | | | expr
+| | | | | | intnum
+| | | | | term
+| | | | | | id
+| | | | term
+| | | | | id
+| | | reptstatblock1
+| | | | relexpr
+| | | | | term
 | | | | | | id
 | | | | | relop
-| | | | | arithexpr
+| | | | | intnum
+| | | | while

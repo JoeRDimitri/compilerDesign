@@ -1079,9 +1079,9 @@ bool parser::parse(const std::vector<token*>  & vectorOfTokens){
 	token* currentToken = (*vectorIterator);
 
 	while(parsingStack.top()!="$"){
-		if(i >= 1280)
+		if(i >= 2650)
 		{
-//			std::cout<<i<<std::endl;
+			std::cout<<i<<std::endl;
 
 		}
 		i++;
@@ -1118,6 +1118,9 @@ bool parser::parse(const std::vector<token*>  & vectorOfTokens){
 			parsingStack.pop();
 			for(int i = 1; i<topOfTheStack.size();i++){
 				semanticFunction +=topOfTheStack[i];
+			}
+			if(semanticFunction=="factor2"){
+				std::cout<<"hello"<<std::endl;
 			}
 			semanticHandler.handleAction(semanticFunction,lastTokenValue);
 			derivation.erase(derivation.begin()+lineIndex);
@@ -1326,7 +1329,7 @@ void parser::semanticActions::handleAction(std::string semanticFunction,std::str
 	else if(semanticFunction == "reptclassdecl4"){abstractSyntaxTree::reptclassdecl4Node * newnode = new abstractSyntaxTree::reptclassdecl4Node();std::vector<std::string> v = {"epsilon"}; semanticHandler.makeSubTree("reptclassdecl4","{",'E',v,newnode);}
 	else if(semanticFunction == "classdecl"){abstractSyntaxTree::classdeclNode * newnode = new abstractSyntaxTree::classdeclNode();std::vector<std::string> v = {"id","optclassdecl2","reptclassdecl4"}; semanticHandler.makeSubTree("classdecl","classdecl",3,v,newnode);}
 	else if(semanticFunction == "aparams"){abstractSyntaxTree::aparamsNode * newnode = new abstractSyntaxTree::aparamsNode(); std::vector<std::string> v = {"epsilon"}; semanticHandler.makeSubTree("aparams","aparams",'E',v,newnode);}
-	else if(semanticFunction == "funcdef"){abstractSyntaxTree::classdeclNode * newnode = new abstractSyntaxTree::classdeclNode();std::vector<std::string> v = {"funchead","funcbody"}; semanticHandler.makeSubTree("funcdef","funcdef",2,v,newnode);}
+	else if(semanticFunction == "funcdef"){abstractSyntaxTree::funcdefNode * newnode = new abstractSyntaxTree::funcdefNode();std::vector<std::string> v = {"funchead","funcbody"}; semanticHandler.makeSubTree("funcdef","funcdef",2,v,newnode);}
 	else if(semanticFunction == "expr"){abstractSyntaxTree::exprNode*newnode = new abstractSyntaxTree::exprNode(); std::vector<std::string> v = {"arithexpr","expr2","epsilon"}; semanticHandler.makeSubTree("expr","expr",2,v,newnode);}
 	else if(semanticFunction == "expr2"){abstractSyntaxTree::expr2Node*newnode = new abstractSyntaxTree::expr2Node();std::vector<std::string> v = {"relop","arithexpr"}; semanticHandler.makeSubTree("expr2","expr2",2,v,newnode);}
 	else if(semanticFunction == "reptfparams3"){abstractSyntaxTree::reptfparams3Node*newnode = new abstractSyntaxTree::reptfparams3Node();std::vector<std::string> v = {"epsilon"}; semanticHandler.makeSubTree("reptfparams3","dimlist",'E',v,newnode);}
@@ -1347,7 +1350,7 @@ void parser::semanticActions::handleAction(std::string semanticFunction,std::str
 	else if(semanticFunction == "reptprog0"){abstractSyntaxTree::reptprog0Node*newnode = new abstractSyntaxTree::reptprog0Node();std::vector<std::string> v = {"epsilon"}; semanticHandler.makeSubTree("reptprog0","prog",'E',v,newnode);}
 	else if(semanticFunction == "relexpr"){abstractSyntaxTree::relexprNode*newnode = new abstractSyntaxTree::relexprNode();std::vector<std::string> v = {"arithexpr","relop","arithexpr"}; semanticHandler.makeSubTree("relexpr","relexpr",3,v,newnode);}
 	else if(semanticFunction == "funcdeclfam"){abstractSyntaxTree::funcdeclfamNode*newnode = new abstractSyntaxTree::funcdeclfamNode();std::vector<std::string> v = {"visibility","funcdecl"}; semanticHandler.makeSubTree("funcdecl","funcdecl",2,v,newnode);}
-	else if(semanticFunction == "attributedeclfam"){abstractSyntaxTree::attributedeclfamNode*newnode = new abstractSyntaxTree::attributedeclfamNode();std::vector<std::string> v = {"visibility","attributedecl"}; semanticHandler.makeSubTree("attributedecl","attributedecl",2,v,newnode);}
+	else if(semanticFunction == "attributedeclfam"){abstractSyntaxTree::attributedeclfamNode*newnode = new abstractSyntaxTree::attributedeclfamNode();std::vector<std::string> v = {"visibility","attributedecl"}; semanticHandler.makeSubTree("attributedeclfam","attributedecl",2,v,newnode);}
 	else if(semanticFunction == "reptstatblock1"){abstractSyntaxTree::reptstatblock1Node*newnode = new abstractSyntaxTree::reptstatblock1Node();std::vector<std::string> v = {"epsilon"}; semanticHandler.makeSubTree("reptstatblock1","reptstatblock1",'E',v,newnode);}
 	else if(semanticFunction == "vardecl"){abstractSyntaxTree::vardeclNode*newnode = new abstractSyntaxTree::vardeclNode();std::vector<std::string> v = {"id","type","reptvardecl3"}; semanticHandler.makeSubTree("vardecl","vardecl",3,v,newnode);}
 	else if(semanticFunction == "reptvardecl3"){abstractSyntaxTree::reptvardecl3Node*newnode = new abstractSyntaxTree::reptvardecl3Node();std::vector<std::string> v = {"epsilon"}; semanticHandler.makeSubTree("reptvardecl3","dimlist",'E',v,newnode);}
@@ -1380,11 +1383,17 @@ void parser::semanticActions:: makeLeaf(std::string nodeType,std::string lastTok
 void parser::semanticActions::makeBinarySubTreeWithHead(std::string nodeType,int numOfPops,abstractSyntaxTree::node* newnode){
 	std::vector <abstractSyntaxTree::node *>nodesOnStack;
 	std::vector <abstractSyntaxTree::node *>children;
+	std::stack <abstractSyntaxTree::node*> reverseChildren;
 
 	for(int i = numOfPops -1; i>=0; i--){
-		nodesOnStack.emplace_back(semanticStack.top());
+		reverseChildren.push(semanticStack.top());
 		semanticStack.pop();
 	}
+	while(!reverseChildren.empty()){
+		nodesOnStack.emplace_back(reverseChildren.top());
+		reverseChildren.pop();
+	}
+
 	abstractSyntaxTree::node * parentNode = nodesOnStack[nodesOnStack.size()-1];
 	newnode->copyNode(parentNode, newnode, nodeType);
 	delete parentNode;
@@ -1478,30 +1487,60 @@ void parser::semanticActions::makeBinarySubTree(std::string nodeType,int i,abstr
 
 void parser::semanticActions:: makeSubTree(std::string nodeType, std::string semanticMeaning,int amountOfPops,std::vector<std::string> match, abstractSyntaxTree::node* newnode){
 	std::vector<abstractSyntaxTree::node *> nodesFromTheStack;
+	std::stack <abstractSyntaxTree::node*> reverseChildren;
+
 	if(amountOfPops == 'E'){
 		abstractSyntaxTree::node * n = semanticStack.top();
 		while(n->nodeType!="epsilon"){
-			nodesFromTheStack.emplace_back(n);
+			reverseChildren.push(n);
 			semanticStack.pop();
 			n = semanticStack.top();
 		}
 		semanticStack.pop();
-
-
+		while(!reverseChildren.empty()){
+			nodesFromTheStack.emplace_back(reverseChildren.top());
+			reverseChildren.pop();
+		}
 	}
 	//First if statement handles if the amount that we are about to pop matches the amount we need to match.
 	else if(amountOfPops == match.size()){
-		for(int i = amountOfPops-1; i>=0;i--){
-			abstractSyntaxTree::node * n = semanticStack.top();
-			if(n->nodeType==match.at(i)){
-				nodesFromTheStack.emplace_back(n);
-				semanticStack.pop();
-			}
-			else{
-				std::cout<<"Mistake matching in " + nodeType + "with : " + match.at(i);
-				exit(1);
+		bool good = false;
+		if(semanticStack.top()->nodeType==match.at(amountOfPops-1)){
+			for(int i = amountOfPops-1; i>=0;i--){
+				abstractSyntaxTree::node * n = semanticStack.top();
+				if(n->nodeType==match.at(i)){
+					reverseChildren.push(n);
+					semanticStack.pop();
+					if(i == 1){
+						good = true;
+					}
+				}
 			}
 		}
+		else{
+		if(!good)
+			for(int i = 0; i<amountOfPops;i++){
+				abstractSyntaxTree::node * n = semanticStack.top();
+				if(n->nodeType==match.at(i)){
+					reverseChildren.push(n);
+					semanticStack.pop();
+					if(i == amountOfPops-1){
+						good = true;
+					}
+				}
+			}
+		}
+
+
+		if(!good){
+			std::cout<<"Mistake matching in " + nodeType <<std::endl;
+			exit(1);
+		}
+		while(!reverseChildren.empty()){
+			nodesFromTheStack.emplace_back(reverseChildren.top());
+			reverseChildren.pop();
+		}
+
 	}
 	//If it does not match then we need to match just one of them
 	else{
@@ -1520,7 +1559,7 @@ void parser::semanticActions:: makeSubTree(std::string nodeType, std::string sem
 			}
 
 			if(k == match.size()){
-				std::cout<<"problem with stack cant find the matching items  : " + nodeType;
+				std::cout<<"problem with stack cant find the matching items  : " + nodeType<<std::endl;
 				exit(1);
 			}
 		}
@@ -1585,7 +1624,7 @@ void parser::semanticActions:: passAlong(std::string nodeType,abstractSyntaxTree
 		newnode->semanticMeaning ="epsilon";
 	}
 	delete topofthestack;
-	if(nodeType == "start"){AST.treeHead = newnode;}
+	if(nodeType == "start"){AST.treeHead = dynamic_cast<abstractSyntaxTree::startNode*>(newnode);}
 	else {semanticStack.push(newnode);}
 
 }
@@ -1601,7 +1640,7 @@ void parser::semanticActions:: passAlong(std::string nodeType,std::string semant
 	}
 	delete topofthestack;
 	if(nodeType == "start"){
-		AST.treeHead = newnode;
+		AST.treeHead = dynamic_cast<abstractSyntaxTree::startNode*>(newnode);
 
 	}
 	else {
@@ -1628,8 +1667,13 @@ void parser::abstractSyntaxTree::printTree(){
 	abstractSyntaxTree::node * head = AST.treeHead;
 	std::vector<abstractSyntaxTree::node*> v = head->children;
 	int counter = 0;
-	astout<<head->nodeType<<std::endl;
-	for(int k = v.size()-1;k>=0;k--){
+	astout<<head->semanticMeaning<<std::endl;
+	for(int k = 0;k<v.size();k++){
+//		if(v.at(k)->semanticMeaning=="epsilon"){
+//			delete v.at(k);
+//		    v.erase(v.begin()+k);
+//		    continue;
+//		}
 		traverseTree(v.at(k),counter,astout);
 	}
 }
@@ -1640,21 +1684,34 @@ void parser::abstractSyntaxTree::traverseTree(abstractSyntaxTree::node* head, in
 		for(int i = 0; i<counter; i++){
 			ao<<"| ";
 		}
-		if(head->semanticMeaning !="epsilon")ao<<head->nodeType<<std::endl;
+
+		if(head->semanticMeaning !="epsilon")ao<<head->semanticMeaning<<std::endl;
 		std::vector<abstractSyntaxTree::node*> v = head->children;
-		for(int k = v.size()-1;k>=0;k--){
+		for(int k = 0;k<v.size();k++){
+//			if(v.at(k)->semanticMeaning=="epsilon"){
+//				delete v.at(k);
+//			    v.erase(v.begin()+k);
+//			    continue;
+//			}
 			traverseTree(v.at(k),counter,ao);
 		}
 		counter--;
 	}
 	else if(head->children.size() == 0){
+		if(head->semanticMeaning =="epsilon"){
+			std::cout<<"EPSIOLON"<<std::endl;
+			node* parent = head->parent;
+
+
+		}
+
 		if(head->semanticMeaning !="epsilon"){
 
 
 		for(int i = 0; i<counter; i++){
 					ao<<"| ";
 				}
-		ao<<head->nodeType<<std::endl;
+		ao<<head->semanticMeaning<<std::endl;
 		std::cout << typeid(*head).name() << std::endl; // Dereference to get dynamic type
 
 		}
@@ -1663,4 +1720,315 @@ void parser::abstractSyntaxTree::traverseTree(abstractSyntaxTree::node* head, in
 
 }
 
+void parser::abstractSyntaxTree::printSymbolTable(node* head){
+	std::vector<node*>headChildren = head->children;
+    std::ofstream symtabout("symbolTable.txt"); // Open file for writing
+
+	symtabout<<"Global Table"<<std::endl<<"========================="<<std::endl;
+	for (auto it = head->stMap.begin(); it != head->stMap.end(); ++it) {
+	    symtabout << it->first << ": " << it->second->kind + " | "<< it->second->type+ " | "<< std::endl;
+	    if(it->second->hasLink){
+	    	symtabout<<"========================="<<std::endl<<"\ttable for "<<it->second->name<<std::endl<<std::endl;
+	    	int count = 0;
+	    	printSymbolTableRec(it->second->link,count,symtabout);
+	    }
+	}
+}
+void parser::abstractSyntaxTree::printSymbolTableRec(std::map<std::string,parser::abstractSyntaxTree::node::symbolTableEntry*> * link,int & count,std::ofstream & ao){
+count ++;
+	for (auto it = link->begin(); it != link->end(); ++it) {
+		if(it->first!="")
+		for (int i = 0; i < count; i++) {
+	        ao << "\t";
+	    }
+	    if(it->first!="")ao << it->first << ": " << it->second->kind + " | " + it->second->type + " | " << std::endl;
+	    if(it->second->hasLink){
+		    for (int i = 0; i < count; i++) {
+		        ao << "\t";
+		    }
+
+	    	ao<<"========================="<<std::endl<<"\ttable for "<<it->second->name<<std::endl<<std::endl;
+	    	printSymbolTableRec(it->second->link,count,ao);
+		    for (int i = 0; i < count+1; i++) {
+		        ao << "\t";
+		    }
+
+	    	ao<<"========================="<<std::endl;
+	    }
+	}
+
+count --;
+}
+
+
+
+
+std::string parser::abstractSyntaxTree::SymTabCreationVisitor::get(std::string search, node& head){
+	for(node * child : head.children){
+		if(child->semanticMeaning == search){
+			return child->nodeValue;
+		}
+	}
+	return get(search,(*head.children[0]));
+
+
+}
+void parser::abstractSyntaxTree::SymTabCreationVisitor:: visit(funcdeclNode & head){
+	node::symbolTableEntry *ste = &head.stEntry;
+
+	//kind
+	ste->kind = "function";
+	//haslink
+	ste->hasLink =true;
+	//name
+	ste->name=get("id",head);
+	ste->type = get("returntype",head);
+
+	for(node*children:head.children){
+
+		 if(children->nodeType=="fparams"){
+			//link
+			 ste->link =  &children->stMap;
+		}
+	}
+}
+
+void parser::abstractSyntaxTree::SymTabCreationVisitor:: visit(fparamsNode & head){
+	std::map<std::string, node::symbolTableEntry*> *mp = &head.stMap;
+	for(node*child:head.children){
+		if(child->nodeType=="param"){
+			 if((*mp).count(child->stEntry.name)>0){
+				 std::cerr<<"Multiple Parameters with the same name for: "+child->stEntry.name +"."<<std::endl;
+			 }
+			 else{
+					(*mp)[child->stEntry.name] =& child->stEntry;
+			 }
+		}
+	}
+}
+
+void parser::abstractSyntaxTree::SymTabCreationVisitor:: visit(paramNode & head){
+	node::symbolTableEntry *ste = &head.stEntry;
+	ste->kind ="parameter";
+	ste->name = get("id",head);
+	ste->type = get("type",head);
+
+
+}
+
+void parser::abstractSyntaxTree::SymTabCreationVisitor:: visit(classNode & head){
+	std::map<std::string, node::symbolTableEntry*> *mp = &head.stMap;
+	node::symbolTableEntry *ste = &head.stEntry;
+	ste->kind ="class";
+	ste->name = get("id",head);
+	ste->hasLink =true;
+	ste->link=mp;
+	for(node*child:head.children){
+		if(child->semanticMeaning=="isalist"){
+			for(node*children:child->children){
+				ste->type+=children->nodeValue;
+
+			}
+		}
+		else if(child->semanticMeaning=="{"){
+			for(node*children:child->children){
+				if(children->semanticMeaning=="attributedecl"){
+					 if((*mp).count(children->stEntry.name)>0){
+						 std::cerr<<"Multiple Attribute Declarations for: "+children->stEntry.name +"."<<std::endl;
+					 }
+					 else{
+							(*mp)[children->stEntry.name] =& children->stEntry;
+
+					 }
+
+				}
+				else if(children->semanticMeaning == "funcdecl"){
+					for(node*grandchildren:children->children){
+						if(grandchildren->semanticMeaning=="funchead"){
+							 if((*mp).count(grandchildren->stEntry.name)>0){
+								 std::cerr<<"Multiple Function Declarations for: "+grandchildren->stEntry.name +"."<<std::endl;
+							 }
+							 else{
+									(*mp)[grandchildren->stEntry.name] = &grandchildren->stEntry;
+
+							 }
+						}
+					}
+				}
+			}
+		}
+	}
+
+}
+int uniquenamecount = 0;
+
+std::string generateUniqueName(std::string baseName) {
+    std::string newName = baseName +std::to_string(uniquenamecount);
+    uniquenamecount++;
+    return newName;
+}
+
+void parser::abstractSyntaxTree::SymTabCreationVisitor:: visit(startNode & head){
+	std::map<std::string, node::symbolTableEntry*> *mp = &head.stMap;
+	for(node*child:head.children){
+		 if(child->semanticMeaning=="classdecl"){
+			//link
+			 if((*mp).count(child->stEntry.name)>0){
+				 std::cerr<<"Multiple Class Declaration for: "+child->stEntry.name +"."<<std::endl;
+
+			 }
+			 else{
+				 (*mp)[child->stEntry.name] = &child->stEntry;
+
+			 }
+		}
+		 else if(child->semanticMeaning=="funcdef"){
+			 (*mp)[child->stEntry.name] = &child->stEntry;
+		 }
+		 else if(child->semanticMeaning=="impldef"){
+			 if((*mp).count(child->stEntry.name)>0){
+				 if((*mp)[child->stEntry.name]->kind=="class"){
+					 std::cout<<"Class Declaration found for " + child->stEntry.name + ". Updating implementation."<<std::endl;
+					 (*mp)[child->stEntry.name] = &child->stEntry;
+				 }
+
+			 }
+			 else{
+				 std::cerr<<"Missing Class Declaration for: "+child->stEntry.name +"."<<std::endl;
+			 }
+
+		 }
+
+	}
+    for (const auto& [key, value] : (*mp)) {
+    	if(value->kind=="class"){
+    		std::cerr<<"There is a class declaration: "+value->name+" without implementation"<<std::endl;
+    	}
+    }
+
+}
+
+void parser::abstractSyntaxTree::SymTabCreationVisitor:: visit(attributedeclNode & head){
+	node::symbolTableEntry *ste = &head.stEntry;
+	ste->kind ="variable";
+	ste->name = get("id",head);
+	ste->type = get("type",head);
+
+}
+
+void parser::abstractSyntaxTree::SymTabCreationVisitor:: visit(attributedeclfamNode & head){
+	node::symbolTableEntry *ste = &head.stEntry;
+	ste->kind ="attribute";
+	for(node*child:head.children){
+		if(child->semanticMeaning =="vardecl"){
+			ste->name=child->stEntry.name;
+			ste->type=child->stEntry.type;
+
+		}
+	}
+}
+void parser::abstractSyntaxTree::SymTabCreationVisitor:: visit(implNode & head){
+	std::map<std::string, node::symbolTableEntry*> *mp = &head.stMap;
+	node::symbolTableEntry *ste = &head.stEntry;
+	ste->kind ="implementation";
+	ste->name = get("id",head);
+	ste->hasLink =true;
+	ste->link=mp;
+	for(node*child:head.children){
+		 if(child->semanticMeaning=="reptimpldef3"){
+			for(node*children:child->children){
+				if(children->semanticMeaning=="funcdef"){
+					 if((*mp).count(children->stEntry.name)>0){
+						 std::cerr<<"Multiple Function Definitions for: "+children->stEntry.name +"."<<std::endl;
+					 }
+					 else{
+							(*mp)[children->stEntry.name] =& children->stEntry;
+					 }
+				}
+			}
+		}
+	}
+}
+
+void parser::abstractSyntaxTree::SymTabCreationVisitor:: visit(funcdefNode & head){
+	std::map<std::string, node::symbolTableEntry*> *mp = &head.stMap;
+	node::symbolTableEntry *ste = &head.stEntry;
+	ste->kind ="function";
+	ste->hasLink =true;
+	ste->link=mp;
+
+	for(node*child:head.children){
+		 if(child->semanticMeaning=="funchead"){
+			 mp->insert((*child->stEntry.link).begin(), (*child->stEntry.link).end());
+			 ste->name = child->stEntry.name;
+			 ste->type = child->stEntry.type;
+		 }
+		 else if(child->semanticMeaning=="funcbody"){
+			 mp->insert((*child->stEntry.link).begin(), (*child->stEntry.link).end());
+			 child->stEntry.name=ste->name;
+
+		 }
+
+	}
+}
+void parser::abstractSyntaxTree::SymTabCreationVisitor:: visit(funcheadNode & head){
+	node::symbolTableEntry *ste = &head.stEntry;
+	ste->kind ="function head";
+	ste->name = get("id",head);
+//	ste->name = generateUniqueName(ste->name);
+	for(node*child:head.children){
+		 if(child->semanticMeaning=="returntype"){
+			 ste->type=child->nodeValue;
+		}
+		 else if(child->semanticMeaning =="funcparams" ){
+			//link
+			ste->link =  &child->stMap;
+
+		 }
+	}
+}
+void parser::abstractSyntaxTree::SymTabCreationVisitor:: visit(funcbodyNode & head){
+	std::map<std::string, node::symbolTableEntry*> *mp = &head.stMap;
+	node::symbolTableEntry *ste = &head.stEntry;
+	ste->hasLink =true;
+	ste->link=mp;
+	ste->kind ="function body";
+	for(node*child:head.children){
+		 if(child->semanticMeaning=="vardecl"){
+			 if((*mp).count(child->stEntry.name)>0){
+				 std::cerr<<"Multiple Variable Declarations for: "+child->stEntry.name +"."<<std::endl;
+			 }
+			 else{
+					(*mp)[child->stEntry.name] =& child->stEntry;
+			 }
+		}
+	}
+}
+
+void parser::abstractSyntaxTree::SymTabCreationVisitor:: visit(localvardeclNode & head){
+	node::symbolTableEntry *ste = &head.stEntry;
+	ste->kind ="variable";
+	ste->name = get("id",head);
+	ste->type = get("type",head);
+}
+
+void parser::abstractSyntaxTree::SymTabCreationVisitor:: visit(funcNode & head){
+	std::map<std::string, node::symbolTableEntry*> *mp = &head.stMap;
+	node::symbolTableEntry *ste = &head.stEntry;
+	ste->kind ="function";
+	ste->hasLink =true;
+	ste->link=mp;
+
+	for(node*child:head.children){
+		 if(child->semanticMeaning=="funchead"){
+			 if(!mp->empty())mp->insert((*child->stEntry.link).begin(), (*child->stEntry.link).end());
+			 ste->name = child->stEntry.name;
+			 ste->type = child->stEntry.type;
+		 }
+		 else if(child->semanticMeaning=="funcbody"){
+			 mp->insert((*child->stEntry.link).begin(), (*child->stEntry.link).end());
+			 child->stEntry.name=ste->name;
+		 }
+	}
+}
 

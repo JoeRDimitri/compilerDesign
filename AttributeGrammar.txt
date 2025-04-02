@@ -1,7 +1,7 @@
 <START> ::= <prog> #start 
 
 <aParams> ::= #p <expr> <rept-aParams1> #aparams 
-<aParams> ::= EPSILON 
+<aParams> ::= EPSILON #p #aparams 
 
 <aParamsTail> ::= ',' <expr>  
 

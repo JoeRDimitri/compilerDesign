@@ -201,7 +201,13 @@ void lexor::setPossibleType(){
 	std::string charAsString {currentCharacter};
 	if(isInArray(letterArray,53))possibleType = "id";
 	else if(isInArray(intArray,10))possibleType = "num";
-	else if(tokenMap.count(charAsString)>0||currentCharacter == '=') possibleType ="res";
+
+	else if(tokenMap.count(charAsString)>0||currentCharacter == '=') {
+		possibleType ="res";
+		if(currentCharacter =='='){
+		std::cout<<"here"<<std::endl;
+		}
+	}
 	else if(currentCharacter == '/')possibleType="cmt";
 	else {possibleType="inv";}
 
@@ -213,7 +219,7 @@ bool lexor::virginProtocol(){
 	std::cout<<"File Location:";
 	std::cin>>fileLocation;
 	//File Location acquired, check if we can properly connect.
-	if(connectFile("/home/giusuppe/eclipse-workspace/compilerDesign/Assignment3.COMP442-6421.paquet.2025.4/assignment3.COMP442-6421.paquet.2025.4/source files/polynomial.src"))
+	if(connectFile("/home/giusuppe/eclipse-workspace/compilerDesign/Assignment4.COMP442-6421.paquet.2025.4/assignment4.COMP442-6421.paquet.2025.4/polynomialsemanticerrors.src"))
 	{
 		handler.setFileName(fileLocation);
 
@@ -413,7 +419,8 @@ token* lexor::fraction(){
 		while(isInArray(intArray,10)){addAndMove();}
 		//Need to verify the last character of the lexeme is not a 0
 		if(currentLexeme == "0.0"){return validToken("frac");}
-		if(currentLexeme.back() == '0'){return errorProtocol("frac");}
+		if(currentLexeme.back() == '0' && currentLexeme.size()==3 ){return validToken("frac");}
+		else if(currentLexeme.back() == '0'){return errorProtocol("frac");}
 
 		else if(currentCharacter == 'e')return flt();
 		//If we reach a white space or a reserve word we've reached the end of the lexeme

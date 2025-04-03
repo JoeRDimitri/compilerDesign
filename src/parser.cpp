@@ -1724,13 +1724,15 @@ void parser::abstractSyntaxTree::printSymbolTable(node* head){
 	std::vector<node*>headChildren = head->children;
     std::ofstream symtabout("symbolTable.txt"); // Open file for writing
 
-	symtabout<<"Global Table"<<std::endl<<"========================="<<std::endl;
+	symtabout<<"========================="<<std::endl<<"Global Table"<<std::endl<<"========================="<<std::endl;
 	for (auto it = head->stMap.begin(); it != head->stMap.end(); ++it) {
-	    symtabout << it->first << ": " << it->second->kind + " | "<< it->second->type+ " | "<< std::endl;
+	    symtabout << it->second->name << " | " << it->second->kind + " | "<< it->second->type+ " | "<< std::endl;
 	    if(it->second->hasLink){
-	    	symtabout<<"========================="<<std::endl<<"\ttable for "<<it->second->name<<std::endl<<std::endl;
+	    	symtabout<<"\t========================="<<std::endl<<"\tTable : "<<it->second->name<<std::endl<<"\t========================="<<std::endl;
 	    	int count = 0;
 	    	printSymbolTableRec(it->second->link,count,symtabout);
+		    symtabout<<"\t========================="<<std::endl;
+
 	    }
 	}
 }
@@ -1738,22 +1740,22 @@ void parser::abstractSyntaxTree::printSymbolTableRec(std::map<std::string,parser
 count ++;
 	for (auto it = link->begin(); it != link->end(); ++it) {
 		if(it->first!="")
-		for (int i = 0; i < count; i++) {
-	        ao << "\t";
-	    }
-	    if(it->first!="")ao << it->first << ": " << it->second->kind + " | " + it->second->type + " | " << std::endl;
+		for (int i = 0; i < count; i++) {ao << "\t";}
+	    ao << it->second->name << " | " << it->second->kind + " | " + it->second->type + " | " << std::endl;
 	    if(it->second->hasLink){
-		    for (int i = 0; i < count; i++) {
-		        ao << "\t";
-		    }
+		    for (int i = 0; i < count; ++i) {ao << "\t";}
+	    	ao<<"\t========================="<<std::endl;
 
-	    	ao<<"========================="<<std::endl<<"\ttable for "<<it->second->name<<std::endl<<std::endl;
+		    for (int i = 0; i < count+1; ++i) {ao << "\t";}
+		    ao<<"Table : "<<it->second->name<<std::endl;
+
+		    for (int i = 0; i < count; ++i) {ao << "\t";}
+	    	ao<<"\t========================="<<std::endl;
+
 	    	printSymbolTableRec(it->second->link,count,ao);
-		    for (int i = 0; i < count+1; i++) {
-		        ao << "\t";
-		    }
+		    for (int i = 0; i < count; ++i) {ao << "\t";}
+	    	ao<<"\t========================="<<std::endl;
 
-	    	ao<<"========================="<<std::endl;
 	    }
 	}
 
@@ -1782,12 +1784,15 @@ void parser::abstractSyntaxTree::SymTabCreationVisitor:: visit(funcdeclNode & he
 	ste->hasLink =true;
 	//name
 	ste->name=get("id",head);
+	ste->UUID = ste->name;
 	ste->type = get("returntype",head);
 
 	for(node*children:head.children){
 
 		 if(children->nodeType=="fparams"){
 			//link
+			 ste->UUID += buildUUID(children);
+
 			 ste->link =  &children->stMap;
 		}
 	}
@@ -1797,11 +1802,11 @@ void parser::abstractSyntaxTree::SymTabCreationVisitor:: visit(fparamsNode & hea
 	std::map<std::string, node::symbolTableEntry*> *mp = &head.stMap;
 	for(node*child:head.children){
 		if(child->nodeType=="param"){
-			 if((*mp).count(child->stEntry.name)>0){
-				 std::cerr<<"Multiple Parameters with the same name for: "+child->stEntry.name +"."<<std::endl;
+			 if((*mp).count(child->stEntry.UUID)>0){
+				 std::cerr<<"Multiple Parameters with the same name and type for: "+child->stEntry.name +"."<<std::endl;
 			 }
 			 else{
-					(*mp)[child->stEntry.name] =& child->stEntry;
+					(*mp)[child->stEntry.UUID] =& child->stEntry;
 			 }
 		}
 	}
@@ -1812,9 +1817,21 @@ void parser::abstractSyntaxTree::SymTabCreationVisitor:: visit(paramNode & head)
 	ste->kind ="parameter";
 	ste->name = get("id",head);
 	ste->type = get("type",head);
+	ste->UUID = ste->name+ste->type;
 
 
 }
+
+std::string parser::abstractSyntaxTree::SymTabCreationVisitor:: buildUUID(node * head){
+	std::string returnString;
+	for(node * child : head->children){
+		if(child->semanticMeaning=="param"){
+			returnString+=child->stEntry.type;
+		}
+	}
+	return returnString;
+}
+
 
 void parser::abstractSyntaxTree::SymTabCreationVisitor:: visit(classNode & head){
 	std::map<std::string, node::symbolTableEntry*> *mp = &head.stMap;
@@ -1823,40 +1840,43 @@ void parser::abstractSyntaxTree::SymTabCreationVisitor:: visit(classNode & head)
 	ste->name = get("id",head);
 	ste->hasLink =true;
 	ste->link=mp;
+
 	for(node*child:head.children){
 		if(child->semanticMeaning=="isalist"){
 			for(node*children:child->children){
 				ste->type+=children->nodeValue;
-
 			}
 		}
+
 		else if(child->semanticMeaning=="{"){
 			for(node*children:child->children){
+
 				if(children->semanticMeaning=="attributedecl"){
-					 if((*mp).count(children->stEntry.name)>0){
-						 std::cerr<<"Multiple Attribute Declarations for: "+children->stEntry.name +"."<<std::endl;
-					 }
-					 else{
-							(*mp)[children->stEntry.name] =& children->stEntry;
-
-					 }
-
+					 if((*mp).count(children->stEntry.UUID)>0){std::cerr<<"Multiple Attribute Declarations for: "+children->stEntry.name +"."<<std::endl;}
+					 else{(*mp)[children->stEntry.UUID] =& children->stEntry;}
 				}
+
 				else if(children->semanticMeaning == "funcdecl"){
 					for(node*grandchildren:children->children){
 						if(grandchildren->semanticMeaning=="funchead"){
-							 if((*mp).count(grandchildren->stEntry.name)>0){
-								 std::cerr<<"Multiple Function Declarations for: "+grandchildren->stEntry.name +"."<<std::endl;
-							 }
-							 else{
-									(*mp)[grandchildren->stEntry.name] = &grandchildren->stEntry;
-
-							 }
+							if((*mp).count(grandchildren->stEntry.UUID)>0){std::cerr<<"Multiple Function Declarations for: "+grandchildren->stEntry.name +"."<<std::endl;}
+							else{
+								bool duplicateFound = false;
+								for (const auto& [key, entry] : (*mp) ){
+									if (entry->name == grandchildren->stEntry.name) {  // Compare the age attribute
+										duplicateFound = true;
+										std::cout << "Overloaded definition of  " << entry->name << ", but with different parameters"<<std::endl;
+										break;  // Stop early if we find a match
+									}
+								}
+								(*mp)[grandchildren->stEntry.UUID] = &grandchildren->stEntry;
+							}
 						}
 					}
 				}
 			}
 		}
+
 	}
 
 }
@@ -1867,44 +1887,164 @@ std::string generateUniqueName(std::string baseName) {
     uniquenamecount++;
     return newName;
 }
+bool parser::abstractSyntaxTree::SymTabCreationVisitor::checkForDeclaration(std::string s,int i){
+	if(i == 0){
+
+		if(semanticTracking.count(s)>0){
+			if(semanticTracking[s].t == CLASSDECL){
+				return true;
+			}
+			else return false;
+		}
+		else return false;
+	}
+	else if(i == 1){
+		if(semanticTracking.count(s)>0){
+			if(semanticTracking[s].t == CLASSDECL&& semanticTracking[s].match ==false ){
+				return true;
+			}
+			else return false;
+		}
+		else return false;
+
+	}
+
+}
+
+bool parser::abstractSyntaxTree::SymTabCreationVisitor::checkForImplementation(std::string s){
+	if(semanticTracking.count(s)>0){
+		if(semanticTracking[s].t== CLASSIMPL &&semanticTracking[s].match==false)return true;
+		else return false;
+	}
+	else return false;
+}
+
+void parser::abstractSyntaxTree::SymTabCreationVisitor::removeDeclaration(std::string s){
+	semanticTracking[s].match=true;
+	std::cout<<"Matched the declaration : "+s+" to its respective implementation in the symbol table."<<std::endl;
+}
+void parser::abstractSyntaxTree::SymTabCreationVisitor::addDeclaration(std::string s){
+	std::cout<<"Implentation not found for the declaration: "+s+". Saving declaration for possible late implementation"<<std::endl;
+	semTrack st = {false,CLASSDECL};
+	semanticTracking[s]=st;
+
+}
 
 void parser::abstractSyntaxTree::SymTabCreationVisitor:: visit(startNode & head){
 	std::map<std::string, node::symbolTableEntry*> *mp = &head.stMap;
 	for(node*child:head.children){
 		 if(child->semanticMeaning=="classdecl"){
-			//link
-			 if((*mp).count(child->stEntry.name)>0){
-				 std::cerr<<"Multiple Class Declaration for: "+child->stEntry.name +"."<<std::endl;
+			 //If there are two class declarations of the same name then it is wrong.
+//
+//			 if(checkForDeclaration(child->stEntry.name,0)){
+//				 std::cerr<<"Multiple Class Declaration for: "+child->stEntry.name +"."<<std::endl;
+//				 //Then dont do anything with this class decleration, essentially throwing it away.
+//			 }
+//			 else if(checkForImplementation(child->stEntry.name)){
+//				 removeDeclaration(child->stEntry.name);
+//				 (*mp)[child->stEntry.name]->type = child->stEntry.type;
+//
+//			 }
+//			 else{
+//				 addDeclaration(child->stEntry.name);
+//				 semanticTracking[child->stEntry.name].n = child;
+//				 (*mp)[child->stEntry.name] = &child->stEntry;
+//
+//			 }
 
+//
+//			 //link
+//			 if((*mp).count(child->stEntry.name)>0){
+//				 std::cerr<<"Multiple Class Declaration for: "+child->stEntry.name +"."<<std::endl;
+//
+//			 }
+//			 else{
+			 child->stEntry.UUID=child->stEntry.name+"class";
+			 if((*mp).count(child->stEntry.UUID)>0){
+				 std::cerr<<"Multipliy Declared Class error for class : "+child->stEntry.name<<std::endl;
 			 }
 			 else{
-				 (*mp)[child->stEntry.name] = &child->stEntry;
+				 (*mp)[child->stEntry.UUID] = &child->stEntry;
 
 			 }
+//
+//			 }
 		}
-		 else if(child->semanticMeaning=="funcdef"){
-			 (*mp)[child->stEntry.name] = &child->stEntry;
-		 }
-		 else if(child->semanticMeaning=="impldef"){
-			 if((*mp).count(child->stEntry.name)>0){
-				 if((*mp)[child->stEntry.name]->kind=="class"){
-					 std::cout<<"Class Declaration found for " + child->stEntry.name + ". Updating implementation."<<std::endl;
-					 (*mp)[child->stEntry.name] = &child->stEntry;
-				 }
 
+
+		 else if(child->semanticMeaning=="funcdef"){
+			 if((*mp).count(child->stEntry.UUID)>0){
+				 std::cerr<<"Multiple free functions with same signature error for function : "+child->stEntry.name<<std::endl;
 			 }
 			 else{
-				 std::cerr<<"Missing Class Declaration for: "+child->stEntry.name +"."<<std::endl;
+					for (const auto& [key, entry] : (*mp) ){
+						if (entry->name == child->stEntry.name) {  // Compare the age attribute
+							std::cout << "Overloaded function for :" << entry->name << ", but with different parameters"<<std::endl;
+							break;  // Stop early if we find a match
+						}
+					}
+
+				 (*mp)[child->stEntry.UUID] = &child->stEntry;
+
 			 }
+		 }
+
+
+		 else if(child->semanticMeaning=="impldef"){
+//			 if(checkForDeclaration(child->stEntry.name,1)){
+//				 std::cout<<"Found Declaration for implementation : "+child->stEntry.name +"."<<std::endl;
+//				 //If we found a matching declaration for this implementation, then we remove it from the dict
+//				semanticTracking[child->stEntry.name].match=true;
+			 child->stEntry.UUID= child->stEntry.name+"impl";
+				(*mp)[child->stEntry.UUID] = &child->stEntry;
+//				(*mp)[child->stEntry.name]->type = semanticTracking[child->stEntry.name].n->stEntry.type;
+//			 }
+
+//			 if((*mp).count(child->stEntry.name)>0){
+//				 if((*mp)[child->stEntry.name]->kind=="class"){
+//					 std::cout<<"Class Declaration found for " + child->stEntry.name + ". Updating implementation."<<std::endl;
+//					 (*mp)[child->stEntry.name] = &child->stEntry;
+//				 }
+//
+//			 }
+//			 else{
+//				 std::cerr<<"Missing Class Declaration for: "+child->stEntry.name +". Saving name for possible later declaration."<<std::endl;
+//				semTrack st = {false,CLASSIMPL};
+
+
+
+//			 }
 
 		 }
 
 	}
+    for (auto value = mp->begin(); value != mp->end();++value) {
+    	if(value->second->kind=="class"){
+    	    for (auto value2 = mp->begin(); value2 != mp->end(); value2++) {
+    	    	if(value2->second->kind =="implementation"){
+					if(value->second->name == value2->second->name){
+						std::cout<<"Matched Class decleration and implementation for: "+value2->second->name<<std::endl;
+						value2->second->type=value->second->type;
+						value2->second->link->insert(value->second->link->begin(), value->second->link->end());
+						value= mp->erase(value);
+						break;
+
+					}
+    	    	}
+    	    }
+
+    	}
+	    else{++value;}
+
+    }
     for (const auto& [key, value] : (*mp)) {
     	if(value->kind=="class"){
     		std::cerr<<"There is a class declaration: "+value->name+" without implementation"<<std::endl;
+
     	}
+
     }
+
 
 }
 
@@ -1913,6 +2053,7 @@ void parser::abstractSyntaxTree::SymTabCreationVisitor:: visit(attributedeclNode
 	ste->kind ="variable";
 	ste->name = get("id",head);
 	ste->type = get("type",head);
+	ste->UUID = ste->name+ste->type;
 
 }
 
@@ -1923,6 +2064,7 @@ void parser::abstractSyntaxTree::SymTabCreationVisitor:: visit(attributedeclfamN
 		if(child->semanticMeaning =="vardecl"){
 			ste->name=child->stEntry.name;
 			ste->type=child->stEntry.type;
+			ste->UUID = ste->name+ste->type;
 
 		}
 	}
@@ -1938,11 +2080,11 @@ void parser::abstractSyntaxTree::SymTabCreationVisitor:: visit(implNode & head){
 		 if(child->semanticMeaning=="reptimpldef3"){
 			for(node*children:child->children){
 				if(children->semanticMeaning=="funcdef"){
-					 if((*mp).count(children->stEntry.name)>0){
-						 std::cerr<<"Multiple Function Definitions for: "+children->stEntry.name +"."<<std::endl;
+					 if((*mp).count(children->stEntry.UUID)>0){
+						 std::cerr<<"Multiple Function Definitions for: "+children->stEntry.name +". Within implementation " + ste->name+"."<<std::endl;
 					 }
 					 else{
-							(*mp)[children->stEntry.name] =& children->stEntry;
+							(*mp)[children->stEntry.UUID] =& children->stEntry;
 					 }
 				}
 			}
@@ -1962,6 +2104,7 @@ void parser::abstractSyntaxTree::SymTabCreationVisitor:: visit(funcdefNode & hea
 			 mp->insert((*child->stEntry.link).begin(), (*child->stEntry.link).end());
 			 ste->name = child->stEntry.name;
 			 ste->type = child->stEntry.type;
+			 ste->UUID = child->stEntry.UUID;
 		 }
 		 else if(child->semanticMeaning=="funcbody"){
 			 mp->insert((*child->stEntry.link).begin(), (*child->stEntry.link).end());
@@ -1975,12 +2118,14 @@ void parser::abstractSyntaxTree::SymTabCreationVisitor:: visit(funcheadNode & he
 	node::symbolTableEntry *ste = &head.stEntry;
 	ste->kind ="function head";
 	ste->name = get("id",head);
+	ste->UUID = ste->name;
 //	ste->name = generateUniqueName(ste->name);
 	for(node*child:head.children){
 		 if(child->semanticMeaning=="returntype"){
 			 ste->type=child->nodeValue;
 		}
 		 else if(child->semanticMeaning =="funcparams" ){
+			 ste->UUID += buildUUID(child);
 			//link
 			ste->link =  &child->stMap;
 
@@ -1995,11 +2140,11 @@ void parser::abstractSyntaxTree::SymTabCreationVisitor:: visit(funcbodyNode & he
 	ste->kind ="function body";
 	for(node*child:head.children){
 		 if(child->semanticMeaning=="vardecl"){
-			 if((*mp).count(child->stEntry.name)>0){
-				 std::cerr<<"Multiple Variable Declarations for: "+child->stEntry.name +"."<<std::endl;
+			 if((*mp).count(child->stEntry.UUID)>0){
+				 std::cerr<<"Multiple Local Variable Declarations for: "+child->stEntry.name +"."<<std::endl;
 			 }
 			 else{
-					(*mp)[child->stEntry.name] =& child->stEntry;
+				 (*mp)[child->stEntry.UUID] =& child->stEntry;
 			 }
 		}
 	}
@@ -2010,6 +2155,7 @@ void parser::abstractSyntaxTree::SymTabCreationVisitor:: visit(localvardeclNode 
 	ste->kind ="variable";
 	ste->name = get("id",head);
 	ste->type = get("type",head);
+	ste->UUID=ste->name+ste->type;
 }
 
 void parser::abstractSyntaxTree::SymTabCreationVisitor:: visit(funcNode & head){
@@ -2024,6 +2170,7 @@ void parser::abstractSyntaxTree::SymTabCreationVisitor:: visit(funcNode & head){
 			 if(!mp->empty())mp->insert((*child->stEntry.link).begin(), (*child->stEntry.link).end());
 			 ste->name = child->stEntry.name;
 			 ste->type = child->stEntry.type;
+			 ste->UUID=child->stEntry.UUID;
 		 }
 		 else if(child->semanticMeaning=="funcbody"){
 			 mp->insert((*child->stEntry.link).begin(), (*child->stEntry.link).end());

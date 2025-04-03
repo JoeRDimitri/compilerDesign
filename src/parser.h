@@ -23,6 +23,7 @@ public:
 	class node{
 	public:
 		struct symbolTableEntry{
+			std::string UUID;
 			bool hasLink = false;
 			std::string name;
 			std::string kind;
@@ -766,7 +767,13 @@ public:
 			FUNCDECL,
 			FUNCIMPL
 		};
-		std::unordered_map<std::string, type  > semanticTracking;
+		struct semTrack{
+			bool match = false;
+			type t;
+			node* n;
+		};
+
+		std::unordered_map<std::string, semTrack> semanticTracking;
 	    virtual ~SymTabCreationVisitor() {}
 		void visit(node * head){};
 		void visit(funcNode& head);
@@ -783,6 +790,11 @@ public:
 		void visit(attributedeclfamNode & head);
 		void visit(funcbodyNode & head);
 		std::string get(std::string, node& head);
+		bool checkForImplementation(std::string s);
+		bool checkForDeclaration(std::string s,int i);
+		void removeDeclaration(std::string s);
+		void addDeclaration(std::string s);
+		std::string buildUUID(node* st);
 
 
 	};

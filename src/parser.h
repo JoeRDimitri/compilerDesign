@@ -14,6 +14,7 @@ class parser{
 
 class abstractSyntaxTree{
 
+
 public:
 
 	class symbolTable;
@@ -21,6 +22,7 @@ public:
 	class node{
 	public:
 		struct symbolTableEntry{
+			bool hasLink = false;
 			std::string name;
 			std::string kind;
 			std::string type;
@@ -49,7 +51,7 @@ public:
 		node(std::vector<node*> v,std::string type) : headOfSibling(nullptr),leftSibling(nullptr),rightSibling(nullptr),children(v),parent(nullptr),nodeType(type),semanticMeaning(type){}
 		node(std::vector<node*> v,std::string type,std::string value) : headOfSibling(nullptr),leftSibling(nullptr),rightSibling(nullptr),children(v),parent(nullptr),nodeType(type),semanticMeaning(value){}
 
-	    virtual void accept(visitor& visitor) = 0; // Pure virtual function
+	    virtual void accept(visitor& visitor)=0; // Pure virtual function
 	    virtual ~node() {} // Virtual destructor
 	};
 	//Composite Element
@@ -83,7 +85,8 @@ public:
 
 	class epsilonNode : public node {
 	public:
-	    void accept(visitor& v) override { v.visit(*this); }
+	    void accept(visitor& v) override {
+	    	}
 	};
 	//Composite Element
 	class aparamsNode : public node {
@@ -111,7 +114,7 @@ public:
 	class arithexprNode : public node {
 	public:
 	    void accept(visitor& v) override {
-	    	if(this->isLeaf ==true){v.visit(*this);}
+	    	if(this->isLeaf ==true){v.visit((*this));}
 	    	else{for(node * child : this->children){child->accept(v);}
 	    	v.visit(*this);
 	    	}
@@ -197,7 +200,8 @@ public:
 	class exprNode : public node {
 	public:
 	    void accept(visitor& v) override {
-	    	for(node * child : this->children){child->accept(v);}
+	    	for(node * child : this->children){
+	    		child->accept(v);}
 	    	v.visit(*this);
 	    	}
 	};
@@ -663,106 +667,105 @@ public:
 
 
 
-	node * treeHead;
-	void printTree();
-	void traverseTree(abstractSyntaxTree::node* head, int& counter,std::ofstream & ao);
 
 	class visitor{
 	public:
-	    virtual void visit(abstractSyntaxTree::paramNode& n) = 0;
+	    virtual void visit(abstractSyntaxTree::paramNode& n) {};
 	    virtual void visit(abstractSyntaxTree::startNode& n) = 0;
-	    virtual void visit(abstractSyntaxTree::intNode& n) = 0;
-	    virtual void visit(abstractSyntaxTree::floatNode& n) = 0;
-	    virtual void visit(abstractSyntaxTree::epsilonNode& n) = 0;
-	    virtual void visit(abstractSyntaxTree::aparamsNode& n) = 0;
-	    virtual void visit(abstractSyntaxTree::aparamstailNode& n) = 0;
-	    virtual void visit(abstractSyntaxTree::addopNode& n) = 0;
-	    virtual void visit(abstractSyntaxTree::arithexprNode& n) = 0;
-	    virtual void visit(abstractSyntaxTree::arraysizeNode& n) = 0;
-	    virtual void visit(abstractSyntaxTree::assignNode& n) = 0;
-	    virtual void visit(abstractSyntaxTree::attributedeclNode& n) = 0;
-	    virtual void visit(abstractSyntaxTree::idNode& n) = 0;
-	    virtual void visit(abstractSyntaxTree::reptclassdecl4Node& n) = 0;
-	    virtual void visit(abstractSyntaxTree::classdeclNode& n) = 0;
-	    virtual void visit(abstractSyntaxTree::classNode& n) = 0;
-	    virtual void visit(abstractSyntaxTree::implNode& n) = 0;
-	    virtual void visit(abstractSyntaxTree::funcNode& n) = 0;
-	    virtual void visit(abstractSyntaxTree::exprNode& n) = 0;
-	    virtual void visit(abstractSyntaxTree::expr2Node& n) = 0;
-	    virtual void visit(abstractSyntaxTree::relopNode& n) = 0;
-	    virtual void visit(abstractSyntaxTree::reptfparams3Node& n) = 0;
-	    virtual void visit(abstractSyntaxTree::reptfparams4Node& n) = 0;
-	    virtual void visit(abstractSyntaxTree::fparamsNode& n) = 0;
-	    virtual void visit(abstractSyntaxTree::factorNode& n) = 0;
-	    virtual void visit(abstractSyntaxTree::factor2Node& n) = 0;
-	    virtual void visit(abstractSyntaxTree::selfNode& n) = 0;
-	    virtual void visit(abstractSyntaxTree::selfandidnest2Node& n) = 0;
-	    virtual void visit(abstractSyntaxTree::dotNode& n) = 0;
-	    virtual void visit(abstractSyntaxTree::idnest2Node& n) = 0;
-	    virtual void visit(abstractSyntaxTree::reptvariable2Node& n) = 0;
-	    virtual void visit(abstractSyntaxTree::aparamsandidNode& n) = 0;
-	    virtual void visit(abstractSyntaxTree::reptvariable2andidNode& n) = 0;
-	    virtual void visit(abstractSyntaxTree::reptfuncbody1Node& n) = 0;
-	    virtual void visit(abstractSyntaxTree::funcbodyNode& n) = 0;
-	    virtual void visit(abstractSyntaxTree::funcdeclNode& n) = 0;
-	    virtual void visit(abstractSyntaxTree::funcdefNode& n) = 0;
-	    virtual void visit(abstractSyntaxTree::funcheadNode& n) = 0;
-	    virtual void visit(abstractSyntaxTree::reptimpldef3Node& n) = 0;
-	    virtual void visit(abstractSyntaxTree::impldefNode& n) = 0;
-	    virtual void visit(abstractSyntaxTree::indiceNode& n) = 0;
-	    virtual void visit(abstractSyntaxTree::localvardeclNode& n) = 0;
-	    virtual void visit(abstractSyntaxTree::localvardeclorstatNode& n) = 0;
-	    virtual void visit(abstractSyntaxTree::multopNode& n) = 0;
-	    virtual void visit(abstractSyntaxTree::reptoptclassdecl22Node& n) = 0;
-	    virtual void visit(abstractSyntaxTree::optclassdecl2Node& n) = 0;
-	    virtual void visit(abstractSyntaxTree::reptprog0Node& n) = 0;
-	    virtual void visit(abstractSyntaxTree::progNode& n) = 0;
-	    virtual void visit(abstractSyntaxTree::relexprNode& n) = 0;
-	    virtual void visit(abstractSyntaxTree::funcdeclfamNode& n) = 0;
-	    virtual void visit(abstractSyntaxTree::attributedeclfamNode& n) = 0;
-	    virtual void visit(abstractSyntaxTree::voidNode& n) = 0;
-	    virtual void visit(abstractSyntaxTree::returntypeNode& n) = 0;
-	    virtual void visit(abstractSyntaxTree::rightrectermNode& n) = 0;
-	    virtual void visit(abstractSyntaxTree::signNode& n) = 0;
-	    virtual void visit(abstractSyntaxTree::reptstatblock1Node& n) = 0;
-	    virtual void visit(abstractSyntaxTree::statblockNode& n) = 0;
-	    virtual void visit(abstractSyntaxTree::ifstatementNode& n) = 0;
-	    virtual void visit(abstractSyntaxTree::ifNode& n) = 0;
-	    virtual void visit(abstractSyntaxTree::conditionNode& n) = 0;
-	    virtual void visit(abstractSyntaxTree::thenNode& n) = 0;
-	    virtual void visit(abstractSyntaxTree::felseNode& n) = 0;
-	    virtual void visit(abstractSyntaxTree::whilestatementNode& n) = 0;
-	    virtual void visit(abstractSyntaxTree::whileNode& n) = 0;
-	    virtual void visit(abstractSyntaxTree::readNode& n) = 0;
-	    virtual void visit(abstractSyntaxTree::readstatementNode& n) = 0;
-	    virtual void visit(abstractSyntaxTree::writeNode& n) = 0;
-	    virtual void visit(abstractSyntaxTree::writestatementNode& n) = 0;
-	    virtual void visit(abstractSyntaxTree::returnNode& n) = 0;
-	    virtual void visit(abstractSyntaxTree::freturnstatementNode& n) = 0;
-	    virtual void visit(abstractSyntaxTree::reptstatement4Node& n) = 0;
-	    virtual void visit(abstractSyntaxTree::termNode& n) = 0;
-	    virtual void visit(abstractSyntaxTree::typeNode& n) = 0;
-	    virtual void visit(abstractSyntaxTree::vardeclNode& n) = 0;
-	    virtual void visit(abstractSyntaxTree::visibilityNode& n) = 0;
-	    virtual void visit(abstractSyntaxTree::reptvardecl3Node& n) = 0;
-	    virtual void visit(abstractSyntaxTree::rightrecarithexprNode& n) = 0;
-	    virtual void visit(abstractSyntaxTree::floatnumNode& n) = 0;
+	    virtual void visit(abstractSyntaxTree::intNode& n) {};
+	    virtual void visit(abstractSyntaxTree::floatNode& n) {};
+	    virtual void visit(abstractSyntaxTree::epsilonNode& n) {};
+	    virtual void visit(abstractSyntaxTree::aparamsNode& n) {};
+	    virtual void visit(abstractSyntaxTree::aparamstailNode& n) {};
+	    virtual void visit(abstractSyntaxTree::addopNode& n) {};
+	    virtual void visit(abstractSyntaxTree::arithexprNode& n) {};
+	    virtual void visit(abstractSyntaxTree::arraysizeNode& n) {};
+	    virtual void visit(abstractSyntaxTree::assignNode& n) {};
+	    virtual void visit(abstractSyntaxTree::attributedeclNode& n) {};
+	    virtual void visit(abstractSyntaxTree::idNode& n) {};
+	    virtual void visit(abstractSyntaxTree::reptclassdecl4Node& n) {};
+	    virtual void visit(abstractSyntaxTree::classdeclNode& n) {};
+	    virtual void visit(abstractSyntaxTree::classNode& n) {};
+	    virtual void visit(abstractSyntaxTree::implNode& n) {};
+	    virtual void visit(abstractSyntaxTree::funcNode& n) {};
+	    virtual void visit(abstractSyntaxTree::exprNode& n) {};
+	    virtual void visit(abstractSyntaxTree::expr2Node& n) {};
+	    virtual void visit(abstractSyntaxTree::relopNode& n) {};
+	    virtual void visit(abstractSyntaxTree::reptfparams3Node& n) {};
+	    virtual void visit(abstractSyntaxTree::reptfparams4Node& n) {};
+	    virtual void visit(abstractSyntaxTree::fparamsNode& n) {};
+	    virtual void visit(abstractSyntaxTree::factorNode& n) {};
+	    virtual void visit(abstractSyntaxTree::factor2Node& n) {};
+	    virtual void visit(abstractSyntaxTree::selfNode& n) {};
+	    virtual void visit(abstractSyntaxTree::selfandidnest2Node& n) {};
+	    virtual void visit(abstractSyntaxTree::dotNode& n) {};
+	    virtual void visit(abstractSyntaxTree::idnest2Node& n) {};
+	    virtual void visit(abstractSyntaxTree::reptvariable2Node& n) {};
+	    virtual void visit(abstractSyntaxTree::aparamsandidNode& n) {};
+	    virtual void visit(abstractSyntaxTree::reptvariable2andidNode& n) {};
+	    virtual void visit(abstractSyntaxTree::reptfuncbody1Node& n) {};
+	    virtual void visit(abstractSyntaxTree::funcbodyNode& n) {};
+	    virtual void visit(abstractSyntaxTree::funcdeclNode& n) {};
+	    virtual void visit(abstractSyntaxTree::funcdefNode& n) {};
+	    virtual void visit(abstractSyntaxTree::funcheadNode& n) {};
+	    virtual void visit(abstractSyntaxTree::reptimpldef3Node& n) {};
+	    virtual void visit(abstractSyntaxTree::impldefNode& n) {};
+	    virtual void visit(abstractSyntaxTree::indiceNode& n) {};
+	    virtual void visit(abstractSyntaxTree::localvardeclNode& n) {};
+	    virtual void visit(abstractSyntaxTree::localvardeclorstatNode& n) {};
+	    virtual void visit(abstractSyntaxTree::multopNode& n) {};
+	    virtual void visit(abstractSyntaxTree::reptoptclassdecl22Node& n) {};
+	    virtual void visit(abstractSyntaxTree::optclassdecl2Node& n) {};
+	    virtual void visit(abstractSyntaxTree::reptprog0Node& n) {};
+	    virtual void visit(abstractSyntaxTree::progNode& n) {};
+	    virtual void visit(abstractSyntaxTree::relexprNode& n) {};
+	    virtual void visit(abstractSyntaxTree::funcdeclfamNode& n) {};
+	    virtual void visit(abstractSyntaxTree::attributedeclfamNode& n) {};
+	    virtual void visit(abstractSyntaxTree::voidNode& n) {};
+	    virtual void visit(abstractSyntaxTree::returntypeNode& n) {};
+	    virtual void visit(abstractSyntaxTree::rightrectermNode& n) {};
+	    virtual void visit(abstractSyntaxTree::signNode& n) {};
+	    virtual void visit(abstractSyntaxTree::reptstatblock1Node& n) {};
+	    virtual void visit(abstractSyntaxTree::statblockNode& n) {};
+	    virtual void visit(abstractSyntaxTree::ifstatementNode& n) {};
+	    virtual void visit(abstractSyntaxTree::ifNode& n) {};
+	    virtual void visit(abstractSyntaxTree::conditionNode& n) {};
+	    virtual void visit(abstractSyntaxTree::thenNode& n) {};
+	    virtual void visit(abstractSyntaxTree::felseNode& n) {};
+	    virtual void visit(abstractSyntaxTree::whilestatementNode& n) {};
+	    virtual void visit(abstractSyntaxTree::whileNode& n) {};
+	    virtual void visit(abstractSyntaxTree::readNode& n) {};
+	    virtual void visit(abstractSyntaxTree::readstatementNode& n) {};
+	    virtual void visit(abstractSyntaxTree::writeNode& n) {};
+	    virtual void visit(abstractSyntaxTree::writestatementNode& n) {};
+	    virtual void visit(abstractSyntaxTree::returnNode& n) {};
+	    virtual void visit(abstractSyntaxTree::freturnstatementNode& n) {};
+	    virtual void visit(abstractSyntaxTree::reptstatement4Node& n) {};
+	    virtual void visit(abstractSyntaxTree::termNode& n) {};
+	    virtual void visit(abstractSyntaxTree::typeNode& n) {};
+	    virtual void visit(abstractSyntaxTree::vardeclNode& n) {};
+	    virtual void visit(abstractSyntaxTree::visibilityNode& n) {};
+	    virtual void visit(abstractSyntaxTree::reptvardecl3Node& n) {};
+	    virtual void visit(abstractSyntaxTree::rightrecarithexprNode& n) {};
+	    virtual void visit(abstractSyntaxTree::floatnumNode& n) {};
 		    virtual ~visitor() {} // Virtual destructor for proper cleanup
 
 	};
 
-	class SymTabCreationVisitor : visitor{
+	class SymTabCreationVisitor : public visitor{
 	public:
 		void accept(){};
+		void visit(node * head){};
 		void visit(startNode& head){
 
 			for(node * child : head.children){
-				if(child->semanticMeaning == "classdecl" || child->semanticMeaning =="funcdecl"||child->semanticMeaning == "vardecl"){
+				if(child->semanticMeaning == "classdecl" || child->semanticMeaning =="funcdef"||child->semanticMeaning == "vardecl"){
 					node::symbolTableEntry ste;
 					std::string type;
 					if(child->semanticMeaning=="funcdef"){
 						ste.kind = "function";
 						ste.link = & child->stMap;
+						ste.hasLink = true;
 						std::vector<node*> findTheType = child -> children;
 						for(node* childrenOfChild:findTheType){
 							if(childrenOfChild->semanticMeaning =="returntype"){
@@ -783,6 +786,7 @@ public:
 					}
 					else{
 						ste.link = & child->stMap;
+						ste.hasLink = true;
 						ste.kind = "classdecl";
 						type = "";
 					}
@@ -804,6 +808,7 @@ public:
 							std::string type;
 							ste.kind = "function";
 							ste.link = & actualChild->stMap;
+							ste.hasLink = true;
 							std::vector<node*> findTheType = actualChild -> children;
 							for(node* childrenOfChild:findTheType){
 								if(childrenOfChild->semanticMeaning =="returntype"){
@@ -816,7 +821,7 @@ public:
 							head.stMap[actualChild->nodeValue] = ste;
 
 						}
-						if(actualChild->semanticMeaning=="attributedecl"){
+						else if(actualChild->semanticMeaning=="attributedecl"){
 							node::symbolTableEntry ste;
 							std::string type;
 							ste.kind = "Class Variable";
@@ -834,12 +839,69 @@ public:
 									}
 								}
 							}
+							head.stMap[child->nodeValue] = ste;
+
 						}
 					}
 				}
 			}
 		}
+
+		void visit(funcNode& head){
+			for(node * child : head.children){
+				if(child->semanticMeaning == "funchead" ){
+					for(node * actualChild : child->children){
+						if(actualChild->semanticMeaning =="funcparams"){
+							for(node * actualActualChild : actualChild->children){
+								if(actualActualChild->semanticMeaning =="param"){
+									node::symbolTableEntry ste;
+									ste.type = "parameter";
+									for(node * paramChild : actualActualChild->children){
+										if(paramChild->semanticMeaning =="id"){
+											ste.name = paramChild->nodeValue;
+										}
+										else if(paramChild->semanticMeaning == "type"){
+											ste.type = paramChild->nodeValue;
+										}
+
+									}
+									head.stMap[child->nodeValue] = ste;
+
+								}
+
+							}
+
+						}
+
+					}
+				}
+				if(child->semanticMeaning == "funcbody" ){
+					for(node * actualChild : child->children){
+						if(actualChild->semanticMeaning =="vardecl"){
+							node::symbolTableEntry ste;
+							ste.kind = "variable";
+							for(node * varDeclChild: actualChild->children){
+								if(varDeclChild->semanticMeaning =="id"){
+									ste.name = varDeclChild->nodeValue;
+								}
+								else if(varDeclChild ->semanticMeaning =="type"){
+									ste.type = varDeclChild->nodeType;
+								}
+							}
+							head.stMap[child->nodeValue] = ste;
+						}
+					}
+				}
+			}
+		}
+
 	};
+
+
+	startNode * treeHead;
+	void printTree();
+	void traverseTree(abstractSyntaxTree::node* head, int& counter,std::ofstream & ao);
+
 };
 //struct symbolTableEntry{
 //	std::string name;
@@ -1014,6 +1076,8 @@ public:
 	static std::stack<abstractSyntaxTree::node *> semanticStack;
 	static abstractSyntaxTree AST;
 
+	parser::abstractSyntaxTree::SymTabCreationVisitor *firstVisitor = new parser::abstractSyntaxTree::SymTabCreationVisitor();
+	parser::abstractSyntaxTree::visitor & first = *firstVisitor;
 	bool searchFirst(std::string lookahead, std::string topOfTheStack);
 	bool parse(const  std::vector<token*> &);
 	void inverseRHSMultiplePush(tableEntry t,std::vector<std::string>& vec,const int & lineIndex);

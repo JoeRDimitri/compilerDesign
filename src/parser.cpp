@@ -1326,7 +1326,7 @@ void parser::semanticActions::handleAction(std::string semanticFunction,std::str
 	else if(semanticFunction == "reptclassdecl4"){abstractSyntaxTree::reptclassdecl4Node * newnode = new abstractSyntaxTree::reptclassdecl4Node();std::vector<std::string> v = {"epsilon"}; semanticHandler.makeSubTree("reptclassdecl4","{",'E',v,newnode);}
 	else if(semanticFunction == "classdecl"){abstractSyntaxTree::classdeclNode * newnode = new abstractSyntaxTree::classdeclNode();std::vector<std::string> v = {"id","optclassdecl2","reptclassdecl4"}; semanticHandler.makeSubTree("classdecl","classdecl",3,v,newnode);}
 	else if(semanticFunction == "aparams"){abstractSyntaxTree::aparamsNode * newnode = new abstractSyntaxTree::aparamsNode(); std::vector<std::string> v = {"epsilon"}; semanticHandler.makeSubTree("aparams","aparams",'E',v,newnode);}
-	else if(semanticFunction == "funcdef"){abstractSyntaxTree::classdeclNode * newnode = new abstractSyntaxTree::classdeclNode();std::vector<std::string> v = {"funchead","funcbody"}; semanticHandler.makeSubTree("funcdef","funcdef",2,v,newnode);}
+	else if(semanticFunction == "funcdef"){abstractSyntaxTree::funcdefNode * newnode = new abstractSyntaxTree::funcdefNode();std::vector<std::string> v = {"funchead","funcbody"}; semanticHandler.makeSubTree("funcdef","funcdef",2,v,newnode);}
 	else if(semanticFunction == "expr"){abstractSyntaxTree::exprNode*newnode = new abstractSyntaxTree::exprNode(); std::vector<std::string> v = {"arithexpr","expr2","epsilon"}; semanticHandler.makeSubTree("expr","expr",2,v,newnode);}
 	else if(semanticFunction == "expr2"){abstractSyntaxTree::expr2Node*newnode = new abstractSyntaxTree::expr2Node();std::vector<std::string> v = {"relop","arithexpr"}; semanticHandler.makeSubTree("expr2","expr2",2,v,newnode);}
 	else if(semanticFunction == "reptfparams3"){abstractSyntaxTree::reptfparams3Node*newnode = new abstractSyntaxTree::reptfparams3Node();std::vector<std::string> v = {"epsilon"}; semanticHandler.makeSubTree("reptfparams3","dimlist",'E',v,newnode);}
@@ -1585,7 +1585,7 @@ void parser::semanticActions:: passAlong(std::string nodeType,abstractSyntaxTree
 		newnode->semanticMeaning ="epsilon";
 	}
 	delete topofthestack;
-	if(nodeType == "start"){AST.treeHead = newnode;}
+	if(nodeType == "start"){AST.treeHead = dynamic_cast<abstractSyntaxTree::startNode*>(newnode);}
 	else {semanticStack.push(newnode);}
 
 }
@@ -1601,7 +1601,7 @@ void parser::semanticActions:: passAlong(std::string nodeType,std::string semant
 	}
 	delete topofthestack;
 	if(nodeType == "start"){
-		AST.treeHead = newnode;
+		AST.treeHead = dynamic_cast<abstractSyntaxTree::startNode*>(newnode);
 
 	}
 	else {
@@ -1628,8 +1628,13 @@ void parser::abstractSyntaxTree::printTree(){
 	abstractSyntaxTree::node * head = AST.treeHead;
 	std::vector<abstractSyntaxTree::node*> v = head->children;
 	int counter = 0;
-	astout<<head->nodeType<<std::endl;
+	astout<<head->semanticMeaning<<std::endl;
 	for(int k = v.size()-1;k>=0;k--){
+//		if(v.at(k)->semanticMeaning=="epsilon"){
+//			delete v.at(k);
+//		    v.erase(v.begin()+k);
+//		    continue;
+//		}
 		traverseTree(v.at(k),counter,astout);
 	}
 }
@@ -1640,21 +1645,34 @@ void parser::abstractSyntaxTree::traverseTree(abstractSyntaxTree::node* head, in
 		for(int i = 0; i<counter; i++){
 			ao<<"| ";
 		}
-		if(head->semanticMeaning !="epsilon")ao<<head->nodeType<<std::endl;
+
+		if(head->semanticMeaning !="epsilon")ao<<head->semanticMeaning<<std::endl;
 		std::vector<abstractSyntaxTree::node*> v = head->children;
 		for(int k = v.size()-1;k>=0;k--){
+//			if(v.at(k)->semanticMeaning=="epsilon"){
+//				delete v.at(k);
+//			    v.erase(v.begin()+k);
+//			    continue;
+//			}
 			traverseTree(v.at(k),counter,ao);
 		}
 		counter--;
 	}
 	else if(head->children.size() == 0){
+		if(head->semanticMeaning =="epsilon"){
+			std::cout<<"EPSIOLON"<<std::endl;
+			node* parent = head->parent;
+
+
+		}
+
 		if(head->semanticMeaning !="epsilon"){
 
 
 		for(int i = 0; i<counter; i++){
 					ao<<"| ";
 				}
-		ao<<head->nodeType<<std::endl;
+		ao<<head->semanticMeaning<<std::endl;
 		std::cout << typeid(*head).name() << std::endl; // Dereference to get dynamic type
 
 		}

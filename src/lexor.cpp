@@ -8,52 +8,7 @@ std::ostream& operator<<(std::ostream& os, token& t)
 }
 
 const std::unordered_map<std::string, std::string> lexor::tokenMap = {
-//    {"==","eq"},
-//    {"+","plus"},
-//    {"or","or"},
-//    {"(","openpar"},
-//	{";","semi"},
-//	{"int","int"},
-//	{"while","while"},
-//	{"local","local"},
-//	{"<>", "noteq"},
-//	{"-","minus"},
-//	{"and","and"},
-//	{")","closepar"},
-//	{",","comma"},
-//	{"float","float"},
-//	{"if","if"},
-//	{"constructor","constructor"},
-//	{"<","lt"},
-//	{"*","mult"},
-//	{"not","not"},
-//	{"{","opencubr"},
-//	{".","dot"},
-//	{"void","void"},
-//	{"then","then"},
-//	{"attribute","attribute"},
-//	{">","gt"},
-//	{"/","div"},
-//	{"}","closecubr"},
-//	{":","colon"},
-//	{"class","class"},
-//	{"else","else"},
-//	{"function","function"},
-//	{"<=","leq"},
-//	{":=","assign"},
-//	{"[","opensqbr"},
-//	{"=>","arrow"},
-//	{"self","self"},
-//	{"read","read"},
-//	{"public","public"},
-//	{">=","geq"},
-//	{"]","closeqbr"},
-//	{"isa","isa"},
-//	{"write","write"},
-//	{"private","private"},
-//	{"implementation","implementation"},
-//	{"return","return"}
-  {"==","=="},
+    {"==","=="},
 	{"+","+"},
 	{"or","or"},
 	{"(","("},
@@ -115,37 +70,37 @@ std::string errorHandler::tokenFileName;
 errorHandler lexor:: handler;
 
 bool lexor::connectFile(std::string fileName){
-
 	if(inputFileStream.is_open()){
-			std::cout<<"The file is connected... Closing it first..."<<std::endl;
-			inputFileStream.close();
-		}
+		spdlog::info("The file is connected... Closing it first...");     // info level
+		inputFileStream.close();
+	}
 
 	inputFileStream.open(fileName);
 
 	if(inputFileStream.is_open()){
-		std::cout<<"Successfully opened file: "<<fileName<<"."<<std::endl;
+		spdlog::info("Successfully opened file: {}.", fileName);     // info level
 		return true;
 	}
 	else{
-		std::cout<<"Failed to open file: "<<fileName<<"."<<std::endl;
+		spdlog::info("Failed to open file: {}.", fileName);     // info level
 		return false;
 	}
 }
 
 bool lexor::disconnectFile(){
 	if(!inputFileStream.is_open()){
-			std::cout<<"The file is not even connected. No need to close."<<std::endl;
+			spdlog::info("The file is not even connected. No need to close.");     // info level
 			return true;
 		}
 	inputFileStream.close();
 
 	if(!inputFileStream.is_open()){
-		std::cout<<"Successfully closed the inputFileStream."<<std::endl;
+		spdlog::info("Successfully closed the inputFileStream.");     // info level
+
 		return true;
 	}
 	else{
-		std::cout<<"Failed to close the inputFileStream."<<std::endl;
+		spdlog::info("Failed to close the inputFileStream.");     // info level
 		return false;
 	}
 }
@@ -205,7 +160,6 @@ void lexor::setPossibleType(){
 	else if(tokenMap.count(charAsString)>0||currentCharacter == '=') {
 		possibleType ="res";
 		if(currentCharacter =='='){
-		std::cout<<"here"<<std::endl;
 		}
 	}
 	else if(currentCharacter == '/')possibleType="cmt";
@@ -218,13 +172,10 @@ bool lexor::virginProtocol(){
 	std::string fileLocation;
 	std::cout<<"File Location:";
 	std::cin>>fileLocation;
-	//File Location acquired, check if we can properly connect.
-	if(connectFile("/home/giusuppe/eclipse-workspace/compilerDesign/Assignment4.COMP442-6421.paquet.2025.4/assignment4.COMP442-6421.paquet.2025.4/polynomialsemanticerrors.src"))
+	//File Location acquired, check if we can properly c\onnect.
+	if(connectFile("C:\\Users\\radyd\\eclipse-workspace\\Compiler_Design\\compilerDesign\\assignment1.COMP442-6421.paquet.2025.4\\lexpositivegrading.src"))
 	{
 		handler.setFileName(fileLocation);
-
-
-
 		//We've properly connected to the file now we need to get rid of the white space and then hand control back over getNextToken().
 		return true;
 	}
@@ -351,7 +302,7 @@ token* lexor::id(){
 	 * 2. We might've reached a special character, in that case we can simply return from thins functino since we have found a proper lexeme
 	 * 3. else*/
 
-	if(isWhiteSpace()||checkEndOfStream()){}
+	if(checkEndOfStream()||isWhiteSpace()){}
 	else if(isReservedWord()){}
 	else{return errorProtocol("id");}
 	return validToken("id");
@@ -373,7 +324,7 @@ token* lexor::num(int decision){
 		if(decision == 0){
 			if(currentCharacter =='.')return fraction();
 		}
-		if(isWhiteSpace()||isReservedWord()||checkEndOfStream()){return validToken("intnum");}
+		if(checkEndOfStream()||isWhiteSpace()||isReservedWord()){return validToken("intnum");}
 
 		else{return errorProtocol("intnum");}
 	}
@@ -418,11 +369,11 @@ token* lexor::fraction(){
 		//When we've reached the end of the lexeme we need to check the final digit.
 		while(isInArray(intArray,10)){addAndMove();}
 		//Need to verify the last character of the lexeme is not a 0
-		if(currentLexeme == "0.0"){return validToken("frac");}
-		if(currentLexeme.back() == '0' && currentLexeme.size()==3 ){return validToken("frac");}
+		if(currentCharacter == 'e') return flt();
+		else if(currentLexeme == "0.0"){return validToken("frac");}
+		else if(currentLexeme.back() == '0' && currentLexeme.size()==3 ){return validToken("frac");}
 		else if(currentLexeme.back() == '0'){return errorProtocol("frac");}
 
-		else if(currentCharacter == 'e')return flt();
 		//If we reach a white space or a reserve word we've reached the end of the lexeme
 		else if(isWhiteSpace()||isReservedWord()||checkEndOfStream()){return validToken("frac");}
 		else{return errorProtocol("frac");}
@@ -574,6 +525,7 @@ token* lexor:: getNextToken(){
 	getRidOfWhiteSpace();
 
 	if(checkEndOfStream()){
+		spdlog::warn("Reached end of Stream.");        // warn level
 		throw EndOfFileException();
 	}
 
@@ -636,7 +588,7 @@ void errorHandler::handleError(const std::string& errorType,const std::string & 
     // Open the file in append mode to write (creates the file if it doesn't exist)
     std::ofstream file1(errorFileName, std::ios::app);
     std::ofstream file2(tokenFileName, std::ios::app);
-
+    spdlog::warn("Warning: lexeme '{}' is problematic. The compiler believes it is of type {}, but does not conform.", lexeme,invalidType);        // warn level
     // Write error content to the file
     file1 << errorType << ": "<<invalidType<<"\": "<<lexeme<<"\""<<": line "<<line<<": column "<<column<<std::endl;
     //write error token to the token file

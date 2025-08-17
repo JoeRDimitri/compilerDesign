@@ -7,6 +7,7 @@
 #include <vector>
 #include <stdexcept>
 #include <stack>
+#include <spdlog/spdlog.h>
 //forward declaration
 class token;
 //The error handler handles the errors

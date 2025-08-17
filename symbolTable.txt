@@ -1,0 +1,94 @@
+Global Table
+=========================
+C: class | E | 
+=========================
+	table for C
+
+	a: attribute | int | 
+D: class | C | 
+=========================
+	table for D
+
+	b: attribute | int | 
+E: class | D | 
+=========================
+	table for E
+
+	c: attribute | int | 
+LINEAR: implementation |  | 
+=========================
+	table for LINEAR
+
+	build: function | LINEAR | 
+	=========================
+	table for build
+
+		A: parameter | float | 
+		B: parameter | float | 
+		new_functiontion: variable | LINEAR | 
+		=========================
+	evaluate: function | float | 
+	=========================
+	table for evaluate
+
+		result: variable | float | 
+		x: parameter | float | 
+		=========================
+POLYNOMIAL: implementation |  | 
+=========================
+	table for POLYNOMIAL
+
+	evaluate: function | float | 
+	=========================
+	table for evaluate
+
+		x: parameter | float | 
+		=========================
+QUADRATIC: implementation |  | 
+=========================
+	table for QUADRATIC
+
+	build: function | QUADRATIC | 
+	=========================
+	table for build
+
+		A: parameter | float | 
+		B: parameter | float | 
+		C: parameter | float | 
+		new_functiontion: variable | QUADRATIC | 
+		=========================
+	build2: function | QUADRATIC | 
+	=========================
+	table for build2
+
+		A: parameter | float | 
+		B: parameter | float | 
+		C: parameter | float | 
+		new_functiontion: variable | QUADRATIC | 
+		=========================
+	evaluate: function | float | 
+	=========================
+	table for evaluate
+
+		result: variable | float | 
+		x: parameter | float | 
+		=========================
+f: function | integer | 
+=========================
+	table for f
+
+f3: function | integer | 
+=========================
+	table for f3
+
+main: function | void | 
+=========================
+	table for main
+
+	a: variable | a | 
+	c: variable | C | 
+	counter: variable | integer | 
+	f1: variable | LINEAR | 
+	f2: variable | QUADRATIC | 
+	i: variable | integer | 
+	j: variable | integer | 

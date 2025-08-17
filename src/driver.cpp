@@ -35,58 +35,59 @@ int main (){
 		}
 
 		delete lex;
+
 //		*/
-	std::cout<<"------------------------------------------------------------------------------------"<<std::endl;
-	std::cout<<std::endl;
-
-	parser p;
-	p.faf.generateFirstSet();
-    std::ofstream outFile("firstSet"); // Open file for writing
-    for (const auto& pair : p.faf.firstSet) {
-    	outFile << "Key: " << pair.first << " -> Values: "<<std::endl;
-
-        // Check if the pointer is valid before dereferencing
-        if (pair.second) {
-            for (const auto& value : *(pair.second)) {
-            	outFile<< value << " "<<std::endl;
-            }
-        }
-        outFile << std::endl;
-    }
-    outFile.close();
-
-	std::cout<<"------------------------------------------------------------------------------------"<<std::endl;
-	p.faf.generateFollowSet();
-    std::ofstream secondOutFile("followSet"); // Open file for writing
-
-	// Iterate over the map
-	    for (const auto& pair : p.faf.followSet) {
-	    	secondOutFile << "Key: " << pair.first << " -> Values: "<<std::endl;
-
-	        // Check if the pointer is valid before dereferencing
-	        if (pair.second) {
-	            for (const auto& value : *(pair.second)) {
-	            	secondOutFile << value << " "<<std::endl;
-	            }
-	        }
-	        secondOutFile << std::endl;
-	    }
-
-	    secondOutFile.close();
-	std::cout<<"------------------------------------------------------------------------------------"<<std::endl;
-
-	p.parsingTable.buildTable();
-	p.parse(vectorOfTokens);
-	std::cout<<"Finished Parsing"<<std::endl;
-	p.AST.printTree();
-
-
-	std::cout<<"------------------------------------------------------------------------------------"<<std::endl;
-
-	p.AST.treeHead->accept(p.first);
-	p.AST.printSymbolTable(p.AST.treeHead);
-	std::cout<<"Finished Building Symbol Table"<<std::endl;
-
+//	std::cout<<"------------------------------------------------------------------------------------"<<std::endl;
+//	std::cout<<std::endl;
+//
+//	parser p;
+//	p.faf.generateFirstSet();
+//    std::ofstream outFile("firstSet"); // Open file for writing
+//    for (const auto& pair : p.faf.firstSet) {
+//    	outFile << "Key: " << pair.first << " -> Values: "<<std::endl;
+//
+//        // Check if the pointer is valid before dereferencing
+//        if (pair.second) {
+//            for (const auto& value : *(pair.second)) {
+//            	outFile<< value << " "<<std::endl;
+//            }
+//        }
+//        outFile << std::endl;
+//    }
+//    outFile.close();
+//
+//	std::cout<<"------------------------------------------------------------------------------------"<<std::endl;
+//	p.faf.generateFollowSet();
+//    std::ofstream secondOutFile("followSet"); // Open file for writing
+//
+//	// Iterate over the map
+//	    for (const auto& pair : p.faf.followSet) {
+//	    	secondOutFile << "Key: " << pair.first << " -> Values: "<<std::endl;
+//
+//	        // Check if the pointer is valid before dereferencing
+//	        if (pair.second) {
+//	            for (const auto& value : *(pair.second)) {
+//	            	secondOutFile << value << " "<<std::endl;
+//	            }
+//	        }
+//	        secondOutFile << std::endl;
+//	    }
+//
+//	    secondOutFile.close();
+//	std::cout<<"------------------------------------------------------------------------------------"<<std::endl;
+//
+//	p.parsingTable.buildTable();
+//	p.parse(vectorOfTokens);
+//	std::cout<<"Finished Parsing"<<std::endl;
+//	p.AST.printTree();
+//
+//
+//	std::cout<<"------------------------------------------------------------------------------------"<<std::endl;
+//
+//	p.AST.treeHead->accept(p.first);
+//	p.AST.printSymbolTable(p.AST.treeHead);
+//	std::cout<<"Finished Building Symbol Table"<<std::endl;
+//
 	return 0;
 
 }

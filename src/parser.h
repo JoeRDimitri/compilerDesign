@@ -11,6 +11,7 @@
 #include "lexor.h";
 #include <deque>
 #include <typeinfo>
+#include <spdlog/spdlog.h>
 class parser{
 
 class abstractSyntaxTree{

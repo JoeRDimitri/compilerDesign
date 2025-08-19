@@ -1,35 +1,12 @@
-#ifndef LEXOR_H
-#define LEXOR_H
-#include <iostream>
-#include <string>
+#pragma once
 #include <unordered_map>
-#include <fstream>
-#include <vector>
 #include <stdexcept>
 #include <stack>
-#include <spdlog/spdlog.h>
+#include "handler.h"
+
+
 //forward declaration
-class token;
 //The error handler handles the errors
-class errorHandler{
-private:
-
-public:
-	static std::string errorFileName;
-	static std::string tokenFileName;
-
-
-	errorHandler(){};
-	errorHandler(std::string filename1,std::string filename2){errorFileName = filename1;tokenFileName = filename2;};
-
-	void setFileName(std::string s);
-
-	void handleError(const std::string & errorType,const std::string & invalidType,const std::string & lexeme, const int & line, const int & column, token * t);
-
-	std::vector <std::string> splitString(const std::string& str, char delimiter);
-
-	void writeToken(token* t);
-};
 
 //A token is defined as a data structure that has a lexeme, a type, and a location (line + column)
 
@@ -44,6 +21,7 @@ private:
 	int line;
 	//Column is the column that that the lexeme is found on the line in the file.
 	int column;
+    void updateHandler();
 
 public:
 	//Constructor
@@ -70,7 +48,7 @@ public:
 std::ostream& operator<<(std::ostream& os, token& t);
 
 //Lexor class
-class lexor{
+class lexor {
 
 private:
 	//Token map will be initialized with the buildTokenMap function.
@@ -84,10 +62,6 @@ private:
 	static const char letterArray[53];
 	//Array to hold Alphanum = letters + numbers
 	static const char alphanumArray[63];
-	//inputFileStream to read the file.
-	static std::ifstream inputFileStream;
-	//A boolean to check if this is the first time reading the txt file.
-	static bool virgin;
 	//running line number and column number, and current character variable
 	static int line;
 	static int column;
@@ -95,13 +69,10 @@ private:
 	static std::string currentLexeme;
 	static std::string possibleType;
 	static token currentToken;
-	static errorHandler handler;
+	static errorHandler errorHandler;
+	static fileHandler fileHandler;
 
 
-	//Function to establish connection to the file to read.
-	static bool connectFile(std::string);
-	//Function to cut the connection to the file to read.
-	static bool disconnectFile();
 	//Function to check if the lexeme is a reserved word by looking into tokenMap.
 	//Returns true if reserved word is found and false if none are found.
 	bool isReservedWord(std::string lexeme);
@@ -109,16 +80,12 @@ private:
 	void getRidOfWhiteSpace();
 	//checks if current character is whitespace
 	bool isWhiteSpace();
-	//Function that runs the first time that we read from a text file. This should only be called a single time in the entire program.
-	bool virginProtocol();
 	//Given a an array, this function will check that array to compare it to the currentCharacter
 	bool isInArray(const char * c, int n);
 	//check dictionnary
 	bool isReservedWord();
 	//Sets the possible type to determine what the type of the lexeme is.
 	void setPossibleType();
-	//function that checks for the end of the input stream
-	bool checkEndOfStream();
 	//function that updates the string and advance the pointer
 	void addAndMove();
 	//function that update the string that is provided. Overloaded function
@@ -146,18 +113,8 @@ public:
 	~lexor(){};
 	//Overall flow control. Returns the next token in input file.
 	token* getNextToken();
-
-
-
+	//Function that runs the first time that we read from a text file. This should only be called a single time in the entire program.
+	bool static virginProtocol(std::string filelocation);
 
 };
 
-class EndOfFileException : public std::exception {
-public:
-    const char* what() const noexcept override {
-        return "End of file reached";
-    }
-};
-
-
-#endif

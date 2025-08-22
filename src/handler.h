@@ -6,28 +6,34 @@
 #include <spdlog/spdlog.h>
 
 //Forward Declaration of the token class
-class token{};
+class token;
+class lexor;  // Add this forward declaration
+
+std::ostream& operator<<(std::ostream& os, token& t);
 
 class fileHandler{
 public:
+	fileHandler(){};
+
 	static std::string tokenFileName;
 	friend class errorHandler;
+	char move();
+	void writeToken(token* t);
+	bool checkEndOfStream();
+	static bool virgin;
+	bool virginProtocol();
 
 private:
 
 	//A boolean to check if this is the first time reading the txt file.
-	static bool virgin;
 	//inputFileStream to read the file.
 	static std::ifstream inputFileStream;
-	bool virginProtocol();
 	//Function to establish connection to the file to read.
 	static bool connectFile(std::string);
 	//Function to cut the connection to the file to read.
 	static bool disconnectFile();
 	//function that checks for the end of the input stream
-	bool checkEndOfStream();
 	void setFileName(std::string s);
-	void writeToken(token* t);
 	std::vector <std::string> splitString(const std::string& str, char delimiter);
 
 };

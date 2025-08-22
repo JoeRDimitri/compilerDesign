@@ -77,9 +77,12 @@ void parser::parsing_table::fillTableWithErrors(){
 	    	table[i][j] = currentEntry;
 	    }
 	}
+    spdlog::info("Successfully filled Table with error symbols.");
+
 }
 
 void parser::parsing_table:: setUniqueTerminalSymbols(){
+	std::cout<<"hello"<<std::endl;
     for (const auto& pair : faf.firstSet) {
         for (const auto& value : (*pair.second)) {
         	if(value == "EPSILON"){
@@ -101,7 +104,7 @@ void parser::parsing_table:: setUniqueTerminalSymbols(){
     uniqueTerminalSymbols.insert("invalidnum");
 
 
-
+    spdlog::info("Successfully set unique Terminal Symbols set.");
 
 }
 //THE TABLESROWS REPRESENT THE VALUE OF THE FIRST ARRAY
@@ -117,6 +120,8 @@ void parser::parsing_table:: setRowAndColumnSize(){
 	TABLEROWSIZE = getTableRowSize();
 	TABLECOLUMNSIZE = getTableColumnSize();
 	UNIT = sizeof(struct tableEntry);
+    spdlog::info("Successfully set Parsing Table row and column size.");
+
 }
 
 void parser::parsing_table:: setTheTableSize(){
@@ -124,6 +129,7 @@ void parser::parsing_table:: setTheTableSize(){
 	for (int i = 0; i < TABLEROWSIZE; ++i) {
 	    table[i] = new tableEntry[TABLECOLUMNSIZE]; // Allocate each row
 	}
+    spdlog::info("Successfully created table with appropriate size {} x {}.",TABLEROWSIZE,TABLECOLUMNSIZE);
 }
 
 void parser::parsing_table::setTableRow(){
@@ -134,6 +140,8 @@ void parser::parsing_table::setTableRow(){
 //		std::cout<<"Row = "<< value.first <<", value = "<<i<<std::endl;
 		i++;
 	}
+    spdlog::info("Successfully filled first Table Row.");
+
 }
 
 void parser::parsing_table::setTableColumn(){
@@ -145,6 +153,7 @@ void parser::parsing_table::setTableColumn(){
 
 		i++;
 	}
+    spdlog::info("Successfully filled first Table Column.");
 
 }
 
@@ -306,8 +315,8 @@ void parser::parsing_table::getFollowOfRule(std::unordered_set <std::string> & f
 }
 
 void parser::parsing_table::createParsingTable(){
-	if(connectFile("/home/giusuppe/eclipse-workspace/compilerDesign/AttributeGrammar.txt")){
-//	if(connectFile("/home/giusuppe/eclipse-workspace/compilerDesign/Assignment2.COMP442-6421.paquet.2025.4/assignment2.COMP442-6421.paquet.2025.4 NEW/grammars/noLeftRec.grm")){
+	std::cout<<"Enter the location of the Attribute Grammar file: "<<std::endl;
+	if(connectFile("C:/Users/radyd/eclipse-workspace/Compiler_Design/compilerDesign/Outputs/AttributeGrammar.txt")){//	if(connectFile("/home/giusuppe/eclipse-workspace/compilerDesign/Assignment2.COMP442-6421.paquet.2025.4/assignment2.COMP442-6421.paquet.2025.4 NEW/grammars/noLeftRec.grm")){
 
 		//We've properly connected to the file now we need to get rid of the white space and then hand control back over getNextToken().
 	}
@@ -1021,7 +1030,7 @@ void parser::abstractSyntaxTree::traverseTree(abstractSyntaxTree::node* head, in
 	}
 	else if(head->children.size() == 0){
 		if(head->semanticMeaning =="epsilon"){
-			std::cout<<"EPSIOLON"<<std::endl;
+			std::cout<<"EPSILON"<<std::endl;
 			node* parent = head->parent;
 
 

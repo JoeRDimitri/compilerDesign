@@ -45,12 +45,13 @@ public:
 
 };
 
-std::ostream& operator<<(std::ostream& os, token& t);
 
 //Lexor class
 class lexor {
-
 private:
+	static errorHandler erroneousHandler;
+	static fileHandler fileousHandler;
+
 	//Token map will be initialized with the buildTokenMap function.
 	//Will contain all of the mappings between the lexeme and the type. Except for intnum, floatnum, id, blockcmt since they need a more complex analysis.
 	static const std::unordered_map<std::string,std::string> tokenMap;
@@ -69,8 +70,6 @@ private:
 	static std::string currentLexeme;
 	static std::string possibleType;
 	static token currentToken;
-	static errorHandler errorHandler;
-	static fileHandler fileHandler;
 
 
 	//Function to check if the lexeme is a reserved word by looking into tokenMap.
@@ -107,6 +106,7 @@ private:
 
 
 public:
+
 	//Constructor
 	lexor(){};
 	//Destructor

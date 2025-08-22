@@ -10,54 +10,49 @@ bool first_and_follow::virgin = true;
 bool first_and_follow::change = true;
 int first_and_follow::lineIndex;
 
-
 bool first_and_follow::connectFile(std::string fileName){
+	if(inputFileStream.is_open()){
+		spdlog::info("The file is connected... Closing it first...");     // info level
+		inputFileStream.close();
+	}
+
+	inputFileStream.open(fileName);
 
 	if(inputFileStream.is_open()){
-			std::cout<<"The file is connected... Closing it first..."<<std::endl;
-			inputFileStream.close();
-		}
-
-	inputFileStream.open(fileName,std::ios::in);
-
-	if(inputFileStream){
-		std::cout<<"Successfully opened file: "<<fileName<<"."<<std::endl;
+		spdlog::info("Successfully opened file: {}.", fileName);     // info level
 		return true;
 	}
 	else{
-		std::cout<<"Failed to open file: "<<fileName<<"."<<std::endl;
+		spdlog::info("Failed to open file: {}.", fileName);     // info level
 		return false;
 	}
 }
+
 
 bool first_and_follow::disconnectFile(){
 
 	virgin = true;
 	if(!inputFileStream.is_open()){
-			std::cout<<"The file is not even connected. No need to close."<<std::endl;
+			spdlog::info("The file is not even connected. No need to close.");
 			return true;
 		}
 	inputFileStream.close();
 
 	if(!inputFileStream.is_open()){
-		std::cout<<"Successfully closed the inputFileStream."<<std::endl;
+		spdlog::info("Successfully closed the inputFileStream.");
 		return true;
 	}
 	else{
-		std::cout<<"Failed to close the inputFileStream."<<std::endl;
+		spdlog::warn("Failed to close the inputFileStream.");
 		return false;
 	}
-}
-
-void first_and_follow::updateHandler(int code) {
-    std::cout << "Lexor handling error: " << code << "\n";
 }
 
 bool first_and_follow::virginProtocol(){
 	//Get the file location from the user since it is the first time he is using it given we are in the virgin protocol().
 	std::string fileLocation;
-	std::cout<<"File Location:";
-	std::cin>>fileLocation;
+	std::cout<<"File Location of the properly formatted grammar:";
+	std::getline(std::cin, fileLocation);
 	//File Location acquired, check if we can properly connect.
 	if(connectFile(fileLocation)){
 		//We've properly connected to the file now we need to get rid of the white space and then hand control back over getNextToken().
@@ -76,6 +71,8 @@ void first_and_follow::getRidOfWhiteSpace(int&tempLineIndex){
 }
 
 void first_and_follow::generateFirstSet(){
+	spdlog::info("Generating First Set from the properly modified grammar.");
+
 
 	//Check if we've run this file before. IF we have not then we begin the virgin protocol
 	//Virgin protocol is used to get the establish file connection.
@@ -176,14 +173,16 @@ void first_and_follow::generateFirstSet(){
 
 				}
 				else{
-					std::cout<<"Error in the grammar, neither NT or T found at: "<<currentWord<<std::endl<<"line is: "<<line<<std::endl<<"lineIndex is "<<lineIndex<<std::endl;
+					spdlog::error("Error in the grammar, neither NT or T found at: {}",currentWord);
+					spdlog::error("line is: {}",line);
+					spdlog::error("lineIndex is {}",lineIndex);
 				}
 
 			}
 
 			else{
 				//If we are here then we did not reach the assignment operator after identfying the noterminal symbol there for there is an error in the grammar
-				std::cout<<"There is an error here in the grammar. Should have reach an assignment operator for the NT symbol: "<<currentWord<<std::endl;
+				spdlog::error("There is an error here in the grammar. Should have reach an assignment operator for the NT symbol: {}.",currentWord);
 				currentWord ="";
 				continue;
 			}
@@ -417,8 +416,66 @@ bool first_and_follow::checkForAssignment(){
 	}
 	return false;
 }
+bool first_and_follow::writeToFollowSetFile(){
+	std::string followSetFileName="followSet";
+	int followSetCounter = 0;
+    std::ofstream secondOutFile(followSetFileName); // Open file for writing
 
+	// Iterate over the map
+	    for (const auto& pair : this->followSet) {
+	    	followSetCounter++;
+
+	    	secondOutFile << "Key: " << pair.first << " -> Values: "<<std::endl;
+
+	        // Check if the pointer is valid before dereferencing
+	        if (pair.second) {
+	            for (const auto& value : *(pair.second)) {
+	            	secondOutFile << value << " "<<std::endl;
+	            }
+	        }
+	        secondOutFile << std::endl;
+	    }
+
+	    secondOutFile.close();
+	    if(followSetCounter == this->followSet.size()){
+	    	spdlog::info("Number of values written to followSet file match the size of the first set map.");
+	    	return true;
+	    }
+	    else{
+	    	spdlog::warn("Number of values written to followSet file did not match the size of the first set map.");
+	    	return false;
+	    }
+
+}
+bool first_and_follow::writeToFirstSetFile(){
+	std::string firstSetFileName="firstSet";
+	int firstSetCounter = 0;
+	std::ofstream outFile(firstSetFileName); // Open file for writing
+    for (const auto& pair : this->firstSet) {
+    	firstSetCounter++;
+    	outFile << "Key: " << pair.first << " -> Values: "<<std::endl;
+
+        // Check if the pointer is valid before dereferencing
+        if (pair.second) {
+            for (const auto& value : *(pair.second)) {
+            	outFile<< value << " "<<std::endl;
+            }
+        }
+        outFile << std::endl;
+    }
+    outFile.close();
+    if(firstSetCounter == this->firstSet.size()){
+    	spdlog::info("Number of values written to firstSet file match the size of the first set map.");
+    	return true;
+    }
+    else{
+    	spdlog::warn("Number of values written to firstSet file did not match the size of the first set map.");
+    	return false;
+    }
+
+}
 void first_and_follow::generateFollowSet(){
+	spdlog::info("Generating Follow Set from the properly modified grammar.");
 
 	//Check if we've run this file before. IF we have not then we begin the virgin protocol
 	//Virgin protocol is used to get the establish file connection.

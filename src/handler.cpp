@@ -1,13 +1,24 @@
 #include "handler.h"
+#include "lexor.h"    // Include here instead of in the header
 
 std::ifstream fileHandler::inputFileStream;
 bool fileHandler::virgin = true;
 
+char fileHandler::move(){
+	return this->inputFileStream.get();
+}
+
+std::ostream& operator<<(std::ostream& os, token& t)
+{
+	os<<"["<<t.getTypeName()<<","<<t.getLexeme()<<","<<t.getLine()<<","<<t.getColumn()<<"]";
+	return os;
+}
+
 bool fileHandler::virginProtocol(){
 	std::string fileLocation;
-	std::cout<<"File Location:";
+	std::cout<<"Enter the location of the script file you would like to parse : ";
 	//Get the file location from the user since it is the first time he is using it given we are in the virgin protocol().
-	std::cin>>fileLocation;
+	std::getline(std::cin, fileLocation);
 
 	//File Location acquired, check if we can properly c\onnect.
 	if(connectFile(fileLocation))

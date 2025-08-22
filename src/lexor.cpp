@@ -1,11 +1,6 @@
 #include "lexor.h"
 
 
-std::ostream& operator<<(std::ostream& os, token& t)
-{
-	os<<"["<<t.getTypeName()<<","<<t.getLexeme()<<","<<t.getLine()<<","<<t.getColumn()<<"]";
-	return os;
-}
 
 const std::unordered_map<std::string, std::string> lexor::tokenMap = {
     {"==","=="},{"+","+"},{"or","or"},{"(","("},{";",";"},{"int","int"},{"while","while"},
@@ -29,8 +24,8 @@ std::string lexor::currentLexeme;
 std::string lexor::possibleType;
 std::string errorHandler::errorFileName;
 std::string fileHandler::tokenFileName;
-errorHandler lexor:: errorHandler;
-fileHandler lexor::fileHandler;
+errorHandler lexor:: erroneousHandler;
+fileHandler lexor::fileousHandler;
 
 void lexor::getRidOfWhiteSpace(){
 	//Function that moves the input stream forward if it reads white space. white space values are 9-10-11-12-13-32
@@ -46,7 +41,7 @@ void lexor::getRidOfWhiteSpace(){
 			column = 0;
 		}
 		//Move the Input File pointer to the next character
-		currentCharacter = fileHandler.inputFileStream.get();
+		currentCharacter = fileousHandler.move();
 	}
 }
 
@@ -93,7 +88,7 @@ void lexor::setPossibleType(){
 
 void lexor::addAndMove(){
 	currentLexeme+=currentCharacter;
-	currentCharacter = fileHandler.inputFileStream.get();
+	currentCharacter = fileousHandler.move();
 	column++;
 }
 
@@ -102,7 +97,7 @@ int lexor::addAndMove(std::string & templexeme){
 	if(currentCharacter=='\r'){templexeme += "\\n";column = 0;}
 	else if(currentCharacter == '\n'){tempLineCounter++;}
 	else templexeme+=currentCharacter;
-	currentCharacter = fileHandler.inputFileStream.get();
+	currentCharacter = fileousHandler.move();
 	column++;
 	return tempLineCounter;
 }
@@ -115,7 +110,7 @@ token* lexor::errorProtocol(std::string type){
 
 	if(type.compare("id")==0){
 		token * t = new token("invalidid",tempLexeme,line,column);
-		errorHandler.handleError("Lexical error", "Invalid Identifier",tempLexeme, line, column, t);
+		erroneousHandler.handleError("Lexical error", "Invalid Identifier",tempLexeme, line, column, t);
 		return t;
 	}
 	else if(type.compare("intnum")==0){
@@ -124,17 +119,17 @@ token* lexor::errorProtocol(std::string type){
 			while(!isWhiteSpace()&&!isReservedWord()&&currentCharacter != '=')addAndMove(tempLexeme);
 		}
 		token * t = new token("invalidnum",tempLexeme,line,column);
-		errorHandler.handleError("Lexical error", "Invalid Number",tempLexeme, line, column,t);
+		erroneousHandler.handleError("Lexical error", "Invalid Number",tempLexeme, line, column,t);
 		return t;
 	}
 	else if(type.compare("frac")==0){
 		token * t = new token("invalidnum",tempLexeme,line,column);
-		errorHandler.handleError("Lexical error", "Invalid Number",tempLexeme, line, column,t);
+		erroneousHandler.handleError("Lexical error", "Invalid Number",tempLexeme, line, column,t);
 		return t;
 	}
 	else if(type.compare("invChar")==0){
 		token * t = new token("invalidchar",tempLexeme,line,column);
-		errorHandler.handleError("Lexical error", "Invalid Character",tempLexeme, line, column,t);
+		erroneousHandler.handleError("Lexical error", "Invalid Character",tempLexeme, line, column,t);
 		return t;
 	}
 }
@@ -147,49 +142,49 @@ token* lexor::validToken(std::string type, int lineCounter){
 	if(type.compare("id")==0){
 		if(isReservedWord(tempLexeme)) {
 			token* t = new token(tokenMap.at(tempLexeme),tempLexeme,line,column);
-			fileHandler.writeToken(t);
+			fileousHandler.writeToken(t);
 			return t;
 		}
 		else{
 			token* t = new token("id",tempLexeme,line,column);
-			fileHandler.writeToken(t);
+			fileousHandler.writeToken(t);
 			return t;
 		}
 	}
 	else if (type.compare("intnum")==0){
 		token* t = new token("intnum",tempLexeme,line,column);
-		fileHandler.writeToken(t);
+		fileousHandler.writeToken(t);
 		return t;
 	}
 	else if (type.compare("frac")==0){
 		token* t = new token("floatnum",tempLexeme,line,column);
-		fileHandler.writeToken(t);
+		fileousHandler.writeToken(t);
 		return t;
 	}
 	else if(type.compare("res")==0){
 		std::string value = tokenMap.at(tempLexeme);
 		token* t =  new token(value,tempLexeme,line,column);
-		fileHandler.writeToken(t);
+		fileousHandler.writeToken(t);
 		return t;
 	}
 	else if(type.compare("linecomment")==0){
 		getLine(tempLexeme);
 		token* t = new token("linecomment",tempLexeme,line, column);
-		fileHandler.writeToken(t);
+		fileousHandler.writeToken(t);
 		column = 0;
 		return t;
 	}
 
 	else if(type.compare("blockcomment")==0){
 		token* t = new token("blockcmt",tempLexeme,line,column);
-		fileHandler.writeToken(t);
+		fileousHandler.writeToken(t);
 		line+=lineCounter;
 		return t;
 	}
 }
 
 void lexor::getLine(std::string &tempLexeme){
-	while(currentCharacter != '\r' && currentCharacter!='\n'&&!fileHandler.inputFileStream.eof()){
+	while(currentCharacter != '\r' && currentCharacter!='\n'&&!fileousHandler.checkEndOfStream()){
 		addAndMove(tempLexeme);
 	}
 }
@@ -211,7 +206,7 @@ token* lexor::id(){
 	 * 2. We might've reached a special character, in that case we can simply return from thins functino since we have found a proper lexeme
 	 * 3. else*/
 
-	if(fileHandler.checkEndOfStream()||isWhiteSpace()){}
+	if(fileousHandler.checkEndOfStream()||isWhiteSpace()){}
 	else if(isReservedWord()){}
 	else{return errorProtocol("id");}
 	return validToken("id");
@@ -233,7 +228,7 @@ token* lexor::num(int decision){
 		if(decision == 0){
 			if(currentCharacter =='.')return fraction();
 		}
-		if(fileHandler.checkEndOfStream()||isWhiteSpace()||isReservedWord()){return validToken("intnum");}
+		if(fileousHandler.checkEndOfStream()||isWhiteSpace()||isReservedWord()){return validToken("intnum");}
 
 		else{return errorProtocol("intnum");}
 	}
@@ -251,7 +246,7 @@ token* lexor::num(int decision){
 		if(decision == 0){
 		if(currentCharacter =='.')return fraction();
 		}
-		if(isWhiteSpace()||isReservedWord()||fileHandler.checkEndOfStream()){return validToken("intnum");}
+		if(isWhiteSpace()||isReservedWord()||fileousHandler.checkEndOfStream()){return validToken("intnum");}
 
 		else{return errorProtocol("intnum");}
 
@@ -284,7 +279,7 @@ token* lexor::fraction(){
 		else if(currentLexeme.back() == '0'){return errorProtocol("frac");}
 
 		//If we reach a white space or a reserve word we've reached the end of the lexeme
-		else if(isWhiteSpace()||isReservedWord()||fileHandler.checkEndOfStream()){return validToken("frac");}
+		else if(isWhiteSpace()||isReservedWord()||fileousHandler.checkEndOfStream()){return validToken("frac");}
 		else{return errorProtocol("frac");}
 	}
 	//Anything that is not a number is an error.
@@ -369,13 +364,13 @@ token* lexor::cmt(){
 				return validToken("blockcomment",lineCounter);
 			}
 
-			if(fileHandler.checkEndOfStream())
+			if(fileousHandler.checkEndOfStream())
 				return errorProtocol("eof");
 
-			while(currentCharacter != '*'&&currentCharacter != '/'&&!fileHandler.checkEndOfStream()){
+			while(currentCharacter != '*'&&currentCharacter != '/'&&!fileousHandler.checkEndOfStream()){
 				lineCounter += addAndMove(currentLexeme);
 			}
-			if(fileHandler.checkEndOfStream())
+			if(fileousHandler.checkEndOfStream())
 				continue;
 			else if(currentCharacter == '*'){
 				addAndMove(currentLexeme);
@@ -415,26 +410,26 @@ token* lexor:: getNextToken(){
 	//Check if we've run this file before. IF we have not then we begin the virgin protocol
 	//Virgin protocol is used to get the establish file connection.
 	//If the virginf protocol fails then we've already established a connection to the file.
-	if(fileHandler.virgin == true){
+	if(fileousHandler.virgin == true){
 		//Virgin set to false so that we never enter this code again.
-		fileHandler.virgin = false;
+		fileousHandler.virgin = false;
 
 		//If the virgin protocol fails, then we were not able to establish a connection to the file. The program should close
-		if(!fileHandler.virginProtocol())throw std::invalid_argument("Invalid File location");
+		if(!fileousHandler.virginProtocol())throw std::invalid_argument("Invalid File location");
 		else{
 			//We are good to begin the process.
 			//Get rid of white spaces
 			//set line and column to 0
 			line = 1;
 			column = 0;
-			currentCharacter = fileHandler.inputFileStream.get();
+			currentCharacter = fileousHandler.move();
 			currentLexeme = "";
 		}
 	}
 	//Get rid of all white space.
 	getRidOfWhiteSpace();
 
-	if(fileHandler.checkEndOfStream()){
+	if(fileousHandler.checkEndOfStream()){
 		spdlog::warn("Reached end of Stream.");        // warn level
 		throw EndOfFileException();
 	}

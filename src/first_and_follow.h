@@ -51,14 +51,14 @@ private:
 	std::vector<std::string> * findFollowSet(std::string);
 	void compareAndAdd(std::vector<std::string>* v1, std::vector<std::string>* v2);
 	bool hasEpsilon(std::vector<std::string> * v);
-	bool virginProtocol();
 public:
 	bool static inVector(std::vector<std::string> * v, const std::string s = currentSymbol);
 
 	static std::unordered_map<std::string, std::vector<std::string>*> firstSet;
 	static std::unordered_map<std::string, std::vector<std::string>*> followSet;
 
-
+	bool writeToFirstSetFile();
+	bool writeToFollowSetFile();
 	void generateFirstSet();
 	void generateFollowSet();
 
